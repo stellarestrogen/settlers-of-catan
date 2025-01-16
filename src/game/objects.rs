@@ -37,76 +37,10 @@ pub enum DevCardType {
 
 #[derive(Clone)]
 #[derive(Copy)]
-pub enum Edge {
-    Road,
-    None,
-}
-
-#[derive(Clone)]
-#[derive(Copy)]
 pub enum Building {
    Settlement,
    City,
    None,
-}
-
-#[derive(Clone)]
-#[derive(Copy)]
-pub struct Corner {
-    building: Option<Building>,
-    trade_type: Option<TradeType>
-}
-
-impl Corner {
-    pub fn new() -> Self {
-        Corner {
-            building: None,
-            trade_type: None,
-        }
-    }
-
-    pub fn set_building(&mut self, building: Option<Building>) {
-        self.building = building
-    }
-
-    pub fn set_trade(&mut self, trade: Option<TradeType>) {
-        self.trade_type = trade
-    }
-}
-
-#[derive(Clone)]
-#[derive(Copy)]
-pub struct Tile {
-    tile_type: TileType,
-    roll_number: i32,
-}
-
-impl Tile {
-    pub fn new(tile_type: TileType) -> Self {
-        Tile {
-            tile_type,
-            roll_number: 0
-        }
-    }
-
-    pub fn get_tile_type(&self) -> TileType {
-        self.tile_type
-    }
-
-    pub fn get_roll_num(&self) -> i32 {
-        self.roll_number
-    }
-
-    pub fn get_tile_resource(&self) -> Option<ResourceType> {
-        match self.tile_type {
-            TileType::Resource(resource) => Some(resource),
-            _ => None
-        }
-    }
-
-    pub fn set_roll_num(&mut self, roll: i32) {
-        self.roll_number = roll;
-    }
 }
 
 #[derive(Clone)]
