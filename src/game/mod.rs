@@ -1,6 +1,13 @@
 pub mod objects;
 pub mod player;
+pub mod board_old;
 pub mod board;
+pub mod tile_old;
 pub mod tile;
+pub mod edge_old;
 pub mod edge;
+pub mod corner_old;
 pub mod corner;
+pub mod game;
+pub mod resource;
+pub mod draw_iters;

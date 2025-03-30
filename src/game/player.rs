@@ -1,5 +1,5 @@
 use super::objects::*;
-use super::board::{MAX_ROADS, MAX_SETTLEMENTS, MAX_CITIES};
+use super::board_old::{MAX_ROADS, MAX_SETTLEMENTS, MAX_CITIES};
 
 #[derive(Clone)]
 #[derive(Copy)]

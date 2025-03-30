@@ -1,8 +1,6 @@
 use super::player::PlayerColor;
 
-#[derive(Clone)]
-#[derive(Copy)]
-
+#[derive(Clone, Copy, PartialEq)]
 pub enum ResourceType {
     Wood,
     Brick,
@@ -11,10 +9,41 @@ pub enum ResourceType {
     Ore,
 }
 
+impl ResourceType {
+    pub fn get_resource_distribution(&self, size: impl Into<f64>) -> u32 {
+        match self {
+            Self::Wood => (size.into()/5.0).round() as u32,
+            Self::Brick => (size.into()/6.0).round() as u32,
+            Self::Wheat => (size.into()/5.0).round() as u32,
+            Self::Sheep => (size.into()/5.0).round() as u32,
+            Self::Ore => (size.into()/6.0).round() as u32
+        }
+    }
+}
+
+#[derive(Clone)]
+pub struct ResourceDistribution {
+    distribution: [(ResourceType, u32); 5]
+}
+
+impl ResourceDistribution {
+    pub fn new(distribution: [(ResourceType, u32); 5]) -> Self {
+        ResourceDistribution {
+            distribution
+        }
+    }
+
+    pub fn for_resource(&self, resource: ResourceType) -> u32 {
+        let default = (resource, 0);
+        let (_, d) = self.distribution.iter().find(|(rsrc, _)| rsrc == &resource).unwrap_or(&default);
+        *d
+    }
+}
+
 #[derive(Clone)]
 #[derive(Copy)]
 pub enum TileType {
-    Resource(ResourceType),
+    Resource { resource: ResourceType, roll_number: u32 },
     Desert,
     Water,
 }

@@ -1,154 +1,143 @@
-#[derive(Clone)]
-#[derive(Copy)]
-pub enum Edge {
+#[derive(Clone, Copy)]
+pub enum Transport {
     Road,
-    None,
+    Boat
+}
+
+pub struct Edge {
+    transport: Option<Transport>
+}
+
+impl Edge {
+    pub fn new() -> Self {
+        Edge {
+            transport: None
+        }
+    }
+
+    pub fn set_transport(&mut self, transport: Transport) {
+        self.transport = Some(transport)
+    }
+
+    pub fn unset_transport(&mut self) {
+        self.transport = None
+    }
+}
+
+#[derive(Clone, Copy)]
+pub struct EdgePosition {
+    rights: i32,
+    downs: i32
+}
+
+impl EdgePosition {
+    pub fn new(rights: i32, downs: i32) -> Self {
+        EdgePosition {
+            rights,
+            downs
+        }
+    }
+
+    pub fn is_valid(&self) -> bool {
+        (self.rights % 2 == 0 && self.downs % 2 == 0) ||(self.rights % 2 == 1 && self.downs % 2 == 1 && (self.rights + self.downs) % 4 == 0)
+    }
+
+    pub fn calc_distance(&self, other: Self) -> i32 {
+        ((self.rights - other.get_rights()).abs() + (self.downs - other.get_downs()).abs())
+        .checked_div(2)
+        .unwrap()
+    }
+
+    pub fn get_rights(&self) -> i32 {
+        self.rights
+    }
+
+    pub fn get_downs(&self) -> i32 {
+        self.downs
+    }
+
+    pub fn calc_adjacent_edges(&self) -> Vec<EdgePosition> {
+        let edges = [
+            EdgePosition::new(self.rights - 1, self.downs + 1),
+            EdgePosition::new(self.rights + 1, self.downs + 1),
+            EdgePosition::new(self.rights + 2, self.downs),
+            EdgePosition::new(self.rights - 2, self.downs),
+            EdgePosition::new(self.rights - 1, self.downs - 1),
+            EdgePosition::new(self.rights + 1, self.downs - 1)
+        ];
+
+        edges.into_iter()
+        .filter(|r| r.is_valid() )
+        .collect()
+
+    }
 }
 
 pub struct EdgeHolder {
     edges: Vec<Edge>,
-    total_edges: u32,
-    row_length_horizontal: u32,
-    row_count_horizontal: u32,
-    row_length_vertical: u32,
-    row_count_vertical: u32,
-
+    length: u32,
+    width: u32,
 }
 
 impl EdgeHolder {
-    pub fn new() -> Self {
+    pub fn new(length: u32, width: u32) -> Self {
+        let edges = Vec::with_capacity(((length + (length + 1)/2) * width - 2) as usize);
         EdgeHolder {
-            edges: Vec::<Edge>::new(),
-            total_edges: 0,
-            row_length_horizontal: 0,
-            row_count_horizontal: 0,
-            row_length_vertical: 0,
-            row_count_vertical: 0,
+            edges,
+            length,
+            width
         }
     }
 
-    pub fn clear(&mut self) {
-        self.edges.clear();
-        self.total_edges = 0;
-        self.row_length_horizontal = 0;
-        self.row_count_horizontal = 0;
-        self.row_length_vertical = 0;
-        self.row_count_vertical = 0;
+    fn calc_index(&self, position: EdgePosition) -> Option<usize> {
+        let rights: isize = position.get_rights().try_into().ok()?;
+        let downs: isize = position.get_downs().try_into().ok()?;
+        let length_h: isize = self.length.try_into().ok()?;
+        let length_v: isize = self.get_vertical_length().try_into().ok()?;
 
-    }
-
-    /// sets the length of a row for each vector of edges based on the length of a tile row.
-    pub fn set_row_length(&mut self, length: u32) {
-        self.row_length_horizontal = length * 2 + 1;
-        self.row_length_vertical = length + 1;
-    }
-
-    /// sets the number of rows for each vector of edges based on the number of tile rows.
-    pub fn set_row_count(&mut self, count: u32) {
-        self.row_count_horizontal = count + 1;
-        self.row_count_vertical = count;
-    }
-
-    pub fn setup(&mut self, length: u32, count: u32) {
-        self.set_row_length(length);
-        self.set_row_count(count);
-        // the `-2` is due to the fact the top and bottom rows of edges (which are always horizontal) have 1 less edge in them.
-        self.total_edges = self.row_length_horizontal * self.row_count_horizontal + self.row_length_vertical * self.row_count_vertical - 2;
-    }
-
-    /// Generates the array. Edges will be utilized such that horizontal and vertical edges are stored "together"
-    /// For example, if you had a 3x5 board, there would be 11 horizontal edges per row, and 6 vertical edges per row, with a total of 6 rows. 
-    /// The only exception to this is the first and last row of edges; they contain 1 less edge each due to not having a row above/below them.
-    pub fn generate(&mut self, length: u32, count: u32) {
-        self.setup(length, count);
-        self.edges.reserve(self.total_edges as usize);
-
-        for _ in 0..self.edges.capacity() {
-            self.edges.push(Edge::None);
-        }
-    
-    }
-    
-    pub fn build_road (&mut self, idx: u32) {
-        self.edges[idx as usize] = Edge::Road;
-    }
-
-    fn calc_row(&self, idx: u32) -> u32 {
-        // the first row of horizontal edges having 1 less edge than the rest causes another off-by-one. 
-        (idx + 1) / (self.row_length_horizontal + self.row_length_vertical)
-    }
-
-    fn calc_row_idx(&self, idx: u32) -> u32 {
-        if self.calc_row(idx) == 0 && idx < self.row_length_horizontal - 1 { return idx };
-        let row_length = self.row_length_horizontal + self.row_length_vertical;
-        let edge = (idx + 1) % row_length;
-        if edge >= self.row_length_horizontal {
-            edge - self.row_length_horizontal
+        if position.is_valid() && self.is_edge_position_valid(position) {
+            ((downs.checked_div(2)? + downs % 2) * length_h + downs.checked_div(2)? * length_v + if downs % 2 == 0 { rights.checked_div(2)? } else { rights - (rights.checked_div(3)? * 3) })
+            .try_into()
+            .ok()
         } else {
-            edge
+            None
         }
     }
 
-    fn is_edge_vertical(&self, idx: u32) -> bool {
-        let row_length = self.row_length_horizontal + self.row_length_vertical;
-        // the first row of horizontal edges having 1 less edge than the rest causes an off-by-one. 
-        (idx + 1) % row_length >= self.row_length_horizontal
+    pub fn calc_adjacent_edges(&self, position: EdgePosition) -> Vec<EdgePosition> {
+        position.calc_adjacent_edges()
+        .into_iter()
+        .filter(|p| self.is_edge_position_valid(*p) )
+        .collect()
     }
 
-    /// this will only generate valid results if the edge is vertical!
-    fn find_adjacent_edges(&self, idx: u32) -> [Option<u32>; 4] {
-        let row = self.calc_row(idx);
-        let row_idx = self.calc_row_idx(idx);
-        let mut adjacent_edges: [Option<u32>; 4] = if row % 2 == 0 {
-            [
-                Some(idx.saturating_sub(self.row_length_horizontal) + row_idx),
-                Some(idx.saturating_sub(self.row_length_horizontal - 1) + row_idx),
-                Some(idx + self.row_length_vertical + row_idx),
-                Some(idx + (self.row_length_vertical + 1) + row_idx)
-            ]
-        } else {
-            [
-                Some(idx.saturating_sub(self.row_length_horizontal + 1) + row_idx),
-                Some(idx.saturating_sub(self.row_length_horizontal) + row_idx),
-                Some(idx + (self.row_length_vertical - 1) + row_idx),
-                Some(idx + self.row_length_vertical + row_idx)
-            ]
-        };
-        
-        for edge in 0..adjacent_edges.len() {
-            // validity check. all of these edges that are adjacent to the vertical edge must be horizontal. if they are not, set to None to indicate it's invalid.
-            // this is because not all vertical edges have 4 adjacent edges. some only have 2 or 3, and any edge produced by the method above will be vertical if it is not actually adjacent.
-            if self.is_edge_vertical(adjacent_edges[edge].unwrap()) || adjacent_edges[edge].unwrap() >= self.total_edges { 
-                adjacent_edges[edge] = None; 
-            } 
-        }
-
-        adjacent_edges
+    pub fn get(&self, position: EdgePosition) -> Option<&Edge> {
+        Some(&self.edges[self.calc_index(position)?])
     }
 
-    /// determine if 2 edges are adjacent
-    pub fn is_edge_adjacent(&self, first: u32, second: u32) -> bool {
-        if self.is_edge_vertical(first) && self.is_edge_vertical(second) {
-            // 2 vertical edges cannot be adjacent.
-            return false; 
-        } else if !self.is_edge_vertical(first) && !self.is_edge_vertical(second) {
-            // if both edges are horizontal, we simply have to check if they are next to each other.
-            return first.abs_diff(second) <= 1
-        } else {
-            // most complex case, where one edge is vertical and one edge is horizontal
-            let (vertical_edge, horizontal_edge) = if self.is_edge_vertical(first) { (first, second) } else { (second, first) };
-            
-            // find all of the edges that border the vertical edge
-            for edge in self.find_adjacent_edges(vertical_edge) {
-                // check if any of the edges are equal to the horizontal edge. if so, return true!
-                match edge {
-                    Some(value) => if value == horizontal_edge { return true; } else { continue; },
-                    None => continue,
-                }
-            }
-
-            false
-        }
+    pub fn get_mut(&mut self, position: EdgePosition) -> Option<&mut Edge> {
+        let idx = self.calc_index(position)?;
+        Some(&mut self.edges[idx])
     }
 
+    fn is_edge_position_valid(&self, position: EdgePosition) -> bool {
+        position.get_rights().checked_div(2).unwrap_or_default() <= self.length.try_into().unwrap_or_default() && position.get_downs().checked_div(2).unwrap_or_default() <= self.width.try_into().unwrap_or_default()
+    }
+
+    /// Get the number of edges in a "vertical row".
+    fn get_vertical_length(&self) -> u32 {
+        // due to the way a hexagonal board works, `length` is guaranteed to be an odd number.
+        (self.length + 1)/2
+    }
+
+    /// Get the number of rows of vertical edges.
+    /// Currently unused.
+    fn get_vertical_width(&self) -> u32 {
+        self.width - 1
+    }
+
+    /// Get the total number of edges.
+    pub fn get_size(&self) -> usize {
+        ((self.length * self.width - 2) + self.get_vertical_length() * self.get_vertical_width()) as usize
+    }
 }
