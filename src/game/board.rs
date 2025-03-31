@@ -1,4 +1,7 @@
-use super::{corner::CornerHolder, edge::EdgeHolder, game::GameEdition, resource::ResourceDeck, tile::TileHolder};
+use super::{
+    corner::CornerHolder, edge::EdgeHolder, game::GameEdition, resource::ResourceDeck,
+    tile::holder::TileHolder,
+};
 
 pub struct Board {
     corners: CornerHolder,
@@ -17,22 +20,19 @@ impl Board {
         Board {
             corners: CornerHolder::new(length_corner, width_corner),
             edges: EdgeHolder::new(length_edge, width_edge),
-            tiles: Self::create_tiles(edition)
+            tiles: Self::create_tiles(edition),
         }
     }
-
 
     fn create_tiles(edition: impl GameEdition) -> TileHolder {
         let mut tiles = TileHolder::new(edition.get_board_length(), edition.get_board_width());
         let mut resource_deck = ResourceDeck::new(&edition);
         let mut iter = edition.get_tile_draw_iter();
-        
+
         while let Some(p) = iter.next() {
             tiles[p] = resource_deck.draw();
         }
 
         tiles
     }
-
-
 }

@@ -1,9 +1,9 @@
-use super::tile::{Tile, TilePosition};
+use super::tile::{Tile, position::TilePosition};
 
 #[derive(Clone, Copy)]
 enum RingDistance {
     Side,
-    Top
+    Top,
 }
 
 const DIRECTIONS: [(TilePosition, RingDistance); 6] = [
@@ -12,7 +12,7 @@ const DIRECTIONS: [(TilePosition, RingDistance); 6] = [
     (TilePosition::DOWN_LEFT, RingDistance::Side),
     (TilePosition::LEFT, RingDistance::Top),
     (TilePosition::UP_LEFT, RingDistance::Side),
-    (TilePosition::UP_RIGHT, RingDistance::Side)
+    (TilePosition::UP_RIGHT, RingDistance::Side),
 ];
 
 #[derive(Clone, Copy)]
@@ -21,7 +21,7 @@ pub struct Ring {
     shortest: u32,
     longest: u32,
     remaining: u32,
-    direction_index: u8
+    direction_index: u8,
 }
 
 impl Ring {
@@ -31,7 +31,7 @@ impl Ring {
             shortest,
             longest,
             remaining: shortest,
-            direction_index: 0
+            direction_index: 0,
         }
     }
 }
@@ -43,18 +43,17 @@ impl Iterator for Ring {
         if self.remaining == 0 {
             self.direction_index += 1;
             if self.direction_index >= 6 {
-                return None
+                return None;
             }
             let (dir, ring_dist) = DIRECTIONS[self.direction_index as usize];
             match ring_dist {
                 RingDistance::Top => self.remaining = self.shortest - 1,
-                RingDistance::Side => self.remaining = self.longest - self.shortest
+                RingDistance::Side => self.remaining = self.longest - self.shortest,
             }
 
             if dir == TilePosition::UP_RIGHT {
                 self.remaining -= 1;
             }
-            
         }
 
         let (dir, _) = DIRECTIONS[self.direction_index as usize];
@@ -68,7 +67,7 @@ pub struct CircularOrbit {
     position: TilePosition,
     shortest: u32,
     longest: u32,
-    ring: Ring
+    ring: Ring,
 }
 
 impl CircularOrbit {
@@ -77,7 +76,7 @@ impl CircularOrbit {
             position,
             shortest,
             longest,
-            ring: Ring::new(position, shortest, longest)
+            ring: Ring::new(position, shortest, longest),
         }
     }
 }
