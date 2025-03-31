@@ -1,6 +1,4 @@
-use std::iter;
-
-use super::{objects::{ResourceDistribution, ResourceType}, tile::TilePosition};
+use super::{draw_iters::CircularOrbit, objects::{ResourceDistribution, ResourceType}, tile::TilePosition};
 
 const ROLL_ORDER_BASE: [u32; 18] = [
     5, 2, 6, 3, 8, 10, 9, 12, 11,
@@ -28,7 +26,7 @@ pub trait GameEdition {
     fn get_board_width(&self) -> u32;
     fn get_resource_distribution(&self) -> ResourceDistribution;
     fn get_roll_numbers(&self) -> Vec<u32>;
-    fn get_tile_draw_iter(&self) -> impl Iterator;
+    fn get_tile_draw_iter(&self) -> impl Iterator<Item = TilePosition>;
 }
 
 pub struct BaseEdition {
@@ -37,6 +35,7 @@ pub struct BaseEdition {
     width: u32,
     rsrc_distr: ResourceDistribution,
     roll_numbers: Vec<u32>,
+    iter: CircularOrbit
 }
 
 impl BaseEdition {
@@ -54,7 +53,8 @@ impl BaseEdition {
                     (ResourceType::Ore, 3)
                 ]
             ),
-            roll_numbers: ROLL_ORDER_REVERSE.to_vec()
+            roll_numbers: ROLL_ORDER_REVERSE.to_vec(),
+            iter: CircularOrbit::new(TilePosition::RIGHT, 3, 5)
         }
     }
 }
@@ -80,6 +80,10 @@ impl GameEdition for BaseEdition {
         self.roll_numbers.clone()
     }
 
+    fn get_tile_draw_iter(&self) -> impl Iterator<Item = TilePosition> {
+        self.iter
+    }
+
 }
 
 pub struct ExpansionEdition {
@@ -87,7 +91,8 @@ pub struct ExpansionEdition {
     length: u32,
     width: u32,
     rsrc_distr: ResourceDistribution,
-    roll_numbers: Vec<u32>
+    roll_numbers: Vec<u32>,
+    iter: CircularOrbit
 }
 
 impl ExpansionEdition {
@@ -105,7 +110,8 @@ impl ExpansionEdition {
                     (ResourceType::Ore, 5)
                 ]
             ),
-            roll_numbers: ROLL_ORDER_EXP_REVERSE.to_vec()
+            roll_numbers: ROLL_ORDER_EXP_REVERSE.to_vec(),
+            iter: CircularOrbit::new(TilePosition::RIGHT, 3, 6)
         }
     }
 }
@@ -130,22 +136,29 @@ impl GameEdition for ExpansionEdition {
     fn get_roll_numbers(&self) -> Vec<u32> {
         self.roll_numbers.clone()
     }
+
+    fn get_tile_draw_iter(&self) -> impl Iterator<Item = TilePosition> {
+        self.iter
+    }
 }
 
 pub struct CustomEdition {
     shortest: u32,
     longest: u32,
     rsrc_distr: ResourceDistribution,
-    roll_numbers: Vec<u32>
+    roll_numbers: Vec<u32>,
+    iter: CircularOrbit 
 }
 
 impl CustomEdition {
     pub fn new(shortest: u32, longest: u32, rsrc_distr: ResourceDistribution, roll_numbers: Vec<u32>) -> Self {
+        let position = TilePosition::DOWN_LEFT * ((longest - shortest)/2 + 1) + TilePosition::DOWN_RIGHT * ((longest - shortest)/2) + TilePosition::UP_RIGHT * (longest - shortest);
         CustomEdition {
             shortest,
             longest,
             rsrc_distr,
-            roll_numbers
+            roll_numbers,
+            iter: CircularOrbit::new(position, shortest, longest)
         }
     }
 }
@@ -169,5 +182,9 @@ impl GameEdition for CustomEdition {
 
     fn get_roll_numbers(&self) -> Vec<u32> {
         self.roll_numbers.clone()
+    }
+
+    fn get_tile_draw_iter(&self) -> impl Iterator<Item = TilePosition> {
+        self.iter
     }
 }

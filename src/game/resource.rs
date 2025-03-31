@@ -11,21 +11,21 @@ pub struct ResourceDeck {
 }
 
 impl ResourceDeck {
-    pub fn new(edition: impl GameEdition) -> Self {
+    pub fn new(edition: &impl GameEdition) -> Self {
         ResourceDeck {
             resources: Self::create_tiles(edition)
         }
     }
 
-    pub fn draw(&mut self) -> Option<Tile> {
-        self.resources.pop()
+    pub fn draw(&mut self) -> Tile {
+        self.resources.pop().expect("No more resources to draw from ResourceDeck!")
     }
 
     pub fn into_vec(self) -> Vec<Tile> {
         self.resources
     }
 
-    fn create_tiles(edition: impl GameEdition) -> Vec<Tile> {
+    fn create_tiles(edition: &impl GameEdition) -> Vec<Tile> {
         let mut resources = Vec::<Option<ResourceType>>::with_capacity(edition.get_board_size() as usize);
         let distr = edition.get_resource_distribution();
         for resource in RESOURCES {

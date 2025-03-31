@@ -24,8 +24,15 @@ impl Board {
 
     fn create_tiles(edition: impl GameEdition) -> TileHolder {
         let mut tiles = TileHolder::new(edition.get_board_length(), edition.get_board_width());
-        let mut resource_deck = ResourceDeck::new(edition);
+        let mut resource_deck = ResourceDeck::new(&edition);
+        let mut iter = edition.get_tile_draw_iter();
         
+        while let Some(p) = iter.next() {
+            tiles[p] = resource_deck.draw();
+        }
+
+        tiles
     }
+
 
 }

@@ -52,13 +52,13 @@ pub struct TilePosition {
 }
 
 impl TilePosition {
-    const ORIGIN: TilePosition = TilePosition { rights: 0, downs: 0 };
-    const RIGHT: TilePosition = TilePosition { rights: 1, downs: 0 };
-    const DOWN_RIGHT: TilePosition = TilePosition { rights: 1, downs: 1 };
-    const DOWN_LEFT: TilePosition = TilePosition { rights: 0, downs: 1 };
-    const LEFT: TilePosition = TilePosition { rights: -1, downs: 0 };
-    const UP_LEFT: TilePosition = TilePosition { rights: 0, downs: -1 };
-    const UP_RIGHT: TilePosition = TilePosition { rights: 1, downs: -1 };
+    pub const ORIGIN: TilePosition = TilePosition { rights: 0, downs: 0 };
+    pub const RIGHT: TilePosition = TilePosition { rights: 1, downs: 0 };
+    pub const DOWN_RIGHT: TilePosition = TilePosition { rights: 1, downs: 1 };
+    pub const DOWN_LEFT: TilePosition = TilePosition { rights: 0, downs: 1 };
+    pub const LEFT: TilePosition = TilePosition { rights: -1, downs: 0 };
+    pub const UP_LEFT: TilePosition = TilePosition { rights: 0, downs: -1 };
+    pub const UP_RIGHT: TilePosition = TilePosition { rights: 1, downs: -1 };
 
     pub fn horizontal_distance(&self, other: TilePosition) -> HorizontalDistance {
         let dist = (self.rights - other.rights).abs();
@@ -168,6 +168,7 @@ scalar_operations!(u128);
 scalar_operations!(i64);
 scalar_operations!(u64);
 scalar_operations!(i32);
+scalar_operations!(u32);
 scalar_operations!(i16);
 scalar_operations!(u16);
 scalar_operations!(i8);
