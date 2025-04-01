@@ -1,5 +1,6 @@
 pub mod holder;
 pub mod position;
+pub mod bounds;
 
 use super::objects::TileType;
 

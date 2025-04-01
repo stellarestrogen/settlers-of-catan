@@ -1,4 +1,4 @@
-use horizontal_distance::HorizontalDistance;
+pub use horizontal_distance::HorizontalDistance;
 
 pub mod horizontal_distance;
 pub mod op_add;
@@ -60,4 +60,30 @@ impl TilePosition {
     pub fn vertical_distance(&self, other: TilePosition) -> i32 {
         self.downs - other.downs
     }
+
+    pub fn is_left(&self, other: TilePosition) -> bool {
+        self.horizontal_distance(other).ceil() < 0
+    }
+
+    pub fn is_right(&self, other: TilePosition) -> bool {
+        self.horizontal_distance(other).ceil() > 0
+    }
+
+    pub fn is_same_column(&self, other: TilePosition) -> bool {
+        self.horizontal_distance(other).ceil() == 0
+    }
+
+    pub fn is_above(&self, other: TilePosition) -> bool {
+        self.vertical_distance(other) < 0
+    }
+
+    pub fn is_below(&self, other: TilePosition) -> bool {
+        self.vertical_distance(other) > 0
+    }
+
+    pub fn is_same_row(&self, other: TilePosition) -> bool {
+        self.vertical_distance(other) == 0
+    }
+
+   
 }
