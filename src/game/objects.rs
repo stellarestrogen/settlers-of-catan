@@ -40,16 +40,14 @@ impl ResourceDistribution {
     }
 }
 
-#[derive(Clone)]
-#[derive(Copy)]
+#[derive(Clone, Copy)]
 pub enum TileType {
     Resource { resource: ResourceType, roll_number: u32 },
     Desert,
     Water,
 }
 
-#[derive(Copy)]
-#[derive(Clone)]
+#[derive(Clone, Copy)]
 pub enum TradeType {
     Resource(ResourceType),
     Any,
@@ -64,16 +62,20 @@ pub enum DevCardType {
     BuildRoads,
 }
 
-#[derive(Clone)]
-#[derive(Copy)]
+#[derive(Clone, Copy)]
+pub enum Transport {
+    Road,
+    Boat
+}
+
+#[derive(Clone, Copy)]
 pub enum Building {
    Settlement,
    City,
    None,
 }
 
-#[derive(Clone)]
-#[derive(Copy)]
+#[derive(Clone, Copy)]
 pub struct ResourceCard {
     resource_type: ResourceType,
     count: i32
