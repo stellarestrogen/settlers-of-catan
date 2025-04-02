@@ -1,4 +1,4 @@
-use super::{resource::ResourceDeck, tile::{position::TilePosition, Tile}};
+use super::tile::{position::TilePosition, Tile};
 
 #[derive(Clone, Copy)]
 enum RingDistance {
@@ -62,17 +62,16 @@ impl Iterator for Ring {
     }
 }
 
-#[derive(Clone)]
-pub struct CircularOrbit {
+pub struct CircularOrbit<T: Iterator<Item = Tile>> {
     position: TilePosition,
-    tiles: Vec<Tile>,
+    tiles: T,
     shortest: u32,
     longest: u32,
     ring: Ring,
 }
 
-impl CircularOrbit {
-    pub fn new(tiles: Vec<Tile>, shortest: u32, longest: u32) -> Self {
+impl<T: Iterator<Item = Tile>> CircularOrbit<T> {
+    pub fn new(tiles: T, shortest: u32, longest: u32) -> Self {
         CircularOrbit {
             position: TilePosition::ORIGIN,
             tiles,
@@ -83,19 +82,19 @@ impl CircularOrbit {
     }
 }
 
-impl Iterator for CircularOrbit {
+impl<T: Iterator <Item = Tile>> Iterator for CircularOrbit<T> {
     type Item = (TilePosition, Tile);
 
     fn next(&mut self) -> Option<(TilePosition, Tile)> {
         if let Some(next) = self.ring.next() {
             self.position = next;
-            Some((next, self.tiles.pop().expect("Ran out of tiles to iterate on!")))
+            Some((next, self.tiles.next()?))
         } else if self.shortest > 0 && self.longest > 0 {
             self.shortest -= 1;
             self.longest -= 2;
             self.position += TilePosition::RIGHT;
             self.ring = Ring::new(self.position, self.shortest, self.longest);
-            Some((self.ring.next().expect("Ran out of TilePositions!"), self.tiles.pop().expect("Ran out of tiles to iterate on!")))
+            Some((self.ring.next()?, self.tiles.next()?))
         } else {
             None
         }

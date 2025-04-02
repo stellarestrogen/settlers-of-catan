@@ -5,54 +5,46 @@ use std::{
 
 use crate::game::objects::TileType;
 
-use super::{Tile, position::TilePosition};
+use super::{bounds::TileBounds, position::TilePosition, Tile};
 
 /// Holds the entire "game board" tiles, including water tiles.
 pub struct TileHolder {
     tiles: Vec<Tile>,
-    length: u32,
-    width: u32,
+    bounds: TileBounds
 }
 
 impl TileHolder {
-    pub fn new(length: u32, width: u32) -> Self {
-        let mut tiles = Vec::with_capacity((length * width) as usize);
-        tiles.extend(iter::repeat_n(
-            Tile::new(TileType::Water),
-            (length * width) as usize,
-        ));
-
+    pub fn new(bounds: TileBounds) -> Self {
+        let mut tiles = Vec::with_capacity(bounds.get_size());
+        tiles.extend(iter::repeat_n(Tile::new(TileType::Water), bounds.get_size()));
         TileHolder {
-            tiles,
-            length,
-            width,
+            tiles: tiles,
+            bounds
         }
     }
 
     fn calc_index(&self, position: TilePosition) -> Option<usize> {
+        if !self.bounds.check_bounds(position) {
+            return None
+        }
+
         let rights: isize = position
-            .horizontal_distance(TilePosition::ORIGIN)
+            .horizontal_distance(self.bounds.get_top_left())
             .ceil()
             .try_into()
             .ok()?;
 
         let downs: isize = position
-            .vertical_distance(TilePosition::ORIGIN)
+            .vertical_distance(self.bounds.get_top_left())
             .try_into()
             .ok()?;
 
-        let length: isize = self.length.try_into().ok()?;
-        let width: isize = self.width.try_into().ok()?;
+        let length: isize = self.bounds.get_length().try_into().ok()?;
 
-        if rights < length && downs < width && rights >= 0 && downs >= 0 {
-            downs
-                .checked_mul(length)?
-                .checked_add(rights)?
-                .try_into()
-                .ok()
-        } else {
-            None
-        }
+        downs.checked_mul(length)?
+            .checked_add(rights)?
+            .try_into()
+            .ok()
     }
 
     pub fn get(&self, position: TilePosition) -> Option<&Tile> {
@@ -62,6 +54,10 @@ impl TileHolder {
     pub fn get_mut(&mut self, position: TilePosition) -> Option<&mut Tile> {
         let idx = self.calc_index(position)?;
         Some(&mut self.tiles[idx])
+    }
+
+    pub fn get_bounds(&self) -> &TileBounds {
+        &self.bounds
     }
 }
 

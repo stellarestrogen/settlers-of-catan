@@ -22,6 +22,18 @@ impl TileBounds {
         self.bottom_right
     }
 
+    pub fn get_length(&self) -> i32 {
+        self.bottom_right.horizontal_distance(self.top_left).ceil().abs()
+    }
+
+    pub fn get_width(&self) -> i32 {
+        self.bottom_right.vertical_distance(self.top_left).abs()
+    }
+
+    pub fn get_size(&self) -> usize {
+        (self.get_length() * self.get_width()) as usize
+    }
+
     pub fn check_bounds(&self, position: TilePosition) -> bool {
         (position.is_right(self.top_left) || position.is_same_column(self.top_left)) && 
         (position.is_below(self.top_left) || position.is_same_row(self.top_left)) && 

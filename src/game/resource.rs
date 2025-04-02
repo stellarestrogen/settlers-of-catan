@@ -2,7 +2,6 @@ use rand::prelude::*;
 use std::iter;
 
 use super::{
-    game::GameEdition,
     objects::{ResourceDistribution, ResourceType, TileType},
     tile::Tile,
 };
@@ -21,23 +20,23 @@ pub struct ResourceDeck {
 }
 
 impl ResourceDeck {
-    pub fn new(edition: &impl GameEdition, size: usize, distribution: ResourceDistribution, roll_numbers: Vec<u32>) -> Self {
+    pub fn new(size: usize, distribution: ResourceDistribution, roll_numbers: &mut impl Iterator<Item = u8>) -> Self {
         ResourceDeck {
-            resources: Self::create_tiles(edition, size, distribution, roll_numbers),
+            resources: Self::create_tiles(size, distribution, roll_numbers),
         }
     }
 
-    pub fn draw(&mut self) -> Tile {
-        self.resources
-            .pop()
-            .expect("No more resources to draw from ResourceDeck!")
-    }
+    // pub fn draw(&mut self) -> Tile {
+    //     self.resources
+    //         .pop()
+    //         .expect("No more resources to draw from ResourceDeck!")
+    // }
 
-    pub fn into_vec(self) -> Vec<Tile> {
-        self.resources
-    }
+    // pub fn into_vec(self) -> Vec<Tile> {
+    //     self.resources
+    // }
 
-    fn create_tiles(edition: &impl GameEdition, size: usize, distribution: ResourceDistribution, roll_numbers: Vec<u32>) -> Vec<Tile> {
+    fn create_tiles(size: usize, distribution: ResourceDistribution, roll_numbers: &mut impl Iterator<Item = u8>) -> Vec<Tile> {
         let mut resources =
             Vec::<Option<ResourceType>>::with_capacity(size);
         for resource in RESOURCES {
@@ -54,7 +53,6 @@ impl ResourceDeck {
 
         resources.shuffle(&mut rand::rng());
 
-        let mut roll_numbers = roll_numbers.into_iter();
 
         resources
             .into_iter()
@@ -63,11 +61,20 @@ impl ResourceDeck {
                     .map(|rsrc| {
                         Tile::new(TileType::Resource {
                             resource: rsrc,
-                            roll_number: roll_numbers.next().unwrap(),
+                            roll_number: roll_numbers.next().unwrap().into(),
                         })
                     })
                     .unwrap_or(Tile::new(TileType::Desert))
             })
             .collect()
+            
+    }
+}
+
+impl Iterator for ResourceDeck {
+    type Item = Tile;
+
+    fn next(&mut self) -> Option<Tile> {
+        self.resources.pop()
     }
 }

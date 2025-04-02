@@ -1,38 +1,59 @@
 use super::{
-    corner::CornerHolder, edge::EdgeHolder, game::GameEdition, resource::ResourceDeck,
-    tile::holder::TileHolder,
+    corner::{
+        bounds::CornerBounds, 
+        holder::CornerHolder, 
+        position::CornerPosition
+    }, 
+    edge::EdgeHolder, 
+    game::GameEdition, 
+    tile::{
+        bounds::TileBounds, 
+        holder::TileHolder, 
+        position::TilePosition
+    },
 };
 
 pub struct Board {
+    tiles: TileHolder,
     corners: CornerHolder,
     edges: EdgeHolder,
-    tiles: TileHolder,
 }
 
 impl Board {
     pub fn new(edition: impl GameEdition) -> Self {
-        let length_corner = edition.get_board_length() * 2 + 2;
-        let width_corner = edition.get_board_width() + 1;
-
-        let length_edge = edition.get_board_length() * 2 + 1;
-        let width_edge = edition.get_board_width() + 1;
-
+        let tiles = Self::create_tiles(edition);
         Board {
-            corners: CornerHolder::new(length_corner, width_corner),
-            edges: EdgeHolder::new(length_edge, width_edge),
-            tiles: Self::create_tiles(edition),
+            tiles,
+            corners: CornerHolder::new(Self::create_corner_bounds(tiles.get_bounds())),
+            edges: 
         }
     }
 
     fn create_tiles(edition: impl GameEdition) -> TileHolder {
-        let mut tiles = TileHolder::new(edition.get_board_length(), edition.get_board_width());
-        let mut resource_deck = ResourceDeck::new(&edition);
-        let mut iter = edition.get_tile_draw_iter();
+        let mut bounds = TileBounds::new();
+        let mut iter = edition.get_tiles();
 
-        while let Some(p) = iter.next() {
-            tiles[p] = resource_deck.draw();
+        while let Some((p, _)) = iter.next() {
+            bounds.expand_bounds(p);
+        }
+
+        let mut tiles = TileHolder::new(bounds);
+        let mut iter = edition.get_tiles();
+
+        while let Some((p, t)) = iter.next() {
+            tiles[p] = t;
         }
 
         tiles
+    }
+
+    fn create_corner_bounds(bounds: &TileBounds) -> CornerBounds {
+        let top_left = CornerPosition::LEFT * (bounds.get_top_left().horizontal_distance(TilePosition::ORIGIN).ceil().abs() + 1) + CornerPosition::UP * bounds.get_top_left().vertical_distance(TilePosition::ORIGIN).abs();
+        let bottom_right = CornerPosition::RIGHT * (bounds.get_bottom_right().horizontal_distance(TilePosition::ORIGIN).ceil().abs() + 2) + CornerPosition::DOWN * bounds.get_bottom_right().vertical_distance(TilePosition::ORIGIN).abs();
+        CornerBounds::new(top_left, bottom_right)
+    }
+
+    fn create_edge_bounds(bounds: &TileBounds) -> EdgeBounds {
+
     }
 }
