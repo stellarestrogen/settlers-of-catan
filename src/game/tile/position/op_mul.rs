@@ -29,6 +29,21 @@ macro_rules! scalar_operations {
                 self.downs = self.vertical_distance(TilePosition::ORIGIN).mul(rhs as i32);
             }
         }
+
+        impl Mul<TilePosition> for $scalar {
+            type Output = TilePosition;
+
+            fn mul(self, rhs: TilePosition) -> TilePosition {
+                TilePosition {
+                    rights: rhs
+                        .horizontal_distance(TilePosition::ORIGIN)
+                        .mul(self as isize)
+                        .ceil(),
+
+                    downs: rhs.vertical_distance(TilePosition::ORIGIN).mul(self as i32)
+                }
+            }
+        }
     };
 }
 

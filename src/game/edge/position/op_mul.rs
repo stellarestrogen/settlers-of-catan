@@ -1,35 +1,34 @@
 use std::ops::{Mul, MulAssign};
 
-use super::CornerPosition;
-
+use super::EdgePosition;
 
 macro_rules! scalar_operations {
     ($scalar: ty) => {
-        impl Mul<$scalar> for CornerPosition {
-            type Output = CornerPosition;
+        impl Mul<$scalar> for EdgePosition {
+            type Output = EdgePosition;
 
-            fn mul(self, rhs: $scalar) -> CornerPosition {
-                CornerPosition {
+            fn mul(self, rhs: $scalar) -> Self::Output {
+                EdgePosition {
                     rights: self.rights * rhs as i32,
                     downs: self.downs * rhs as i32
                 }
             }
         }
 
-        impl MulAssign<$scalar> for CornerPosition {
+        impl MulAssign<$scalar> for EdgePosition {
             fn mul_assign(&mut self, rhs: $scalar) {
                 self.rights *= rhs as i32;
                 self.downs *= rhs as i32;
             }
         }
 
-        impl Mul<CornerPosition> for $scalar {
-            type Output = CornerPosition;
+        impl Mul<EdgePosition> for $scalar {
+            type Output = EdgePosition;
 
-            fn mul(self, rhs: CornerPosition) -> CornerPosition {
-                CornerPosition {
-                    rights: self as i32 * rhs.rights,
-                    downs: self as i32 * rhs.downs 
+            fn mul(self, rhs: EdgePosition) -> EdgePosition {
+                EdgePosition {
+                    rights: rhs.rights * self as i32,
+                    downs: rhs.downs * self as i32
                 }
             }
         }

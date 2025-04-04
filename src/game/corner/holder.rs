@@ -60,12 +60,12 @@ impl Index<CornerPosition> for CornerHolder {
     type Output = Corner;
 
     fn index(&self, index: CornerPosition) -> &Self::Output {
-        self.get(index).expect("CornerPosition out of bounds!")
+        self.get(index).expect("CornerPosition is out of bounds!")
     }
 }
 
 impl IndexMut<CornerPosition> for CornerHolder {
     fn index_mut(&mut self, index: CornerPosition) -> &mut Self::Output {
-        self.get_mut(index).expect("CornerPosition out of bounds!")
+        self.get_mut(index).expect("CornerPosition is out of bounds!")
     }
 }

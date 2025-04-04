@@ -1,5 +1,6 @@
 use super::objects::Transport;
 
+pub mod bounds;
 pub mod holder;
 pub mod position;
 

@@ -1,40 +1,41 @@
-use super::{position::EdgePosition, Edge};
+use std::ops::{Index, IndexMut};
+
+use super::{bounds::EdgeBounds, position::EdgePosition, Edge};
 
 pub struct EdgeHolder {
     edges: Vec<Edge>,
-    length: u32,
-    width: u32,
+    bounds: EdgeBounds
 }
 
 impl EdgeHolder {
-    pub fn new(length: u32, width: u32) -> Self {
-        let edges = Vec::with_capacity(((length + (length + 1)/2) * width - 2) as usize);
+    pub fn new(bounds: EdgeBounds) -> Self {
+        let edges = Vec::with_capacity(bounds.get_size());
         EdgeHolder {
             edges,
-            length,
-            width
+            bounds
         }
     }
 
     fn calc_index(&self, position: EdgePosition) -> Option<usize> {
-        let rights: isize = position.get_rights().try_into().ok()?;
-        let downs: isize = position.get_downs().try_into().ok()?;
-        let length_h: isize = self.length.try_into().ok()?;
+        if !self.bounds.check_bounds(position) {
+            return None;
+        }
+
+        let rights: isize = position.horizontal_distance(EdgePosition::EMPTY).try_into().ok()?;
+        let downs: isize = position.vertical_distance(EdgePosition::EMPTY).try_into().ok()?;
+        let length_h: isize = self.get_length().try_into().ok()?;
         let length_v: isize = self.get_vertical_length().try_into().ok()?;
 
-        if position.is_valid() && self.is_edge_position_valid(position) {
-            ((downs.checked_div(2)? + downs % 2) * length_h + downs.checked_div(2)? * length_v + if downs % 2 == 0 { rights.checked_div(2)? } else { rights - (rights.checked_div(3)? * 3) })
-            .try_into()
-            .ok()
-        } else {
-            None
-        }
+        ((downs.checked_div(2)? + downs % 2) * length_h + downs.checked_div(2)? * length_v + if downs % 2 == 0 { rights.checked_div(2)? } else { rights - (rights.checked_div(3)? * 3) })
+        .try_into()
+        .ok()
+       
     }
 
     pub fn calc_adjacent_edges(&self, position: EdgePosition) -> Vec<EdgePosition> {
         position.calc_adjacent_edges()
         .into_iter()
-        .filter(|p| self.is_edge_position_valid(*p) )
+        .filter(|p| self.bounds.check_bounds(*p) )
         .collect()
     }
 
@@ -47,24 +48,37 @@ impl EdgeHolder {
         Some(&mut self.edges[idx])
     }
 
-    fn is_edge_position_valid(&self, position: EdgePosition) -> bool {
-        position.get_rights().checked_div(2).unwrap_or_default() <= self.length.try_into().unwrap_or_default() && position.get_downs().checked_div(2).unwrap_or_default() <= self.width.try_into().unwrap_or_default()
+    fn get_length(&self) -> i32 {
+        self.bounds.get_bottom_right().horizontal_distance(self.bounds.get_top_left()).abs()/2
+    }
+
+    fn get_width(&self) -> i32 {
+        self.bounds.get_bottom_right().vertical_distance(self.bounds.get_top_left()).abs()
     }
 
     /// Get the number of edges in a "vertical row".
-    fn get_vertical_length(&self) -> u32 {
+    fn get_vertical_length(&self) -> i32 {
         // due to the way a hexagonal board works, `length` is guaranteed to be an odd number.
-        (self.length + 1)/2
+        (self.get_length() + 1)/2
     }
 
     /// Get the number of rows of vertical edges.
     /// Currently unused.
-    fn get_vertical_width(&self) -> u32 {
-        self.width - 1
+    fn get_vertical_width(&self) -> i32 {
+        self.get_width() - 1
     }
+}
 
-    /// Get the total number of edges.
-    pub fn get_size(&self) -> usize {
-        ((self.length * self.width - 2) + self.get_vertical_length() * self.get_vertical_width()) as usize
+impl Index<EdgePosition> for EdgeHolder {
+    type Output = Edge;
+
+    fn index(&self, index: EdgePosition) -> &Self::Output {
+        self.get(index).expect("EdgePosition is out of bounds!")
+    }
+}
+
+impl IndexMut<EdgePosition> for EdgeHolder {
+    fn index_mut(&mut self, index: EdgePosition) -> &mut Self::Output {
+        self.get_mut(index).expect("EdgePosition is out of bounds!")
     }
 }

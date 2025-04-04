@@ -65,13 +65,13 @@ impl Index<TilePosition> for TileHolder {
     type Output = Tile;
 
     fn index(&self, index: TilePosition) -> &Tile {
-        self.get(index).expect("Indexed TileHolder out of bounds!")
+        self.get(index).expect("TilePosition is out of bounds!")
     }
 }
 
 impl IndexMut<TilePosition> for TileHolder {
     fn index_mut(&mut self, index: TilePosition) -> &mut Tile {
         self.get_mut(index)
-            .expect("Indexed TileHolder out of bounds!")
+            .expect("TilePosition is out of bounds!")
     }
 }

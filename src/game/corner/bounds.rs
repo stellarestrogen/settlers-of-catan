@@ -1,5 +1,3 @@
-use crate::game::tile::bounds::TileBounds;
-
 use super::position::CornerPosition;
 
 pub struct CornerBounds {
