@@ -15,6 +15,7 @@ static RESOURCES: [ResourceType; 5] = [
 ];
 
 /// Holds all of the resource and desert tiles.
+#[derive(Clone)]
 pub struct ResourceDeck {
     resources: Vec<Tile>,
 }

@@ -24,6 +24,11 @@ impl EdgePosition {
         downs: 1
     };
 
+    pub const DOWN: EdgePosition = EdgePosition {
+        rights: 0,
+        downs: 2
+    };
+
     pub const DOWN_LEFT: EdgePosition = EdgePosition {
         rights: -1,
         downs: 1
@@ -39,12 +44,17 @@ impl EdgePosition {
         downs: -1
     };
 
+    pub const UP: EdgePosition = EdgePosition {
+        rights: 0,
+        downs: -2
+    };
+
     pub const UP_RIGHT: EdgePosition = EdgePosition {
         rights: 1,
         downs: -1
     };
 
-    pub fn is_valid(&self) -> bool {
+    fn is_valid(&self) -> bool {
         (self.rights % 2 == 0 && self.downs % 2 == 0)||(self.rights % 2 == 1 && self.downs % 2 == 1 && (self.rights + self.downs) % 4 == 0)
     }
 

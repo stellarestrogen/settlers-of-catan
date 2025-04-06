@@ -9,7 +9,7 @@ const ROLL_ORDER_EXP: [u8; 28] = [
 ];
 
 pub trait GameEdition {
-    fn get_tiles(&self) -> impl Iterator<Item = (TilePosition, Tile)>;
+    fn get_tiles(&self) -> impl Iterator<Item = (TilePosition, Tile)> + Clone;
 }
 
 pub struct BaseEdition {}
@@ -18,7 +18,7 @@ impl BaseEdition {}
 
 impl GameEdition for BaseEdition {
 
-    fn get_tiles(&self) -> impl Iterator<Item = (TilePosition, Tile)> {
+    fn get_tiles(&self) -> impl Iterator<Item = (TilePosition, Tile)> + Clone {
 
         let resource_distribution = ResourceDistribution::new([
             (ResourceType::Wood, 4),
@@ -40,7 +40,7 @@ impl ExpansionEdition {}
 
 impl GameEdition for ExpansionEdition {
 
-    fn get_tiles(&self) -> impl Iterator<Item = (TilePosition, Tile)> {
+    fn get_tiles(&self) -> impl Iterator<Item = (TilePosition, Tile)> + Clone {
         let resource_distribution = ResourceDistribution::new([
             (ResourceType::Wood, 6),
             (ResourceType::Brick, 5),
@@ -81,7 +81,7 @@ impl CustomEdition {
 impl GameEdition for CustomEdition {
 
 
-    fn get_tiles(&self) -> impl Iterator<Item = (TilePosition, Tile)> {
+    fn get_tiles(&self) -> impl Iterator<Item = (TilePosition, Tile)> + Clone {
         let size: usize = ((self.longest - self.shortest) * 2 + 1) as usize;
         let resource_deck = ResourceDeck::new(size, self.rsrc_distr.clone(), &mut self.roll_numbers.clone().into_iter());
 

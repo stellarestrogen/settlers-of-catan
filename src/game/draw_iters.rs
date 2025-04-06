@@ -62,7 +62,8 @@ impl Iterator for Ring {
     }
 }
 
-pub struct CircularOrbit<T: Iterator<Item = Tile>> {
+#[derive(Clone)]
+pub struct CircularOrbit<T: Iterator<Item = Tile> + Clone> {
     position: TilePosition,
     tiles: T,
     shortest: u32,
@@ -70,7 +71,7 @@ pub struct CircularOrbit<T: Iterator<Item = Tile>> {
     ring: Ring,
 }
 
-impl<T: Iterator<Item = Tile>> CircularOrbit<T> {
+impl<T: Iterator<Item = Tile> + Clone> CircularOrbit<T> {
     pub fn new(tiles: T, shortest: u32, longest: u32) -> Self {
         CircularOrbit {
             position: TilePosition::ORIGIN,
@@ -82,7 +83,7 @@ impl<T: Iterator<Item = Tile>> CircularOrbit<T> {
     }
 }
 
-impl<T: Iterator <Item = Tile>> Iterator for CircularOrbit<T> {
+impl<T: Iterator <Item = Tile> + Clone> Iterator for CircularOrbit<T> {
     type Item = (TilePosition, Tile);
 
     fn next(&mut self) -> Option<(TilePosition, Tile)> {
