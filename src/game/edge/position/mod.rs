@@ -1,4 +1,4 @@
-use crate::game::position::Position;
+use crate::game::position::{HorizontalAxis, Position, VerticalAxis};
 
 pub mod op_add;
 pub mod op_mul;
@@ -84,6 +84,10 @@ impl EdgePosition {
 impl Position<i32> for EdgePosition {
     type HorizontalOutput = i32;
     type VerticalOutput = i32;
+
+    fn positive_axes() -> (HorizontalAxis, VerticalAxis) {
+        (HorizontalAxis::Right, VerticalAxis::Down)
+    }
 
     fn horizontal_distance(&self, other: Self) -> Self::HorizontalOutput {
         self.rights - other.rights

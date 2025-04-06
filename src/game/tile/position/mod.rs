@@ -1,6 +1,6 @@
 pub use horizontal_distance::HorizontalDistance;
 
-use crate::game::position::Position;
+use crate::game::position::{HorizontalAxis, Position, VerticalAxis};
 
 pub mod horizontal_distance;
 pub mod op_add;
@@ -55,6 +55,10 @@ impl TilePosition {
 impl Position<i32> for TilePosition {
     type HorizontalOutput = HorizontalDistance;
     type VerticalOutput = i32;
+
+    fn positive_axes() -> (HorizontalAxis, VerticalAxis) {
+        (HorizontalAxis::Right, VerticalAxis::Down)
+    }
 
     fn horizontal_distance(&self, other: Self) -> Self::HorizontalOutput {
         if self.downs % 2 == other.downs % 2 {
