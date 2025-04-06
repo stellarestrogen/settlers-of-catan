@@ -2,6 +2,7 @@ use std::iter;
 use std::ops::{Index, IndexMut};
 
 use crate::game::objects::TradeType;
+use crate::game::position::Position;
 
 use super::bounds::CornerBounds;
 use super::Corner;

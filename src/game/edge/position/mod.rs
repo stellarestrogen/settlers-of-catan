@@ -1,3 +1,5 @@
+use crate::game::position::Position;
+
 pub mod op_add;
 pub mod op_mul;
 pub mod op_sub;
@@ -59,33 +61,7 @@ impl EdgePosition {
     }
 
     pub fn calc_distance(&self, other: Self) -> i32 {
-        (self.horizontal_distance(other).abs() + self.vertical_distance(other).abs())
-        .checked_div(2)
-        .unwrap()
-    }
-
-    pub fn horizontal_distance(&self, other: EdgePosition) -> i32 {
-        self.rights - other.rights
-    }
-
-    pub fn vertical_distance(&self, other: EdgePosition) -> i32 {
-        self.downs - other.downs
-    }
-
-    pub fn is_right(&self, other: EdgePosition) -> bool {
-        self.horizontal_distance(other) > 0
-    }
-
-    pub fn is_left(&self, other: EdgePosition) -> bool {
-        self.horizontal_distance(other) < 0
-    }
-
-    pub fn is_below(&self, other: EdgePosition) -> bool {
-        self.vertical_distance(other) > 0
-    }
-
-    pub fn is_above(&self, other: EdgePosition) -> bool {
-        self.vertical_distance(other) < 0
+        (self.horizontal_distance(other).abs() + self.vertical_distance(other).abs())/2
     }
 
     pub fn calc_adjacent_edges(&self) -> Vec<EdgePosition> {
@@ -102,5 +78,18 @@ impl EdgePosition {
         .filter_map(|r| r )
         .collect()
 
+    }
+}
+
+impl Position<i32> for EdgePosition {
+    type HorizontalOutput = i32;
+    type VerticalOutput = i32;
+
+    fn horizontal_distance(&self, other: Self) -> Self::HorizontalOutput {
+        self.rights - other.rights
+    }
+
+    fn vertical_distance(&self, other: Self) -> Self::VerticalOutput {
+        self.downs - other.downs
     }
 }

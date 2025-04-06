@@ -7,3 +7,4 @@ pub mod objects;
 pub mod player;
 pub mod resource;
 pub mod tile;
+pub mod position;

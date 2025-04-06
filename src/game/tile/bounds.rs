@@ -1,3 +1,5 @@
+use crate::game::position::Position;
+
 use super::position::{TilePosition, HorizontalDistance};
 
 #[derive(Debug)]
@@ -35,10 +37,10 @@ impl TileBounds {
     }
 
     pub fn check_bounds(&self, position: TilePosition) -> bool {
-        (position.is_right(self.top_left) || position.is_same_column(self.top_left)) && 
-        (position.is_below(self.top_left) || position.is_same_row(self.top_left)) && 
-        (position.is_left(self.bottom_right) || position.is_same_column(self.bottom_right)) && 
-        (position.is_above(self.bottom_right) || position.is_same_row(self.bottom_right))
+        position.is_right_or_equal(self.top_left) && 
+        position.is_below_or_equal(self.top_left) && 
+        position.is_left_or_equal(self.bottom_right) && 
+        position.is_above_or_equal(self.bottom_right)
     }
 
     pub fn expand_bounds(&mut self, position: TilePosition) {

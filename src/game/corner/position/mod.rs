@@ -1,3 +1,5 @@
+use crate::game::position::{HorizontalAxis, VerticalAxis, Position};
+
 pub mod op_add;
 pub mod op_sub;
 pub mod op_mul;
@@ -37,30 +39,6 @@ impl CornerPosition {
         downs: -1
     };
 
-    pub fn horizontal_distance(&self, other: CornerPosition) -> i32 {
-        self.rights - other.rights
-    }
-
-    pub fn vertical_distance(&self, other: CornerPosition) -> i32 {
-        self.downs - other.downs
-    }
-
-    pub fn is_right(&self, other: CornerPosition) -> bool {
-        self.horizontal_distance(other) > 0
-    }
-
-    pub fn is_left(&self, other: CornerPosition) -> bool {
-        self.horizontal_distance(other) < 0
-    }
-
-    pub fn is_below(&self, other: CornerPosition) -> bool {
-        self.vertical_distance(other) > 0
-    }
-
-    pub fn is_above(&self, other: CornerPosition) -> bool {
-        self.vertical_distance(other) < 0
-    }
-
     pub fn calc_distance(&self, other: CornerPosition) -> i32 {
         let distance = other - *self;
         let mut distance = distance.rights.abs() + distance.downs.abs();
@@ -70,5 +48,22 @@ impl CornerPosition {
         }
 
         distance
+    }
+}
+
+impl Position<i32> for CornerPosition {
+    type HorizontalOutput = i32;
+    type VerticalOutput = i32;
+
+    fn positive_axes() -> (HorizontalAxis, VerticalAxis) {
+        (HorizontalAxis::Right, VerticalAxis::Down)
+    }
+
+    fn horizontal_distance(&self, other: Self) -> Self::HorizontalOutput {
+        self.rights - other.rights
+    }
+
+    fn vertical_distance(&self, other: Self) -> Self::VerticalOutput {
+        self.downs - other.downs
     }
 }

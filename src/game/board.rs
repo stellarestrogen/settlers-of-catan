@@ -3,14 +3,11 @@ use super::{
         bounds::CornerBounds, 
         holder::CornerHolder, 
         position::CornerPosition
-    }, 
-    edge::{bounds::EdgeBounds, position::EdgePosition, holder::EdgeHolder}, 
-    game::GameEdition, 
-    tile::{
+    }, edge::{bounds::EdgeBounds, holder::EdgeHolder, position::EdgePosition}, game::GameEdition, position::Position, tile::{
         bounds::TileBounds, 
         holder::TileHolder, 
         position::TilePosition
-    },
+    }
 };
 
 pub struct Board {

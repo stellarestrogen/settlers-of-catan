@@ -1,5 +1,7 @@
 use std::ops::{Mul, MulAssign};
 
+use crate::game::position::Position;
+
 use super::TilePosition;
 
 macro_rules! scalar_operations {

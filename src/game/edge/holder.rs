@@ -1,5 +1,7 @@
 use std::ops::{Index, IndexMut};
 
+use crate::game::position::Position;
+
 use super::{bounds::EdgeBounds, position::EdgePosition, Edge};
 
 pub struct EdgeHolder {

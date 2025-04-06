@@ -1,5 +1,7 @@
 use std::ops::{Add, AddAssign};
 
+use crate::game::position::Position;
+
 use super::TilePosition;
 
 impl Add for TilePosition {

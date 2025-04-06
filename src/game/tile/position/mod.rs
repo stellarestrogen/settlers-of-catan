@@ -1,5 +1,7 @@
 pub use horizontal_distance::HorizontalDistance;
 
+use crate::game::position::Position;
+
 pub mod horizontal_distance;
 pub mod op_add;
 pub mod op_mul;
@@ -47,7 +49,14 @@ impl TilePosition {
         downs: -1,
     };
 
-    pub fn horizontal_distance(&self, other: TilePosition) -> HorizontalDistance {
+   
+}
+
+impl Position<i32> for TilePosition {
+    type HorizontalOutput = HorizontalDistance;
+    type VerticalOutput = i32;
+
+    fn horizontal_distance(&self, other: Self) -> Self::HorizontalOutput {
         if self.downs % 2 == other.downs % 2 {
             HorizontalDistance::Unshifted(self.rights - other.rights)
         } else if other.downs % 2 == 1 {
@@ -57,33 +66,7 @@ impl TilePosition {
         }
     }
 
-    pub fn vertical_distance(&self, other: TilePosition) -> i32 {
+    fn vertical_distance(&self, other: Self) -> Self::VerticalOutput {
         self.downs - other.downs
     }
-
-    pub fn is_left(&self, other: TilePosition) -> bool {
-        self.horizontal_distance(other).ceil() < 0
-    }
-
-    pub fn is_right(&self, other: TilePosition) -> bool {
-        self.horizontal_distance(other).ceil() > 0
-    }
-
-    pub fn is_same_column(&self, other: TilePosition) -> bool {
-        self.horizontal_distance(other).ceil() == 0
-    }
-
-    pub fn is_above(&self, other: TilePosition) -> bool {
-        self.vertical_distance(other) < 0
-    }
-
-    pub fn is_below(&self, other: TilePosition) -> bool {
-        self.vertical_distance(other) > 0
-    }
-
-    pub fn is_same_row(&self, other: TilePosition) -> bool {
-        self.vertical_distance(other) == 0
-    }
-
-   
 }

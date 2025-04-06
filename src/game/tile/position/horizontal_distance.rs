@@ -25,6 +25,12 @@ impl HorizontalDistance {
     }
 }
 
+impl Into<i32> for HorizontalDistance {
+    fn into(self) -> i32 {
+        self.ceil()
+    }
+}
+
 impl Into<f64> for HorizontalDistance {
     fn into(self) -> f64 {
         match self {

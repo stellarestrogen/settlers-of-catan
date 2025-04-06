@@ -3,7 +3,7 @@ use std::{
     ops::{Index, IndexMut},
 };
 
-use crate::game::objects::TileType;
+use crate::game::{objects::TileType, position::Position};
 
 use super::{bounds::TileBounds, position::TilePosition, Tile};
 
