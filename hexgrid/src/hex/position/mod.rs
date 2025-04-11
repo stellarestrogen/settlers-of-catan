@@ -1,57 +1,57 @@
 pub use horizontal_distance::HorizontalDistance;
 
-use crate::game::position::{HorizontalAxis, Position, VerticalAxis};
+use crate::position::{HorizontalAxis, Position, VerticalAxis};
 
 pub mod horizontal_distance;
 pub mod op_add;
-pub mod op_mul;
 pub mod op_sub;
+pub mod op_mul;
 
 #[derive(Clone, Copy, PartialEq, Eq, Debug)]
-pub struct TilePosition {
+pub struct HexPosition {
     rights: i32,
     downs: i32,
 }
 
-impl TilePosition {
-    pub const ORIGIN: TilePosition = TilePosition {
+impl HexPosition {
+    pub const ORIGIN: HexPosition = HexPosition {
         rights: 0,
         downs: 0,
     };
 
-    pub const RIGHT: TilePosition = TilePosition {
+    pub const RIGHT: HexPosition = HexPosition {
         rights: 1,
         downs: 0,
     };
 
-    pub const DOWN_RIGHT: TilePosition = TilePosition {
+    pub const DOWN_RIGHT: HexPosition = HexPosition {
         rights: 1,
         downs: 1,
     };
 
-    pub const DOWN_LEFT: TilePosition = TilePosition {
+    pub const DOWN_LEFT: HexPosition = HexPosition {
         rights: 0,
         downs: 1,
     };
 
-    pub const LEFT: TilePosition = TilePosition {
+    pub const LEFT: HexPosition = HexPosition {
         rights: -1,
         downs: 0,
     };
 
-    pub const UP_LEFT: TilePosition = TilePosition {
+    pub const UP_LEFT: HexPosition = HexPosition {
         rights: 0,
         downs: -1,
     };
 
-    pub const UP_RIGHT: TilePosition = TilePosition {
+    pub const UP_RIGHT: HexPosition = HexPosition {
         rights: 1,
         downs: -1,
     };
 
 }
 
-impl Position<i32> for TilePosition {
+impl Position<i32> for HexPosition {
     type HorizontalOutput = HorizontalDistance;
     type VerticalOutput = i32;
 

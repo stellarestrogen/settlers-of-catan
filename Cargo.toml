@@ -7,3 +7,9 @@ edition = "2024"
 rand = "0.9.0"
 geometric = "0.2.1"
 num-traits = "0.2.19"
+
+[workspace]
+resolver = "3"
+members = [
+    "hexgrid"
+]
