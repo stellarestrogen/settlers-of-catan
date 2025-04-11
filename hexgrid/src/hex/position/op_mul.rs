@@ -1,7 +1,5 @@
 use std::ops::{Mul, MulAssign};
 
-use crate::position::Position;
-
 use super::HexPosition;
 
 macro_rules! scalar_operations {

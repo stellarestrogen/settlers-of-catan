@@ -1,7 +1,5 @@
 use std::ops::{Sub, SubAssign};
 
-use crate::position::Position;
-
 use super::HexPosition;
 
 impl Sub for HexPosition {

@@ -1,7 +1,7 @@
 use std::marker::PhantomData;
 use std::ops::Add;
 
-use crate::{hex::position::HexPosition, position::Position};
+use crate::hex::position::HexPosition;
 
 use super::{EdgePosition, Even, Negative, Odd, Positive, Valid};
 

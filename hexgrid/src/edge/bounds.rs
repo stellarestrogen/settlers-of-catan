@@ -1,4 +1,4 @@
-use crate::{hex::{bounds::HexBounds, position::{HexPosition, HorizontalDistance}}, position::Position};
+use crate::hex::{bounds::HexBounds, position::{HexPosition, HorizontalDistance}};
 
 use super::position::{EdgePosition, Valid};
 

@@ -1,5 +1,3 @@
-use crate::position::Position;
-
 use super::position::HexPosition;
 
 #[derive(Clone, Debug)]

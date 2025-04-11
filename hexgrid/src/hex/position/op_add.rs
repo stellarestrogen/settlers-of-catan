@@ -1,7 +1,5 @@
 use std::ops::{Add, AddAssign};
 
-use crate::{corner::position::CornerPosition, position::Position};
-
 use super::HexPosition;
 
 impl Add for HexPosition {

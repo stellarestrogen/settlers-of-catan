@@ -1,7 +1,5 @@
 pub use horizontal_distance::HorizontalDistance;
 
-use crate::position::{HorizontalAxis, Position, VerticalAxis};
-
 pub mod horizontal_distance;
 pub mod op_add;
 pub mod op_sub;
@@ -49,17 +47,7 @@ impl HexPosition {
         downs: -1,
     };
 
-}
-
-impl Position<i32> for HexPosition {
-    type HorizontalOutput = HorizontalDistance;
-    type VerticalOutput = i32;
-
-    fn positive_axes() -> (HorizontalAxis, VerticalAxis) {
-        (HorizontalAxis::Right, VerticalAxis::Down)
-    }
-
-    fn horizontal_distance(&self, other: Self) -> Self::HorizontalOutput {
+    pub fn horizontal_distance(&self, other: Self) -> HorizontalDistance {
         if self.downs % 2 == other.downs % 2 {
             HorizontalDistance::Unshifted(self.rights - other.rights)
         } else if other.downs % 2 == 1 {
@@ -69,7 +57,40 @@ impl Position<i32> for HexPosition {
         }
     }
 
-    fn vertical_distance(&self, other: Self) -> Self::VerticalOutput {
+    pub fn vertical_distance(&self, other: Self) -> i32 {
         self.downs - other.downs
     }
+
+    pub fn is_right(&self, other: Self) -> bool {
+        self.horizontal_distance(other).ceil() > 0
+    }
+
+    pub fn is_right_or_equal(&self, other: Self) -> bool {
+        self.horizontal_distance(other).ceil() >= 0
+    }
+
+    pub fn is_left(&self, other: Self) -> bool {
+        self.horizontal_distance(other).ceil() < 0
+    }
+
+    pub fn is_left_or_equal(&self, other: Self) -> bool {
+        self.horizontal_distance(other).ceil() <= 0
+    }
+
+    pub fn is_below(&self, other: Self) -> bool {
+        self.vertical_distance(other) > 0
+    }
+
+    pub fn is_below_or_equal(&self, other: Self) -> bool {
+        self.vertical_distance(other) >= 0
+    }
+
+    pub fn is_above(&self, other: Self) -> bool {
+        self.vertical_distance(other) < 0
+    }
+
+    pub fn is_above_or_equal(&self, other: Self) -> bool {
+        self.vertical_distance(other) <= 0
+    }
+
 }

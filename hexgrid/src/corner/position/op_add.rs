@@ -1,6 +1,6 @@
 use std::{marker::PhantomData, ops::Add};
 
-use crate::{hex::position::HexPosition, position::Position};
+use crate::hex::position::HexPosition;
 
 use super::{Center, CornerPosition, High, Low};
 

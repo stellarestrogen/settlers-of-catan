@@ -1,7 +1,5 @@
 use std::ops::{Index, IndexMut};
 
-use crate::position::Position;
-
 use super::{bounds::HexBounds, position::HexPosition};
 
 
