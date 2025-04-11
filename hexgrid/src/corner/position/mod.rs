@@ -6,6 +6,7 @@ pub mod op_mul;
 
 pub struct Low;
 pub struct High;
+pub struct Center;
 
 pub trait Height {
     fn is_low() -> bool;
@@ -38,65 +39,22 @@ pub struct CornerPosition<H> {
     height: PhantomData<H>
 }
 
-impl CornerPosition<Low> {
-    /// Signifies going "up-left" from the current position.
-    pub const UP_LEFT: CornerPosition<Low> = CornerPosition {
+impl CornerPosition<High> {
+    pub const UP_LEFT: CornerPosition<High> = CornerPosition {
         rights: -1,
         downs: -1,
-        height: PhantomData::<Low>
+        height: PhantomData::<High>
     };
 
-    /// Signifies going "up-right" from the current position.
-    pub const UP_RIGHT: CornerPosition<Low> = CornerPosition {
+    pub const UP_RIGHT: CornerPosition<High> = CornerPosition {
         rights: 1,
         downs: -1,
-        height: PhantomData::<Low>
+        height: PhantomData::<High>
     };
 
-    /// Signifies going "down" from the current position.
-    pub const DOWN: CornerPosition<Low> = CornerPosition {
+    pub const DOWN: CornerPosition<High> = CornerPosition {
         rights: 0,
         downs: 2,
-        height: PhantomData::<Low>
-    };
-
-    /// Signifies the "top-left" corner for a hex. 
-    pub const TOP_LEFT: CornerPosition<Low> = CornerPosition {
-        rights: 0,
-        downs: 0,
-        height: PhantomData::<Low>
-    };
-
-    pub const TOP_RIGHT: CornerPosition<Low> = CornerPosition {
-        rights: 2,
-        downs: 0,
-        height: PhantomData::<Low>
-    };
-
-    pub const BOTTOM: CornerPosition<Low> = CornerPosition {
-        rights: 1,
-        downs: 3,
-        height: PhantomData::<Low>
-    };
-
-}
-
-impl CornerPosition<High> {
-    pub const DOWN_LEFT: CornerPosition<High> = CornerPosition {
-        rights: -1,
-        downs: 1,
-        height: PhantomData::<High>
-    };
-
-    pub const DOWN_RIGHT: CornerPosition<High> = CornerPosition {
-        rights: 1,
-        downs: 1,
-        height: PhantomData::<High>
-    };
-
-    pub const UP: CornerPosition<High> = CornerPosition {
-        rights: 0,
-        downs: -2,
         height: PhantomData::<High>
     };
 
@@ -116,6 +74,46 @@ impl CornerPosition<High> {
         rights: 1,
         downs: -1,
         height: PhantomData::<High>
+    };
+}
+
+impl CornerPosition<Low> {
+    pub const TOP_LEFT: CornerPosition<Low> = CornerPosition {
+        rights: 0,
+        downs: 0,
+        height: PhantomData::<Low>
+    };
+
+    pub const TOP_RIGHT: CornerPosition<Low> = CornerPosition {
+        rights: 2,
+        downs: 0,
+        height: PhantomData::<Low>
+    };
+
+    pub const BOTTOM: CornerPosition<Low> = CornerPosition {
+        rights: 1,
+        downs: 3,
+        height: PhantomData::<Low>
+    };
+}
+
+impl CornerPosition<Center> {
+    pub const DOWN_LEFT: CornerPosition<Center> = CornerPosition {
+        rights: -1,
+        downs: 1,
+        height: PhantomData::<Center>
+    };
+
+    pub const DOWN_RIGHT: CornerPosition<Center> = CornerPosition {
+        rights: 1,
+        downs: 1,
+        height: PhantomData::<Center>
+    };
+
+    pub const UP: CornerPosition<Center> = CornerPosition {
+        rights: 0,
+        downs: -2,
+        height: PhantomData::<Center>
     };
 }
 
