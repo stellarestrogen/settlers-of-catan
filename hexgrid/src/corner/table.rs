@@ -1,8 +1,8 @@
 use std::ops::{Index, IndexMut};
 
-use crate::{hex::{position::HexPosition, table::HexTable}, position::Position};
+use crate::hex::{position::HexPosition, table::HexTable};
 
-use super::{bounds::CornerBounds, position::CornerPosition};
+use super::{bounds::CornerBounds, position::{CornerPosition, Height}};
 
 
 pub struct CornerTable<T> {
@@ -10,18 +10,15 @@ pub struct CornerTable<T> {
     bounds: CornerBounds
 }
 
-impl CornerPosition {
-    pub(in super) fn structural_owner(&self) -> HexPosition {
-        let top_left_corner = if self.calc_distance(CornerPosition::EMPTY) % 2 == 0 { *self } else { *self + CornerPosition::UP };
-        let rights = top_left_corner.horizontal_distance(CornerPosition::EMPTY);
-        let downs = top_left_corner.vertical_distance(CornerPosition::EMPTY);
-
-        if rights.signum() == downs.signum() {
-            HexPosition::DOWN_RIGHT * downs + ((rights - downs)/2) * HexPosition::RIGHT
+impl<H: Height> CornerPosition<H> {
+    fn structural_owner(&self) -> HexPosition {
+        if let Some(p) = self.as_low() {
+            p + CornerPosition::DOWN_RIGHT
+        } else if let Some(p) = self.as_high() {
+            p + CornerPosition::UP_RIGHT
         } else {
-            HexPosition::DOWN_LEFT * downs + ((rights + downs)/2) * HexPosition::RIGHT
+            unreachable!()
         }
-
     }
 }
 
@@ -33,7 +30,7 @@ impl<T> CornerTable<T> {
         }
     }
 
-    pub fn get(&self, position: CornerPosition) -> Option<&T> {
+    pub fn get<H: Height>(&self, position: CornerPosition<H>) -> Option<&T> {
         if !self.bounds.check_bounds(position) {
             return None;
         }
@@ -42,14 +39,16 @@ impl<T> CornerTable<T> {
 
         let (top, bottom) = &self.data.get(hex)?;
 
-        if position.calc_distance(CornerPosition::EMPTY) % 2 == 0 {
+        if position.is_low() {
             top.as_ref()
-        } else {
+        } else if position.is_high() {
             bottom.as_ref()
+        } else {
+            unreachable!()
         }
     }
 
-    pub fn get_mut(&mut self, position: CornerPosition) -> Option<&mut T> {
+    pub fn get_mut<H: Height>(&mut self, position: CornerPosition<H>) -> Option<&mut T> {
         if !self.bounds.check_bounds(position) {
             return None;
         }
@@ -58,24 +57,26 @@ impl<T> CornerTable<T> {
 
         let (top, bottom) = self.data.get_mut(hex)?;
 
-        if position.calc_distance(CornerPosition::EMPTY) % 2 == 0 {
+        if position.is_low() {
             top.as_mut()
-        } else {
+        } else if position.is_high() {
             bottom.as_mut()
+        } else {
+            unreachable!()
         }
     }
 }
 
-impl<T> Index<CornerPosition> for CornerTable<T> {
+impl<T, H: Height> Index<CornerPosition<H>> for CornerTable<T> {
     type Output = T;
 
-    fn index(&self, index: CornerPosition) -> &Self::Output {
+    fn index(&self, index: CornerPosition<H>) -> &Self::Output {
         self.get(index).expect("No data at specified CornerPosition!")
     }
 }
 
-impl<T> IndexMut<CornerPosition> for CornerTable<T> {
-    fn index_mut(&mut self, index: CornerPosition) -> &mut Self::Output {
+impl<T, H: Height> IndexMut<CornerPosition<H>> for CornerTable<T> {
+    fn index_mut(&mut self, index: CornerPosition<H>) -> &mut Self::Output {
         self.get_mut(index).expect("No data at specified CornerPosition!")
     }
 }

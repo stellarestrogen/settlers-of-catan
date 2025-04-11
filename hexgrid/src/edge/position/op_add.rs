@@ -33,7 +33,7 @@ macro_rules! edge_to_hex {
                 if rights.signum() == downs.signum() {
                     HexPosition::DOWN_RIGHT * ((downs - 1)/2) + HexPosition::RIGHT * ((rights - downs)/4)
                 } else {
-                    HexPosition::DOWN_LEFT * ((downs - 1)/2) + HexPosition::RIGHT * ((rights - downs)/4)
+                    HexPosition::DOWN_LEFT * ((downs - 1)/2) + HexPosition::RIGHT * ((rights.abs() - downs.abs())/4)
                 }
             }
         }

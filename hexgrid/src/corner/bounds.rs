@@ -1,6 +1,6 @@
 use crate::{hex::{bounds::HexBounds, position::{HexPosition, HorizontalDistance}}, position::Position};
 
-use super::position::CornerPosition;
+use super::position::{CornerPosition, Height};
 
 pub struct CornerBounds {
     bounds: HexBounds
@@ -37,13 +37,19 @@ impl CornerBounds {
     
     }
 
-    pub fn check_bounds(&self, position: CornerPosition) -> bool {
-        if position.vertical_distance(CornerPosition::EMPTY) == self.bounds.get_top_left().vertical_distance(HexPosition::ORIGIN) ||
-        (position.vertical_distance(CornerPosition::EMPTY) + 1) == self.bounds.get_bottom_right().vertical_distance(HexPosition::ORIGIN) {
+    pub fn check_bounds<H: Height>(&self, position: CornerPosition<H>) -> bool {
+        if (self.bounds.get_top_left() + CornerPosition::BOTTOM_LEFT).vertical_distance(position) > 0 ||
+        (self.bounds.get_bottom_right() + CornerPosition::TOP_LEFT).vertical_distance(position) < 0 {
             return false;
         }
 
-        let hex = position.structural_owner();
+        let hex = if let Some(p) = position.as_low() {
+            p + CornerPosition::DOWN_RIGHT
+        } else if let Some(p) = position.as_high() {
+            p + CornerPosition::UP_RIGHT
+        } else {
+            unreachable!()
+        };
 
         if self.is_invalid_hex(hex) {
             return false;

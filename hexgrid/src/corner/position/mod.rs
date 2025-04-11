@@ -1,69 +1,176 @@
-use crate::position::{HorizontalAxis, VerticalAxis, Position};
+use std::marker::PhantomData;
 
 pub mod op_add;
 pub mod op_sub;
 pub mod op_mul;
 
-/// A CornerPosition is the distance rightwards and downwards from the "origin" corner, which the top-leftmost corner.
-/// Going right adds 1 to `rights`, going left subtracts 1.
-/// Going down adds 1 to `downs`, going up subtracts 1.
-#[derive(Clone, Copy)]
-pub struct CornerPosition {
+pub struct Low;
+pub struct High;
+
+pub trait Height {
+    fn is_low() -> bool;
+    fn is_high() -> bool;
+}
+
+impl Height for Low {
+    fn is_low() -> bool {
+        true
+    }
+
+    fn is_high() -> bool {
+        false
+    }
+}
+
+impl Height for High {
+    fn is_low() -> bool {
+        false
+    }
+
+    fn is_high() -> bool {
+        true
+    }
+}
+
+pub struct CornerPosition<H> {
     rights: i32,
-    downs: i32
+    downs: i32,
+    height: PhantomData<H>
 }
 
-impl CornerPosition {
-    pub const EMPTY: CornerPosition = CornerPosition {
-        rights: 0,
-        downs: 0
-    };
-
-    pub const RIGHT: CornerPosition = CornerPosition {
-        rights: 1,
-        downs: 0
-    };
-
-    pub const DOWN: CornerPosition = CornerPosition {
-        rights: 0,
-        downs: 1
-    };
-
-    pub const LEFT: CornerPosition = CornerPosition {
+impl CornerPosition<Low> {
+    /// Signifies going "up-left" from the current position.
+    pub const UP_LEFT: CornerPosition<Low> = CornerPosition {
         rights: -1,
-        downs: 0
+        downs: -1,
+        height: PhantomData::<Low>
     };
 
-    pub const UP: CornerPosition = CornerPosition {
+    /// Signifies going "up-right" from the current position.
+    pub const UP_RIGHT: CornerPosition<Low> = CornerPosition {
+        rights: 1,
+        downs: -1,
+        height: PhantomData::<Low>
+    };
+
+    /// Signifies going "down" from the current position.
+    pub const DOWN: CornerPosition<Low> = CornerPosition {
         rights: 0,
-        downs: -1
+        downs: 2,
+        height: PhantomData::<Low>
     };
 
-    pub fn calc_distance(&self, other: CornerPosition) -> i32 {
-        let distance = other - *self;
-        let mut distance = distance.rights.abs() + distance.downs.abs();
+    /// Signifies the "top-left" corner for a hex. 
+    pub const TOP_LEFT: CornerPosition<Low> = CornerPosition {
+        rights: 0,
+        downs: 0,
+        height: PhantomData::<Low>
+    };
 
-        if self.rights == other.rights {
-            distance = distance * 2 - if distance % 2 == 0 { 0 } else { 1 };
-        }
+    pub const TOP_RIGHT: CornerPosition<Low> = CornerPosition {
+        rights: 2,
+        downs: 0,
+        height: PhantomData::<Low>
+    };
 
-        distance
-    }
+    pub const BOTTOM: CornerPosition<Low> = CornerPosition {
+        rights: 1,
+        downs: 3,
+        height: PhantomData::<Low>
+    };
+
 }
 
-impl Position<i32> for CornerPosition {
-    type HorizontalOutput = i32;
-    type VerticalOutput = i32;
+impl CornerPosition<High> {
+    pub const DOWN_LEFT: CornerPosition<High> = CornerPosition {
+        rights: -1,
+        downs: 1,
+        height: PhantomData::<High>
+    };
 
-    fn positive_axes() -> (HorizontalAxis, VerticalAxis) {
-        (HorizontalAxis::Right, VerticalAxis::Down)
-    }
+    pub const DOWN_RIGHT: CornerPosition<High> = CornerPosition {
+        rights: 1,
+        downs: 1,
+        height: PhantomData::<High>
+    };
 
-    fn horizontal_distance(&self, other: Self) -> Self::HorizontalOutput {
+    pub const UP: CornerPosition<High> = CornerPosition {
+        rights: 0,
+        downs: -2,
+        height: PhantomData::<High>
+    };
+
+    pub const BOTTOM_LEFT: CornerPosition<High> = CornerPosition {
+        rights: 0,
+        downs: 2,
+        height: PhantomData::<High>
+    };
+
+    pub const BOTTOM_RIGHT: CornerPosition<High> = CornerPosition {
+        rights: 2,
+        downs: 2,
+        height: PhantomData::<High>
+    };
+
+    pub const TOP: CornerPosition<High> = CornerPosition {
+        rights: 1,
+        downs: -1,
+        height: PhantomData::<High>
+    };
+}
+
+impl<H> CornerPosition<H> {
+    pub fn horizontal_distance<O>(&self, other: CornerPosition<O>) -> i32 {
         self.rights - other.rights
     }
 
-    fn vertical_distance(&self, other: Self) -> Self::VerticalOutput {
+    pub fn vertical_distance<O>(&self, other: CornerPosition<O>) -> i32 {
         self.downs - other.downs
     }
 }
+
+impl<H: Height> CornerPosition<H> {
+    pub fn is_low(&self) -> bool {
+        H::is_low()
+    }
+
+    pub fn is_high(&self) -> bool {
+        H::is_high()
+    }
+
+    pub fn as_low(&self) -> Option<CornerPosition<Low>> {
+        if self.is_low() {
+            Some(CornerPosition {
+                rights: self.rights,
+                downs: self.downs,
+                height: PhantomData::<Low>
+            })
+        } else {
+            None
+        }
+    }
+
+    pub fn as_high(&self) -> Option<CornerPosition<High>> {
+        if self.is_high() {
+            Some(CornerPosition { 
+                rights: self.rights, 
+                downs: self.downs, 
+                height: PhantomData::<High> 
+            })
+        } else {
+            None
+        }
+    }
+}
+
+impl<H> Clone for CornerPosition<H> {
+    fn clone(&self) -> Self {
+        CornerPosition::<H> {
+            rights: self.rights,
+            downs: self.downs,
+            height: PhantomData::<H>
+        }
+    }
+}
+
+impl<H> Copy for CornerPosition<H> {}
