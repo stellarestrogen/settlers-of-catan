@@ -25,6 +25,10 @@ impl<T> HexTable<T> {
         }
     }
 
+    pub fn get_bounds(&self) -> &HexBounds {
+        &self.bounds
+    }
+
     fn calc_index(&self, position: HexPosition) -> Option<usize> {
         if !self.bounds.check_bounds(position) {
             return None

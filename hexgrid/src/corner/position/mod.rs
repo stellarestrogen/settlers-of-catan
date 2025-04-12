@@ -22,7 +22,6 @@ impl Height for Low {
         false
     }
 }
-
 impl Height for High {
     fn is_low() -> bool {
         false
@@ -118,11 +117,11 @@ impl CornerPosition<Center> {
 }
 
 impl<H> CornerPosition<H> {
-    pub fn horizontal_distance<O>(&self, other: CornerPosition<O>) -> i32 {
+    pub fn horizontal_distance<T>(&self, other: CornerPosition<T>) -> i32 {
         self.rights - other.rights
     }
 
-    pub fn vertical_distance<O>(&self, other: CornerPosition<O>) -> i32 {
+    pub fn vertical_distance<T>(&self, other: CornerPosition<T>) -> i32 {
         self.downs - other.downs
     }
 }

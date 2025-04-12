@@ -14,7 +14,7 @@ impl<Type: Valid> EdgePosition<Type> {
         if let Some(p) = self.as_even() {
             p + EdgePosition::DOWN_RIGHT
         } else if let Some(p) = self.as_positive() {
-            p + EdgePosition::RIGHT
+            p + EdgePosition::GO_RIGHT
         } else if let Some(p) = self.as_odd() {
             p + EdgePosition::UP_RIGHT
         } else {
@@ -24,7 +24,7 @@ impl<Type: Valid> EdgePosition<Type> {
 }
 
 impl<T> EdgeTable<T> {
-    fn new(bounds: EdgeBounds) -> Self {
+    pub fn new(bounds: EdgeBounds) -> Self {
         EdgeTable {
             data: HexTable::new(bounds.get_hex_bounds()),
             bounds

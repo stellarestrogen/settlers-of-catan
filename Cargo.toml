@@ -11,5 +11,6 @@ num-traits = "0.2.19"
 [workspace]
 resolver = "3"
 members = [
-    "hexgrid"
+    "hexgrid",
+    "catan/catan-lib"
 ]

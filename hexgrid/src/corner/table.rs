@@ -23,7 +23,7 @@ impl<H: Height> CornerPosition<H> {
 }
 
 impl<T> CornerTable<T> {
-    fn new(bounds: CornerBounds) -> Self {
+    pub fn new(bounds: CornerBounds) -> Self {
         CornerTable {
             data: HexTable::new(bounds.get_hex_bounds()),
             bounds

@@ -42,7 +42,7 @@ impl EdgeBounds {
         let hex = if let Some(p) = position.as_even() {
             p + EdgePosition::DOWN_RIGHT
         } else if let Some(p) = position.as_positive() {
-            p + EdgePosition::RIGHT
+            p + EdgePosition::GO_RIGHT
         } else if let Some(p) = position.as_odd() {
             p + EdgePosition::UP_RIGHT
         } else {

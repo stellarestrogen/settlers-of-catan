@@ -69,13 +69,13 @@ pub struct EdgePosition<Type> {
 }
 
 impl EdgePosition<Even> {
-    pub const TOP_LEFT: EdgePosition<Even> = EdgePosition::<Even> {
+    pub const TOP_LEFT: EdgePosition<Even> = EdgePosition {
         rights: 0,
         downs: 0,
         r#type: PhantomData::<Even>
     };
 
-    pub const BOTTOM_RIGHT: EdgePosition<Even> = EdgePosition::<Even> {
+    pub const BOTTOM_RIGHT: EdgePosition<Even> = EdgePosition {
         rights: 2,
         downs: 2,
         r#type: PhantomData::<Even>
@@ -83,53 +83,66 @@ impl EdgePosition<Even> {
 }
 
 impl EdgePosition<Odd> {
-    pub const RIGHT: EdgePosition<Odd> = EdgePosition::<Odd> {
+    pub const GO_RIGHT: EdgePosition<Odd> = EdgePosition {
         rights: 2,
         downs: 0,
         r#type: PhantomData::<Odd>
     };
 
-    pub const LEFT: EdgePosition<Odd> = EdgePosition::<Odd> {
+    pub const GO_LEFT: EdgePosition<Odd> = EdgePosition {
         rights: -2,
         downs: 0,
         r#type: PhantomData::<Odd>
     };
+
+    pub const BOTTOM_LEFT: EdgePosition<Odd> = EdgePosition {
+        rights: -1,
+        downs: 1,
+        r#type: PhantomData::<Odd>
+    };
+
+    pub const TOP_RIGHT: EdgePosition<Odd> = EdgePosition {
+        rights: 1,
+        downs: -1,
+        r#type: PhantomData::<Odd>
+    };
+
 }
 
 impl EdgePosition<Positive> {
-    pub const DOWN_LEFT: EdgePosition<Positive> = EdgePosition::<Positive> {
+    pub const DOWN_LEFT: EdgePosition<Positive> = EdgePosition {
         rights: -1,
         downs: 1,
         r#type: PhantomData::<Positive>
     };
 
-    pub const BOTTOM_LEFT: EdgePosition<Positive> = EdgePosition::<Positive> {
+    pub const UP_RIGHT: EdgePosition<Positive> = EdgePosition {
+        rights: 1,
+        downs: -1,
+        r#type: PhantomData::<Positive>
+    };
+
+    pub const LEFT: EdgePosition<Positive> = EdgePosition {
         rights: -1,
         downs: 1,
         r#type: PhantomData::<Positive>
     };
 
-    pub const UP_RIGHT: EdgePosition<Positive> = EdgePosition::<Positive> {
-        rights: 1,
-        downs: -1,
-        r#type: PhantomData::<Positive>
-    };
-
-    pub const TOP_RIGHT: EdgePosition<Positive> = EdgePosition::<Positive> {
-        rights: 1,
-        downs: -1,
+    pub const RIGHT: EdgePosition<Positive> = EdgePosition {
+        rights: 3,
+        downs: 1,
         r#type: PhantomData::<Positive>
     };
 }
 
 impl EdgePosition<Negative> {
-    pub const DOWN_RIGHT: EdgePosition<Negative> = EdgePosition::<Negative> {
+    pub const DOWN_RIGHT: EdgePosition<Negative> = EdgePosition {
         rights: 1,
         downs: 1,
         r#type: PhantomData::<Negative>
     };
 
-    pub const UP_LEFT: EdgePosition<Negative> = EdgePosition::<Negative> {
+    pub const UP_LEFT: EdgePosition<Negative> = EdgePosition {
         rights: -1,
         downs: -1,
         r#type: PhantomData::<Negative>

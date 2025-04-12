@@ -30,6 +30,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "catan-lib"
+version = "0.1.0"
+dependencies = [
+ "hexgrid",
+ "rand",
+]
+
+[[package]]
 name = "cfg-if"
 version = "1.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
