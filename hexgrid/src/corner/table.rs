@@ -65,6 +65,24 @@ impl<T> CornerTable<T> {
             unreachable!()
         }
     }
+
+    pub fn set<H: Height>(&mut self, position: CornerPosition<H>, data: T) -> Result<(), ()> {
+        if !self.bounds.check_bounds(position) {
+            return Err(())
+        }
+
+        let d = &mut self.data[position.structural_owner()];
+
+        if position.is_low() {
+            d.0 = Some(data);
+        } else if position.is_high() {
+            d.1 = Some(data);
+        } else {
+            unreachable!()
+        }
+
+        Ok(())
+    }
 }
 
 impl<T, H: Height> Index<CornerPosition<H>> for CornerTable<T> {

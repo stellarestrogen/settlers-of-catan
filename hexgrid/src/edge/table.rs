@@ -70,6 +70,25 @@ impl<T> EdgeTable<T> {
             unreachable!()
         }
     }
+
+    pub fn set<Type: Valid>(&mut self, position: EdgePosition<Type>, data: T) -> Result<(), ()> {
+        if !self.bounds.check_bounds(position) {
+            return Err(());
+        }
+        let d = &mut self.data[position.structural_owner()];
+
+        if position.is_even() {
+            d.0 = Some(data);
+        } else if position.is_positive() {
+            d.1 = Some(data)
+        } else if position.is_odd() {
+            d.2 = Some(data)
+        } else {
+            unreachable!()
+        }
+
+        Ok(())
+    }
 }
 
 impl<T, Type: Valid> Index<EdgePosition<Type>> for EdgeTable<T> {
