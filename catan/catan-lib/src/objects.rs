@@ -79,14 +79,14 @@ impl ResourceCard {
 }
 
 #[derive(Clone, Copy)]
-pub struct Corner {
+pub struct CornerData {
     building: Option<Building>,
     trade_type: Option<TradeType>,
 }
 
-impl Corner {
+impl CornerData {
     pub fn new() -> Self {
-        Corner {
+        CornerData {
             building: None,
             trade_type: None
         }
@@ -105,39 +105,43 @@ impl Corner {
     }
 
     pub fn unset_trade(&mut self) {
-        self. trade_type = None
+        self.trade_type = None
+    }
+
+    pub fn get_building(&self) -> Option<Building> {
+        self.building
+    }
+
+    pub fn get_trade(&self) -> Option<TradeType> {
+        self.trade_type
     }
 }
 
 #[derive(Clone, Copy)]
-pub struct Edge {
-    transport: Option<Transport>
+pub struct EdgeData {
+    transport: Transport
 }
 
-impl Edge {
-    pub fn new() -> Self {
-        Edge {
-            transport: None
+impl EdgeData {
+    pub fn new(transport: Transport) -> Self {
+        EdgeData {
+            transport
         }
     }
 
-    pub fn set_transport(&mut self, transport: Transport) {
-        self.transport = Some(transport)
-    }
-
-    pub fn unset_transport(&mut self) {
-        self.transport = None
+    pub fn get_transport(&self) -> Transport {
+        self.transport
     }
 }
 
-#[derive(Clone)]
-pub struct Tile {
+#[derive(Clone, Copy)]
+pub struct TileData {
     r#type: TileType,
 }
 
-impl Tile {
+impl TileData {
     pub fn new(r#type: TileType) -> Self {
-        Tile { r#type }
+        TileData { r#type }
     }
 
     pub fn get_resource_type(&self) -> TileType {

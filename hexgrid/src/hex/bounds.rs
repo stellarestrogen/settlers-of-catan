@@ -1,16 +1,16 @@
-use super::position::HexPosition;
+use super::position::{HexPosition, HorizontalDistance};
 
 #[derive(Clone, Debug)]
 pub struct HexBounds {
     top_left: HexPosition,
-    bottom_right: HexPosition
+    bottom_right: HexPosition,
 }
 
 impl HexBounds {
     pub fn new() -> Self {
         HexBounds {
             top_left: HexPosition::ORIGIN,
-            bottom_right: HexPosition::ORIGIN
+            bottom_right: HexPosition::ORIGIN,
         }
     }
 
@@ -57,6 +57,50 @@ impl HexBounds {
             let shift: f64 = pos_offset.horizontal_distance(self.bottom_right).into();
             let adjustment = if shift > 0. { HexPosition::DOWN_RIGHT } else if shift < 0. { HexPosition::DOWN_LEFT } else { HexPosition::ORIGIN };
             self.bottom_right += HexPosition::DOWN_LEFT * (vertical_distance/2) + HexPosition::DOWN_RIGHT * (vertical_distance/2) + adjustment;
+        }
+    }
+
+    pub fn get_area<'a>(&'a self) -> impl Iterator<Item = HexPosition> {
+        HexArea::new(self)
+    }
+}
+
+pub struct HexArea<'a> {
+    parent: &'a HexBounds,
+    position: HexPosition
+}
+
+impl<'a> HexArea<'a> {
+    fn new(parent: &'a HexBounds) -> Self {
+        HexArea {
+            parent,
+            position: HexPosition::ORIGIN
+        }
+    }
+}
+
+impl<'a> Iterator for HexArea<'a> {
+    type Item = HexPosition;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        self.position += HexPosition::RIGHT;
+
+        if self.position.is_right(self.parent.get_bottom_right()) {
+            let shift = self.position.horizontal_distance(HexPosition::ORIGIN);
+
+            match shift {
+                HorizontalDistance::Shifted(_) => self.position += HexPosition::DOWN_RIGHT,
+                HorizontalDistance::Unshifted(_) => self.position+= HexPosition::DOWN_LEFT,
+            }
+
+            self.position += HexPosition::LEFT * (self.parent.get_top_left().horizontal_distance(self.parent.get_bottom_right()).ceil().abs());
+
+        }
+
+        if self.position.is_below(self.parent.get_bottom_right()) {
+            None
+        } else {
+            Some(self.position)
         }
     }
 }

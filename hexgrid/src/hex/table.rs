@@ -72,6 +72,18 @@ impl<T> HexTable<T> {
     }
 }
 
+impl<T: Clone> HexTable<T> {
+    fn new_filled(bounds: HexBounds, obj: T) -> Self {
+        let mut data = Vec::with_capacity(bounds.get_size());
+        data.resize(bounds.get_size(), Some(obj));
+
+        HexTable {
+            bounds,
+            data
+        }
+    }
+}
+
 impl<T> Index<HexPosition> for HexTable<T> {
     type Output = T;
 

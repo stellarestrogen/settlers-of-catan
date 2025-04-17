@@ -1,13 +1,3 @@
-[package]
-name = "catan"
-version = "0.1.0"
-edition = "2024"
-
-[dependencies]
-rand = "0.9.0"
-geometric = "0.2.1"
-num-traits = "0.2.19"
-
 [workspace]
 resolver = "3"
 members = [

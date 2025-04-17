@@ -1,7 +1,7 @@
 use rand::prelude::*;
 use std::iter;
 
-use super::objects::{ResourceType, TileType, Tile};
+use super::objects::{ResourceType, TileType, TileData};
 
 static RESOURCES: [ResourceType; 5] = [
     ResourceType::Wood,
@@ -33,7 +33,7 @@ impl ResourceDistribution {
 /// Holds all of the resource and desert tiles.
 #[derive(Clone)]
 pub struct ResourceDeck {
-    resources: Vec<Tile>,
+    resources: Vec<TileData>,
 }
 
 impl ResourceDeck {
@@ -53,7 +53,7 @@ impl ResourceDeck {
     //     self.resources
     // }
 
-    fn create_tiles(size: usize, distribution: ResourceDistribution, roll_numbers: &mut impl Iterator<Item = u8>) -> Vec<Tile> {
+    fn create_tiles(size: usize, distribution: ResourceDistribution, roll_numbers: &mut impl Iterator<Item = u8>) -> Vec<TileData> {
         let mut resources =
             Vec::<Option<ResourceType>>::with_capacity(size);
         for resource in RESOURCES {
@@ -76,12 +76,12 @@ impl ResourceDeck {
             .map(|resource| {
                 resource
                     .map(|rsrc| {
-                        Tile::new(TileType::Resource {
+                        TileData::new(TileType::Resource {
                             resource: rsrc,
                             roll_number: roll_numbers.next().unwrap().into(),
                         })
                     })
-                    .unwrap_or(Tile::new(TileType::Desert))
+                    .unwrap_or(TileData::new(TileType::Desert))
             })
             .collect()
             
@@ -89,9 +89,9 @@ impl ResourceDeck {
 }
 
 impl Iterator for ResourceDeck {
-    type Item = Tile;
+    type Item = TileData;
 
-    fn next(&mut self) -> Option<Tile> {
+    fn next(&mut self) -> Option<TileData> {
         self.resources.pop()
     }
 }

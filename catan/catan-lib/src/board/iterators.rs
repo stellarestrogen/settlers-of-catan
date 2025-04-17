@@ -1,6 +1,6 @@
 use hexgrid::hex::position::HexPosition;
 
-use crate::objects::Tile;
+use crate::objects::TileData;
 
 #[derive(Clone, Copy)]
 enum RingDistance {
@@ -65,7 +65,7 @@ impl Iterator for Ring {
 }
 
 #[derive(Clone)]
-pub struct CircularOrbit<T: Iterator<Item = Tile> + Clone> {
+pub struct CircularOrbit<T: Iterator<Item = TileData> + Clone> {
     position: HexPosition,
     tiles: T,
     shortest: u32,
@@ -73,7 +73,7 @@ pub struct CircularOrbit<T: Iterator<Item = Tile> + Clone> {
     ring: Ring,
 }
 
-impl<T: Iterator<Item = Tile> + Clone> CircularOrbit<T> {
+impl<T: Iterator<Item = TileData> + Clone> CircularOrbit<T> {
     pub fn new(tiles: T, shortest: u32, longest: u32) -> Self {
         CircularOrbit {
             position: HexPosition::ORIGIN,
@@ -85,10 +85,10 @@ impl<T: Iterator<Item = Tile> + Clone> CircularOrbit<T> {
     }
 }
 
-impl<T: Iterator <Item = Tile> + Clone> Iterator for CircularOrbit<T> {
-    type Item = (HexPosition, Tile);
+impl<T: Iterator <Item = TileData> + Clone> Iterator for CircularOrbit<T> {
+    type Item = (HexPosition, TileData);
 
-    fn next(&mut self) -> Option<(HexPosition, Tile)> {
+    fn next(&mut self) -> Option<(HexPosition, TileData)> {
         if let Some(next) = self.ring.next() {
             self.position = next;
             Some((next, self.tiles.next()?))
