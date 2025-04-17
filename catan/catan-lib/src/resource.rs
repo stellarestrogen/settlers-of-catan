@@ -43,16 +43,6 @@ impl ResourceDeck {
         }
     }
 
-    // pub fn draw(&mut self) -> Tile {
-    //     self.resources
-    //         .pop()
-    //         .expect("No more resources to draw from ResourceDeck!")
-    // }
-
-    // pub fn into_vec(self) -> Vec<Tile> {
-    //     self.resources
-    // }
-
     fn create_tiles(size: usize, distribution: ResourceDistribution, roll_numbers: &mut impl Iterator<Item = u8>) -> Vec<TileData> {
         let mut resources =
             Vec::<Option<ResourceType>>::with_capacity(size);
