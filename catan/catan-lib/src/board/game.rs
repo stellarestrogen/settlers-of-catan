@@ -5,7 +5,7 @@ use rand::seq::SliceRandom;
 
 use crate::{objects::{ResourceType, TileData}, resource::{ResourceDeck, ResourceDistribution}};
 
-use super::iterators::CircularOrbit;
+use super::iterators::orbit::CircularOrbit;
 
 const ROLL_ORDER_BASE: [u8; 18] = [11, 3, 6, 5, 4, 9, 10, 8, 4, 11, 12, 9, 10, 8, 3, 6, 2, 5];
 

@@ -97,10 +97,10 @@ impl<'a> Iterator for HexArea<'a> {
 
         }
 
-        if self.position.is_below(self.parent.get_bottom_right()) {
-            None
-        } else {
+        if !self.position.is_below(self.parent.get_bottom_right()) {
             Some(self.position)
+        } else {
+            None
         }
     }
 }
