@@ -1,2 +1,2 @@
-pub mod orbit;
+pub mod spiral;
 pub mod ring;

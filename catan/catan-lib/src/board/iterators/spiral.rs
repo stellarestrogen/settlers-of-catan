@@ -5,7 +5,7 @@ use crate::objects::TileData;
 use super::ring::Ring;
 
 #[derive(Clone)]
-pub struct CircularOrbit<T: Iterator<Item = TileData> + Clone> {
+pub struct Spiral<T: Iterator<Item = TileData> + Clone> {
     position: HexPosition,
     tiles: T,
     shortest: u32,
@@ -13,9 +13,9 @@ pub struct CircularOrbit<T: Iterator<Item = TileData> + Clone> {
     ring: Ring,
 }
 
-impl<T: Iterator<Item = TileData> + Clone> CircularOrbit<T> {
+impl<T: Iterator<Item = TileData> + Clone> Spiral<T> {
     pub fn new(tiles: T, shortest: u32, longest: u32) -> Self {
-        CircularOrbit {
+        Spiral {
             position: HexPosition::ORIGIN,
             tiles,
             shortest,
@@ -25,7 +25,7 @@ impl<T: Iterator<Item = TileData> + Clone> CircularOrbit<T> {
     }
 }
 
-impl<T: Iterator <Item = TileData> + Clone> Iterator for CircularOrbit<T> {
+impl<T: Iterator <Item = TileData> + Clone> Iterator for Spiral<T> {
     type Item = (HexPosition, TileData);
 
     fn next(&mut self) -> Option<(HexPosition, TileData)> {
