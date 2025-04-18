@@ -1,11 +1,9 @@
 use std::iter;
 
-use hexgrid::hex::position::HexPosition;
+use hexgrid::hex::{position::HexPosition, iterators::spiral::HexSpiral};
 use rand::seq::SliceRandom;
 
 use crate::{objects::{ResourceType, TileData}, resource::{ResourceDeck, ResourceDistribution}};
-
-use super::iterators::spiral::Spiral;
 
 const ROLL_ORDER_BASE: [u8; 18] = [11, 3, 6, 5, 4, 9, 10, 8, 4, 11, 12, 9, 10, 8, 3, 6, 2, 5];
 
@@ -37,7 +35,7 @@ impl GameEdition for BaseEdition {
 
         let resource_deck= ResourceDeck::new( 19, resource_distribution, &mut ROLL_ORDER_BASE.into_iter());
 
-        Spiral::new(resource_deck, 3, 5)
+        HexSpiral::new(3, 5).zip(resource_deck)
     }
 }
 
@@ -56,7 +54,7 @@ impl GameEdition for ExpansionEdition {
 
         let resource_deck= ResourceDeck::new( 30, resource_distribution, &mut ROLL_ORDER_EXP.into_iter());
 
-        Spiral::new(resource_deck, 3, 6)
+        HexSpiral::new(3, 6).zip(resource_deck)
     }
 }
 
@@ -78,7 +76,7 @@ impl GameEdition for CustomEdition {
         let size: usize = ((self.longest - self.shortest) * 2 + 1) as usize;
         let resource_deck = ResourceDeck::new(size, self.rsrc_distr.clone(), &mut self.roll_numbers.clone().into_iter());
 
-        Spiral::new(resource_deck, self.shortest, self.longest)
+        HexSpiral::new(self.shortest, self.longest).zip(resource_deck)
     }
 }
 

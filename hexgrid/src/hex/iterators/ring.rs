@@ -1,4 +1,4 @@
-use hexgrid::hex::position::HexPosition;
+use crate::hex::position::HexPosition;
 
 #[derive(Clone, Copy)]
 enum RingDistance {
@@ -16,7 +16,7 @@ const DIRECTIONS: [(HexPosition, RingDistance); 6] = [
 ];
 
 #[derive(Clone, Copy)]
-pub struct Ring {
+pub struct HexRing {
     position: HexPosition,
     shortest: u32,
     longest: u32,
@@ -24,9 +24,9 @@ pub struct Ring {
     direction_index: u8,
 }
 
-impl Ring {
+impl HexRing {
     pub fn new(position: HexPosition, shortest: u32, longest: u32) -> Self {
-        Ring {
+        HexRing {
             position: position - HexPosition::RIGHT,
             shortest,
             longest,
@@ -36,7 +36,7 @@ impl Ring {
     }
 }
 
-impl Iterator for Ring {
+impl Iterator for HexRing {
     type Item = HexPosition;
 
     fn next(&mut self) -> Option<HexPosition> {
