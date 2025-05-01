@@ -1,7 +1,7 @@
 use rand::prelude::*;
 use std::iter;
 
-use super::objects::{ResourceType, TileType, TileData};
+use super::objects::{ResourceType, TileData, TileType};
 
 static RESOURCES: [ResourceType; 5] = [
     ResourceType::Wood,
@@ -13,19 +13,21 @@ static RESOURCES: [ResourceType; 5] = [
 
 #[derive(Clone)]
 pub struct ResourceDistribution {
-    distribution: [(ResourceType, u32); 5]
+    distribution: [(ResourceType, u32); 5],
 }
 
 impl ResourceDistribution {
     pub fn new(distribution: [(ResourceType, u32); 5]) -> Self {
-        ResourceDistribution {
-            distribution
-        }
+        ResourceDistribution { distribution }
     }
 
     pub fn for_resource(&self, resource: ResourceType) -> u32 {
         let default = (resource, 0);
-        let (_, d) = self.distribution.iter().find(|(rsrc, _)| rsrc == &resource).unwrap_or(&default);
+        let (_, d) = self
+            .distribution
+            .iter()
+            .find(|(rsrc, _)| rsrc == &resource)
+            .unwrap_or(&default);
         *d
     }
 }
@@ -37,15 +39,22 @@ pub struct ResourceDeck {
 }
 
 impl ResourceDeck {
-    pub fn new(size: usize, distribution: ResourceDistribution, roll_numbers: &mut impl Iterator<Item = u8>) -> Self {
+    pub fn new(
+        size: usize,
+        distribution: ResourceDistribution,
+        roll_numbers: &mut impl Iterator<Item = u8>,
+    ) -> Self {
         ResourceDeck {
             resources: Self::create_tiles(size, distribution, roll_numbers),
         }
     }
 
-    fn create_tiles(size: usize, distribution: ResourceDistribution, roll_numbers: &mut impl Iterator<Item = u8>) -> Vec<TileData> {
-        let mut resources =
-            Vec::<Option<ResourceType>>::with_capacity(size);
+    fn create_tiles(
+        size: usize,
+        distribution: ResourceDistribution,
+        roll_numbers: &mut impl Iterator<Item = u8>,
+    ) -> Vec<TileData> {
+        let mut resources = Vec::<Option<ResourceType>>::with_capacity(size);
         for resource in RESOURCES {
             resources.extend(iter::repeat_n(
                 Some(resource),
@@ -60,7 +69,6 @@ impl ResourceDeck {
 
         resources.shuffle(&mut rand::rng());
 
-
         resources
             .into_iter()
             .map(|resource| {
@@ -74,7 +82,6 @@ impl ResourceDeck {
                     .unwrap_or(TileData::new(TileType::Desert))
             })
             .collect()
-            
     }
 }
 

@@ -2,11 +2,14 @@ use std::ops::{Index, IndexMut};
 
 use crate::hex::{position::HexPosition, table::HexTable};
 
-use super::{bounds::EdgeBounds, position::{EdgePosition, Valid}};
+use super::{
+    bounds::EdgeBounds,
+    position::{EdgePosition, Valid},
+};
 
 pub struct EdgeTable<T> {
     data: HexTable<(Option<T>, Option<T>, Option<T>)>,
-    bounds: EdgeBounds
+    bounds: EdgeBounds,
 }
 
 impl<Type: Valid> EdgePosition<Type> {
@@ -27,7 +30,7 @@ impl<T> EdgeTable<T> {
     pub fn new(bounds: EdgeBounds) -> Self {
         EdgeTable {
             data: HexTable::new(bounds.get_hex_bounds()),
-            bounds
+            bounds,
         }
     }
 
@@ -99,8 +102,9 @@ impl<T, Type: Valid> Index<EdgePosition<Type>> for EdgeTable<T> {
     }
 }
 
-impl <T, Type: Valid> IndexMut<EdgePosition<Type>> for EdgeTable<T> {
+impl<T, Type: Valid> IndexMut<EdgePosition<Type>> for EdgeTable<T> {
     fn index_mut(&mut self, index: EdgePosition<Type>) -> &mut Self::Output {
-        self.get_mut(index).expect("No data at specified EdgePosition!")
+        self.get_mut(index)
+            .expect("No data at specified EdgePosition!")
     }
 }

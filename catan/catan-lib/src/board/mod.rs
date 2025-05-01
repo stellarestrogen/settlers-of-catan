@@ -1,7 +1,19 @@
 pub mod game;
 
 use game::GameEdition;
-use hexgrid::{corner::{bounds::CornerBounds, position::{CornerPosition, Height}, table::CornerTable}, edge::{bounds::EdgeBounds, position::{EdgePosition, Valid}, table::EdgeTable}, hex::{bounds::HexBounds, position::HexPosition, table::HexTable}};
+use hexgrid::{
+    corner::{
+        bounds::CornerBounds,
+        position::{CornerPosition, Height},
+        table::CornerTable,
+    },
+    edge::{
+        bounds::EdgeBounds,
+        position::{EdgePosition, Valid},
+        table::EdgeTable,
+    },
+    hex::{bounds::HexPerimeter, position::HexPosition, table::HexTable},
+};
 
 use crate::objects::{Building, CornerData, EdgeData, TileData, TileType, TradeType, Transport};
 
@@ -22,7 +34,7 @@ impl Board {
             tiles,
         }
     }
-    
+
     pub fn get_tile(&self, position: HexPosition) -> TileData {
         if let Some(r) = self.tiles.get(position) {
             *r
@@ -43,7 +55,11 @@ impl Board {
         Some(self.edges.get(position)?.get_transport())
     }
 
-    pub fn set_building<H: Height>(&mut self, position: CornerPosition<H>, building: Building) -> Result<(), ()> {
+    pub fn set_building<H: Height>(
+        &mut self,
+        position: CornerPosition<H>,
+        building: Building,
+    ) -> Result<(), ()> {
         if let Some(data) = self.corners.get_mut(position) {
             data.set_building(building);
             Ok(())
@@ -54,12 +70,16 @@ impl Board {
         }
     }
 
-    pub fn set_transport<T: Valid>(&mut self, position: EdgePosition<T>, transport: Transport) -> Result<(), ()> {
+    pub fn set_transport<T: Valid>(
+        &mut self,
+        position: EdgePosition<T>,
+        transport: Transport,
+    ) -> Result<(), ()> {
         self.edges.set(position, EdgeData::new(transport))
     }
-    
+
     fn create_tiles(edition: impl GameEdition) -> HexTable<TileData> {
-        let mut bounds = HexBounds::new();
+        let mut bounds = HexPerimeter::new();
         let iter = edition.get_tiles();
 
         for (b, _) in iter.clone() {
@@ -74,7 +94,4 @@ impl Board {
 
         tiles
     }
-
-    
 }
-

@@ -1,14 +1,14 @@
 use super::position::{HexPosition, HorizontalDistance};
 
 #[derive(Clone, Debug)]
-pub struct HexBounds {
+pub struct HexPerimeter {
     top_left: HexPosition,
     bottom_right: HexPosition,
 }
 
-impl HexBounds {
+impl HexPerimeter {
     pub fn new() -> Self {
-        HexBounds {
+        HexPerimeter {
             top_left: HexPosition::ORIGIN,
             bottom_right: HexPosition::ORIGIN,
         }
@@ -23,7 +23,10 @@ impl HexBounds {
     }
 
     pub fn get_length(&self) -> i32 {
-        self.bottom_right.horizontal_distance(self.top_left).ceil().abs()
+        self.bottom_right
+            .horizontal_distance(self.top_left)
+            .ceil()
+            .abs()
     }
 
     pub fn get_width(&self) -> i32 {
@@ -31,32 +34,51 @@ impl HexBounds {
     }
 
     pub fn check_bounds(&self, position: HexPosition) -> bool {
-        position.is_right_or_equal(self.top_left) && 
-        position.is_below_or_equal(self.top_left) && 
-        position.is_left_or_equal(self.bottom_right) && 
-        position.is_above_or_equal(self.bottom_right)
+        position.is_right_or_equal(self.top_left)
+            && position.is_below_or_equal(self.top_left)
+            && position.is_left_or_equal(self.bottom_right)
+            && position.is_above_or_equal(self.bottom_right)
     }
 
     pub fn expand_bounds(&mut self, position: HexPosition) {
         if position.is_left(self.top_left) {
-            self.top_left += HexPosition::LEFT * position.horizontal_distance(self.top_left).ceil().abs();
+            self.top_left +=
+                HexPosition::LEFT * position.horizontal_distance(self.top_left).ceil().abs();
         } else if position.is_right(self.bottom_right) {
-            self.bottom_right += HexPosition::RIGHT * position.horizontal_distance(self.bottom_right).ceil().abs();
+            self.bottom_right +=
+                HexPosition::RIGHT * position.horizontal_distance(self.bottom_right).ceil().abs();
         }
-        
+
         if position.is_above(self.top_left) {
             let vertical_distance = position.vertical_distance(self.top_left).abs();
-            let pos_offset = position + HexPosition::LEFT * position.horizontal_distance(self.top_left).ceil().abs();
+            let pos_offset = position
+                + HexPosition::LEFT * position.horizontal_distance(self.top_left).ceil().abs();
             let shift: f64 = pos_offset.horizontal_distance(self.top_left).into();
-            let adjustment = if shift > 0. { HexPosition::UP_RIGHT } else if shift < 0. { HexPosition::UP_LEFT } else { HexPosition::ORIGIN };
-            self.top_left += HexPosition::UP_LEFT * (vertical_distance/2) + HexPosition::UP_RIGHT * (vertical_distance/2) + adjustment;
-
+            let adjustment = if shift > 0. {
+                HexPosition::UP_RIGHT
+            } else if shift < 0. {
+                HexPosition::UP_LEFT
+            } else {
+                HexPosition::ORIGIN
+            };
+            self.top_left += HexPosition::UP_LEFT * (vertical_distance / 2)
+                + HexPosition::UP_RIGHT * (vertical_distance / 2)
+                + adjustment;
         } else if position.is_below(self.bottom_right) {
             let vertical_distance = position.vertical_distance(self.bottom_right).abs();
-            let pos_offset = position + HexPosition::RIGHT * position.horizontal_distance(self.bottom_right).ceil().abs();
+            let pos_offset = position
+                + HexPosition::RIGHT * position.horizontal_distance(self.bottom_right).ceil().abs();
             let shift: f64 = pos_offset.horizontal_distance(self.bottom_right).into();
-            let adjustment = if shift > 0. { HexPosition::DOWN_RIGHT } else if shift < 0. { HexPosition::DOWN_LEFT } else { HexPosition::ORIGIN };
-            self.bottom_right += HexPosition::DOWN_LEFT * (vertical_distance/2) + HexPosition::DOWN_RIGHT * (vertical_distance/2) + adjustment;
+            let adjustment = if shift > 0. {
+                HexPosition::DOWN_RIGHT
+            } else if shift < 0. {
+                HexPosition::DOWN_LEFT
+            } else {
+                HexPosition::ORIGIN
+            };
+            self.bottom_right += HexPosition::DOWN_LEFT * (vertical_distance / 2)
+                + HexPosition::DOWN_RIGHT * (vertical_distance / 2)
+                + adjustment;
         }
     }
 
@@ -66,15 +88,15 @@ impl HexBounds {
 }
 
 pub struct HexArea<'a> {
-    parent: &'a HexBounds,
-    position: HexPosition
+    parent: &'a HexPerimeter,
+    position: HexPosition,
 }
 
 impl<'a> HexArea<'a> {
-    fn new(parent: &'a HexBounds) -> Self {
+    fn new(parent: &'a HexPerimeter) -> Self {
         HexArea {
             parent,
-            position: HexPosition::ORIGIN
+            position: HexPosition::ORIGIN,
         }
     }
 }
@@ -90,11 +112,16 @@ impl<'a> Iterator for HexArea<'a> {
 
             match shift {
                 HorizontalDistance::Shifted(_) => self.position += HexPosition::DOWN_RIGHT,
-                HorizontalDistance::Unshifted(_) => self.position+= HexPosition::DOWN_LEFT,
+                HorizontalDistance::Unshifted(_) => self.position += HexPosition::DOWN_LEFT,
             }
 
-            self.position += HexPosition::LEFT * (self.parent.get_top_left().horizontal_distance(self.parent.get_bottom_right()).ceil().abs());
-
+            self.position += HexPosition::LEFT
+                * (self
+                    .parent
+                    .get_top_left()
+                    .horizontal_distance(self.parent.get_bottom_right())
+                    .ceil()
+                    .abs());
         }
 
         if !self.position.is_below(self.parent.get_bottom_right()) {

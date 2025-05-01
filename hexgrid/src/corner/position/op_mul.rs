@@ -3,7 +3,6 @@ use std::ops::{Mul, MulAssign};
 
 use super::{CornerPosition, Low};
 
-
 macro_rules! scalar_operations {
     ($scalar: ty) => {
         impl Mul<$scalar> for CornerPosition<Low> {
@@ -13,7 +12,7 @@ macro_rules! scalar_operations {
                 CornerPosition::<Low> {
                     rights: self.rights * rhs as i32,
                     downs: self.downs * rhs as i32,
-                    height: PhantomData::<Low>
+                    height: PhantomData::<Low>,
                 }
             }
         }
@@ -32,7 +31,7 @@ macro_rules! scalar_operations {
                 CornerPosition::<Low> {
                     rights: self as i32 * rhs.rights,
                     downs: self as i32 * rhs.downs,
-                    height: PhantomData::<Low>
+                    height: PhantomData::<Low>,
                 }
             }
         }

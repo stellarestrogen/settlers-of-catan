@@ -9,7 +9,10 @@ pub enum ResourceType {
 
 #[derive(Clone, Copy)]
 pub enum TileType {
-    Resource { resource: ResourceType, roll_number: u32 },
+    Resource {
+        resource: ResourceType,
+        roll_number: u32,
+    },
     Desert,
     Water,
 }
@@ -32,27 +35,27 @@ pub enum DevCardType {
 #[derive(Clone, Copy)]
 pub enum Transport {
     Road,
-    Boat
+    Boat,
 }
 
 #[derive(Clone, Copy)]
 pub enum Building {
-   Settlement,
-   City,
-   None,
+    Settlement,
+    City,
+    None,
 }
 
 #[derive(Clone, Copy)]
 pub struct ResourceCard {
     resource_type: ResourceType,
-    count: i32
+    count: i32,
 }
 
 impl ResourceCard {
     pub fn new(resource_type: ResourceType, count: i32) -> Self {
         ResourceCard {
             resource_type,
-            count
+            count,
         }
     }
 
@@ -69,12 +72,11 @@ impl ResourceCard {
     }
 
     pub fn sub(&mut self, amt: i32) {
-        if self.count <=0  { 
+        if self.count <= 0 {
             self.count = 0;
         } else {
             self.count -= amt;
         }
-
     }
 }
 
@@ -88,7 +90,7 @@ impl CornerData {
     pub fn new() -> Self {
         CornerData {
             building: None,
-            trade_type: None
+            trade_type: None,
         }
     }
 
@@ -96,7 +98,7 @@ impl CornerData {
         self.building = Some(building)
     }
 
-    pub fn unset_building (&mut self) {
+    pub fn unset_building(&mut self) {
         self.building = None
     }
 
@@ -119,14 +121,12 @@ impl CornerData {
 
 #[derive(Clone, Copy)]
 pub struct EdgeData {
-    transport: Transport
+    transport: Transport,
 }
 
 impl EdgeData {
     pub fn new(transport: Transport) -> Self {
-        EdgeData {
-            transport
-        }
+        EdgeData { transport }
     }
 
     pub fn get_transport(&self) -> Transport {

@@ -2,8 +2,8 @@ pub use horizontal_distance::HorizontalDistance;
 
 pub mod horizontal_distance;
 pub mod op_add;
-pub mod op_sub;
 pub mod op_mul;
+pub mod op_sub;
 
 #[derive(Clone, Copy, PartialEq, Eq, Debug)]
 pub struct HexPosition {
@@ -92,5 +92,4 @@ impl HexPosition {
     pub fn is_above_or_equal(&self, other: Self) -> bool {
         self.vertical_distance(other) <= 0
     }
-
 }

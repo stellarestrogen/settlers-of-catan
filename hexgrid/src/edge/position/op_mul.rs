@@ -13,7 +13,7 @@ macro_rules! scalar_operations {
                 EdgePosition::<Even> {
                     rights: self.rights * rhs as i32,
                     downs: self.downs * rhs as i32,
-                    r#type: PhantomData::<Even>
+                    r#type: PhantomData::<Even>,
                 }
             }
         }
@@ -32,7 +32,7 @@ macro_rules! scalar_operations {
                 EdgePosition::<Even> {
                     rights: rhs.rights * self as i32,
                     downs: rhs.downs * self as i32,
-                    r#type: PhantomData::<Even>
+                    r#type: PhantomData::<Even>,
                 }
             }
         }

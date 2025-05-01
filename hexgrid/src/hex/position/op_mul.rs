@@ -40,7 +40,7 @@ macro_rules! scalar_operations {
                         .mul(self as isize)
                         .ceil(),
 
-                    downs: rhs.vertical_distance(HexPosition::ORIGIN).mul(self as i32)
+                    downs: rhs.vertical_distance(HexPosition::ORIGIN).mul(self as i32),
                 }
             }
         }

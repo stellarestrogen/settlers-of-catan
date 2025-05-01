@@ -14,11 +14,11 @@ macro_rules! edge_add {
                 EdgePosition::<$out> {
                     rights: self.rights + rhs.rights,
                     downs: self.downs + rhs.downs,
-                    r#type: PhantomData::<$out>
+                    r#type: PhantomData::<$out>,
                 }
             }
         }
-    }
+    };
 }
 
 macro_rules! edge_to_hex {
@@ -31,13 +31,15 @@ macro_rules! edge_to_hex {
                 let downs = self.downs + rhs.downs;
 
                 if rights.signum() == downs.signum() {
-                    HexPosition::DOWN_RIGHT * ((downs - 1)/2) + HexPosition::RIGHT * ((rights - downs)/4)
+                    HexPosition::DOWN_RIGHT * ((downs - 1) / 2)
+                        + HexPosition::RIGHT * ((rights - downs) / 4)
                 } else {
-                    HexPosition::DOWN_LEFT * ((downs - 1)/2) + HexPosition::RIGHT * ((rights.abs() - downs.abs())/4)
+                    HexPosition::DOWN_LEFT * ((downs - 1) / 2)
+                        + HexPosition::RIGHT * ((rights.abs() - downs.abs()) / 4)
                 }
             }
         }
-    }
+    };
 }
 
 impl<Type: Valid> Add<HexPosition> for EdgePosition<Type> {
@@ -49,7 +51,7 @@ impl<Type: Valid> Add<HexPosition> for EdgePosition<Type> {
         EdgePosition::<Type> {
             rights: self.rights + (shift * 4.) as i32,
             downs: self.downs + rhs.vertical_distance(HexPosition::ORIGIN) * 2,
-            r#type: PhantomData::<Type>
+            r#type: PhantomData::<Type>,
         }
     }
 }
@@ -63,7 +65,7 @@ impl<Type: Valid> Add<EdgePosition<Type>> for HexPosition {
         EdgePosition::<Type> {
             rights: rhs.rights + (shift * 4.) as i32,
             downs: rhs.downs + self.vertical_distance(HexPosition::ORIGIN) * 2,
-            r#type: PhantomData::<Type>
+            r#type: PhantomData::<Type>,
         }
     }
 }

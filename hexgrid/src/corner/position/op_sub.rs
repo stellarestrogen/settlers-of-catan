@@ -2,7 +2,7 @@ use std::{marker::PhantomData, ops::Sub};
 
 use crate::hex::position::HexPosition;
 
-use super::{CornerPosition, High, Low, Center};
+use super::{Center, CornerPosition, High, Low};
 
 macro_rules! corner_sub {
     ($lhs: ty, $rhs: ty, $out: ty) => {
@@ -13,11 +13,11 @@ macro_rules! corner_sub {
                 CornerPosition::<$out> {
                     rights: self.rights - rhs.rights,
                     downs: self.downs - rhs.downs,
-                    height: PhantomData::<$out>
+                    height: PhantomData::<$out>,
                 }
             }
         }
-    }
+    };
 }
 
 macro_rules! corner_to_hex {
@@ -28,15 +28,18 @@ macro_rules! corner_to_hex {
             fn sub(self, rhs: CornerPosition<$rhs>) -> Self::Output {
                 let rights = self.rights - rhs.rights;
                 let downs = self.downs - rhs.downs;
-        
+
                 if rights.signum() == downs.signum() {
-                    (HexPosition::RIGHT + HexPosition::DOWN_RIGHT) * ((downs - 1)/3) + HexPosition::RIGHT * ((rights - downs)/2)
+                    (HexPosition::RIGHT + HexPosition::DOWN_RIGHT) * ((downs - 1) / 3)
+                        + HexPosition::RIGHT * ((rights - downs) / 2)
                 } else {
-                    (HexPosition::LEFT + HexPosition::DOWN_LEFT) * ((downs - 1)/3) + HexPosition::RIGHT * ((rights.abs() - downs.abs())/2) + HexPosition::UP_RIGHT
+                    (HexPosition::LEFT + HexPosition::DOWN_LEFT) * ((downs - 1) / 3)
+                        + HexPosition::RIGHT * ((rights.abs() - downs.abs()) / 2)
+                        + HexPosition::UP_RIGHT
                 }
             }
         }
-    }
+    };
 }
 
 corner_sub!(High, Low, High);
@@ -57,7 +60,7 @@ impl Sub<HexPosition> for CornerPosition<High> {
         CornerPosition {
             rights: self.rights - (shift * 2.) as i32,
             downs: self.downs - rhs.vertical_distance(HexPosition::ORIGIN) * 3,
-            height: PhantomData::<High>
+            height: PhantomData::<High>,
         }
     }
 }
@@ -70,7 +73,7 @@ impl Sub<HexPosition> for CornerPosition<Low> {
         CornerPosition {
             rights: self.rights - (shift * 2.) as i32,
             downs: self.downs - rhs.vertical_distance(HexPosition::ORIGIN) * 3,
-            height: PhantomData::<Low>
+            height: PhantomData::<Low>,
         }
     }
 }
@@ -83,7 +86,7 @@ impl Sub<CornerPosition<Low>> for HexPosition {
         CornerPosition {
             rights: rhs.rights - (shift * 2.) as i32,
             downs: rhs.downs - self.vertical_distance(HexPosition::ORIGIN) * 3,
-            height: PhantomData::<High>
+            height: PhantomData::<High>,
         }
     }
 }
@@ -96,7 +99,7 @@ impl Sub<CornerPosition<High>> for HexPosition {
         CornerPosition {
             rights: rhs.rights - (shift * 2.) as i32,
             downs: rhs.downs - self.vertical_distance(HexPosition::ORIGIN) * 3,
-            height: PhantomData::<Low>
+            height: PhantomData::<Low>,
         }
     }
 }

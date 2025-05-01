@@ -2,12 +2,14 @@ use std::ops::{Index, IndexMut};
 
 use crate::hex::{position::HexPosition, table::HexTable};
 
-use super::{bounds::CornerBounds, position::{CornerPosition, Height}};
-
+use super::{
+    bounds::CornerBounds,
+    position::{CornerPosition, Height},
+};
 
 pub struct CornerTable<T> {
     data: HexTable<(Option<T>, Option<T>)>,
-    bounds: CornerBounds
+    bounds: CornerBounds,
 }
 
 impl<H: Height> CornerPosition<H> {
@@ -26,7 +28,7 @@ impl<T> CornerTable<T> {
     pub fn new(bounds: CornerBounds) -> Self {
         CornerTable {
             data: HexTable::new(bounds.get_hex_bounds()),
-            bounds
+            bounds,
         }
     }
 
@@ -68,7 +70,7 @@ impl<T> CornerTable<T> {
 
     pub fn set<H: Height>(&mut self, position: CornerPosition<H>, data: T) -> Result<(), ()> {
         if !self.bounds.check_bounds(position) {
-            return Err(())
+            return Err(());
         }
 
         let d = &mut self.data[position.structural_owner()];
@@ -89,12 +91,14 @@ impl<T, H: Height> Index<CornerPosition<H>> for CornerTable<T> {
     type Output = T;
 
     fn index(&self, index: CornerPosition<H>) -> &Self::Output {
-        self.get(index).expect("No data at specified CornerPosition!")
+        self.get(index)
+            .expect("No data at specified CornerPosition!")
     }
 }
 
 impl<T, H: Height> IndexMut<CornerPosition<H>> for CornerTable<T> {
     fn index_mut(&mut self, index: CornerPosition<H>) -> &mut Self::Output {
-        self.get_mut(index).expect("No data at specified CornerPosition!")
+        self.get_mut(index)
+            .expect("No data at specified CornerPosition!")
     }
 }

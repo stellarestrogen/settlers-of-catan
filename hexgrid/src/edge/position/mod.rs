@@ -65,20 +65,20 @@ impl Valid for Positive {
 pub struct EdgePosition<Type> {
     rights: i32,
     downs: i32,
-    r#type: PhantomData<Type>
+    r#type: PhantomData<Type>,
 }
 
 impl EdgePosition<Even> {
     pub const TOP_LEFT: EdgePosition<Even> = EdgePosition {
         rights: 0,
         downs: 0,
-        r#type: PhantomData::<Even>
+        r#type: PhantomData::<Even>,
     };
 
     pub const BOTTOM_RIGHT: EdgePosition<Even> = EdgePosition {
         rights: 2,
         downs: 2,
-        r#type: PhantomData::<Even>
+        r#type: PhantomData::<Even>,
     };
 }
 
@@ -86,52 +86,51 @@ impl EdgePosition<Odd> {
     pub const GO_RIGHT: EdgePosition<Odd> = EdgePosition {
         rights: 2,
         downs: 0,
-        r#type: PhantomData::<Odd>
+        r#type: PhantomData::<Odd>,
     };
 
     pub const GO_LEFT: EdgePosition<Odd> = EdgePosition {
         rights: -2,
         downs: 0,
-        r#type: PhantomData::<Odd>
+        r#type: PhantomData::<Odd>,
     };
 
     pub const BOTTOM_LEFT: EdgePosition<Odd> = EdgePosition {
         rights: -1,
         downs: 1,
-        r#type: PhantomData::<Odd>
+        r#type: PhantomData::<Odd>,
     };
 
     pub const TOP_RIGHT: EdgePosition<Odd> = EdgePosition {
         rights: 1,
         downs: -1,
-        r#type: PhantomData::<Odd>
+        r#type: PhantomData::<Odd>,
     };
-
 }
 
 impl EdgePosition<Positive> {
     pub const DOWN_LEFT: EdgePosition<Positive> = EdgePosition {
         rights: -1,
         downs: 1,
-        r#type: PhantomData::<Positive>
+        r#type: PhantomData::<Positive>,
     };
 
     pub const UP_RIGHT: EdgePosition<Positive> = EdgePosition {
         rights: 1,
         downs: -1,
-        r#type: PhantomData::<Positive>
+        r#type: PhantomData::<Positive>,
     };
 
     pub const LEFT: EdgePosition<Positive> = EdgePosition {
         rights: -1,
         downs: 1,
-        r#type: PhantomData::<Positive>
+        r#type: PhantomData::<Positive>,
     };
 
     pub const RIGHT: EdgePosition<Positive> = EdgePosition {
         rights: 3,
         downs: 1,
-        r#type: PhantomData::<Positive>
+        r#type: PhantomData::<Positive>,
     };
 }
 
@@ -139,13 +138,13 @@ impl EdgePosition<Negative> {
     pub const DOWN_RIGHT: EdgePosition<Negative> = EdgePosition {
         rights: 1,
         downs: 1,
-        r#type: PhantomData::<Negative>
+        r#type: PhantomData::<Negative>,
     };
 
     pub const UP_LEFT: EdgePosition<Negative> = EdgePosition {
         rights: -1,
         downs: -1,
-        r#type: PhantomData::<Negative>
+        r#type: PhantomData::<Negative>,
     };
 }
 
@@ -177,7 +176,7 @@ impl<Type: Valid> EdgePosition<Type> {
             Some(EdgePosition {
                 rights: self.horizontal_distance(EdgePosition::TOP_LEFT),
                 downs: self.vertical_distance(EdgePosition::TOP_LEFT),
-                r#type: PhantomData::default()
+                r#type: PhantomData::default(),
             })
         } else {
             None
@@ -189,7 +188,7 @@ impl<Type: Valid> EdgePosition<Type> {
             Some(EdgePosition {
                 rights: self.horizontal_distance(EdgePosition::TOP_LEFT),
                 downs: self.vertical_distance(EdgePosition::TOP_LEFT),
-                r#type: PhantomData::default()
+                r#type: PhantomData::default(),
             })
         } else {
             None
@@ -201,7 +200,7 @@ impl<Type: Valid> EdgePosition<Type> {
             Some(EdgePosition {
                 rights: self.horizontal_distance(EdgePosition::TOP_LEFT),
                 downs: self.vertical_distance(EdgePosition::TOP_LEFT),
-                r#type: PhantomData::default()
+                r#type: PhantomData::default(),
             })
         } else {
             None
@@ -214,7 +213,7 @@ impl<Type> Clone for EdgePosition<Type> {
         EdgePosition::<Type> {
             rights: self.rights,
             downs: self.downs,
-            r#type: self.r#type
+            r#type: self.r#type,
         }
     }
 }
