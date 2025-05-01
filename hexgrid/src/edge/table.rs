@@ -35,7 +35,7 @@ impl<T> EdgeTable<T> {
     }
 
     pub fn get<Type: Valid>(&self, position: EdgePosition<Type>) -> Option<&T> {
-        if !self.bounds.check_bounds(position) {
+        if !self.bounds.contains(position) {
             return None;
         }
 
@@ -55,7 +55,7 @@ impl<T> EdgeTable<T> {
     }
 
     pub fn get_mut<Type: Valid>(&mut self, position: EdgePosition<Type>) -> Option<&mut T> {
-        if !self.bounds.check_bounds(position) {
+        if !self.bounds.contains(position) {
             return None;
         }
 
@@ -75,7 +75,7 @@ impl<T> EdgeTable<T> {
     }
 
     pub fn set<Type: Valid>(&mut self, position: EdgePosition<Type>, data: T) -> Result<(), ()> {
-        if !self.bounds.check_bounds(position) {
+        if !self.bounds.contains(position) {
             return Err(());
         }
         let d = &mut self.data[position.structural_owner()];

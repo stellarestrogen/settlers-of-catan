@@ -33,7 +33,7 @@ impl<T> CornerTable<T> {
     }
 
     pub fn get<H: Height>(&self, position: CornerPosition<H>) -> Option<&T> {
-        if !self.bounds.check_bounds(position) {
+        if !self.bounds.contains(position) {
             return None;
         }
 
@@ -51,7 +51,7 @@ impl<T> CornerTable<T> {
     }
 
     pub fn get_mut<H: Height>(&mut self, position: CornerPosition<H>) -> Option<&mut T> {
-        if !self.bounds.check_bounds(position) {
+        if !self.bounds.contains(position) {
             return None;
         }
 
@@ -69,7 +69,7 @@ impl<T> CornerTable<T> {
     }
 
     pub fn set<H: Height>(&mut self, position: CornerPosition<H>, data: T) -> Result<(), ()> {
-        if !self.bounds.check_bounds(position) {
+        if !self.bounds.contains(position) {
             return Err(());
         }
 

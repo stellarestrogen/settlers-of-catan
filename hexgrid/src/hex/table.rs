@@ -26,7 +26,7 @@ impl<T> HexTable<T> {
     }
 
     fn calc_index(&self, position: HexPosition) -> Option<usize> {
-        if !self.bounds.check_bounds(position) {
+        if !self.bounds.contains(position) {
             return None;
         }
 
@@ -90,14 +90,14 @@ impl<T> IndexMut<HexPosition> for HexTable<T> {
 
 pub struct HexData<'a, T> {
     parent: &'a HexTable<T>,
-    current: HexPosition
+    current: HexPosition,
 }
 
 impl<'a, T> HexData<'a, T> {
     fn new(parent: &'a HexTable<T>) -> Self {
         HexData {
             parent,
-            current: parent.bounds.get_top_left()
+            current: parent.bounds.get_top_left(),
         }
     }
 }
@@ -106,7 +106,7 @@ impl<'a, T> Iterator for HexData<'a, T> {
     type Item = HexPosition;
 
     fn next(&mut self) -> Option<Self::Item> {
-        let mut area = self.parent.get_bounds().get_area();
+        let mut area = self.parent.get_bounds().area();
         area.position(|p| p == self.current)?;
 
         for p in area {
@@ -116,7 +116,7 @@ impl<'a, T> Iterator for HexData<'a, T> {
                 continue;
             }
         }
-        
+
         None
     }
 }

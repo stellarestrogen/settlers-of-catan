@@ -83,7 +83,7 @@ impl Board {
         let iter = edition.get_tiles();
 
         for (b, _) in iter.clone() {
-            bounds.expand_bounds(b);
+            bounds.expand(b);
         }
 
         let mut tiles = HexTable::new(bounds.clone());

@@ -12,55 +12,40 @@ pub struct EdgeBounds {
 impl EdgeBounds {
     pub fn new(hex_bounds: &HexPerimeter) -> Self {
         let mut bounds: HexPerimeter = hex_bounds.clone();
-        bounds.expand_bounds(bounds.get_top_left() + HexPosition::UP_RIGHT);
-        bounds
-            .expand_bounds(bounds.get_bottom_right() + HexPosition::RIGHT + HexPosition::DOWN_LEFT);
+        bounds.expand(bounds.get_top_left() + HexPosition::UP_RIGHT);
+        bounds.expand(bounds.get_bottom_right() + HexPosition::RIGHT + HexPosition::DOWN_LEFT);
 
         EdgeBounds { bounds }
     }
 
     fn is_invalid_hex(&self, position: HexPosition) -> bool {
-        let mut hex1 = self.bounds.get_top_left();
-        let mut hex2 = self.bounds.get_bottom_right();
+        let top_left = self.bounds.get_top_left();
+        let bottom_right = self.bounds.get_bottom_right();
 
-        if let HorizontalDistance::Unshifted(_) = self
-            .bounds
-            .get_top_left()
-            .horizontal_distance(HexPosition::ORIGIN)
+        let mut hex1 = top_left;
+        let mut hex2 = bottom_right;
+
+        let length = self.bounds.get_length();
+
+        if let HorizontalDistance::Unshifted(_) = top_left.horizontal_distance(HexPosition::ORIGIN)
         {
-            hex1 = self.bounds.get_top_left()
-                + self
-                    .bounds
-                    .get_bottom_right()
-                    .horizontal_distance(self.bounds.get_top_left())
-                    .ceil()
-                    .abs()
-                    * HexPosition::RIGHT;
+            hex1 = top_left + length * HexPosition::RIGHT;
         }
 
-        if let HorizontalDistance::Shifted(_) = self
-            .bounds
-            .get_bottom_right()
-            .horizontal_distance(HexPosition::ORIGIN)
+        if let HorizontalDistance::Shifted(_) =
+            bottom_right.horizontal_distance(HexPosition::ORIGIN)
         {
-            hex2 = self.bounds.get_bottom_right()
-                + self
-                    .bounds
-                    .get_bottom_right()
-                    .horizontal_distance(self.bounds.get_top_left())
-                    .ceil()
-                    .abs()
-                    * HexPosition::LEFT;
+            hex2 = bottom_right + length * HexPosition::LEFT;
         }
 
         position == hex1 || position == hex2
     }
 
-    pub fn check_bounds<T: Valid>(&self, position: EdgePosition<T>) -> bool {
-        if (self.bounds.get_top_left() + EdgePosition::BOTTOM_LEFT).vertical_distance(position) > 0
-            || (self.bounds.get_bottom_right() + EdgePosition::TOP_LEFT).vertical_distance(position)
-                < 0
-        {
+    pub fn contains<T: Valid>(&self, position: EdgePosition<T>) -> bool {
+        let top_row = self.bounds.get_top_left() + EdgePosition::BOTTOM_LEFT;
+        let bottom_row = self.bounds.get_bottom_right() + EdgePosition::TOP_LEFT;
+
+        if top_row.vertical_distance(position) > 0 || bottom_row.vertical_distance(position) < 0 {
             return false;
         }
 
@@ -78,7 +63,7 @@ impl EdgeBounds {
             return false;
         }
 
-        self.bounds.check_bounds(hex)
+        self.bounds.contains(hex)
     }
 
     pub fn get_hex_bounds(&self) -> HexPerimeter {

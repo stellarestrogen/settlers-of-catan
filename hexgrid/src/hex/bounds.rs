@@ -1,3 +1,5 @@
+use crate::{corner::bounds::CornerBounds, edge::bounds::EdgeBounds};
+
 use super::position::{HexPosition, HorizontalDistance};
 
 #[derive(Clone, Debug)]
@@ -33,56 +35,84 @@ impl HexPerimeter {
         self.bottom_right.vertical_distance(self.top_left).abs()
     }
 
-    pub fn check_bounds(&self, position: HexPosition) -> bool {
+    pub fn contains(&self, position: HexPosition) -> bool {
         position.is_right_or_equal(self.top_left)
             && position.is_below_or_equal(self.top_left)
             && position.is_left_or_equal(self.bottom_right)
             && position.is_above_or_equal(self.bottom_right)
     }
 
-    pub fn expand_bounds(&mut self, position: HexPosition) {
+    /// Expands the current HexPerimeter to include the newly inserted position. If the given position is in bounds, nothing happens.
+    pub fn expand(&mut self, position: HexPosition) {
+        if self.contains(position) { return }
+
+        let horizontal_distance_top_left = position.horizontal_distance(self.top_left).ceil().abs();
+        let vertical_distance_top_left = position.vertical_distance(self.top_left).abs();
+
+        let horizontal_distance_bottom_right =
+            position.horizontal_distance(self.bottom_right).ceil().abs();
+
+        let vertical_distance_bottom_right = position.vertical_distance(self.bottom_right).abs();
+
         if position.is_left(self.top_left) {
-            self.top_left +=
-                HexPosition::LEFT * position.horizontal_distance(self.top_left).ceil().abs();
+            self.top_left += HexPosition::LEFT * horizontal_distance_top_left;
         } else if position.is_right(self.bottom_right) {
-            self.bottom_right +=
-                HexPosition::RIGHT * position.horizontal_distance(self.bottom_right).ceil().abs();
+            self.bottom_right += HexPosition::RIGHT * horizontal_distance_bottom_right;
         }
 
         if position.is_above(self.top_left) {
-            let vertical_distance = position.vertical_distance(self.top_left).abs();
-            let pos_offset = position
-                + HexPosition::LEFT * position.horizontal_distance(self.top_left).ceil().abs();
+            let vertical_distance = vertical_distance_top_left;
+
+            let pos_offset = position + HexPosition::LEFT * horizontal_distance_top_left;
+
             let shift: f64 = pos_offset.horizontal_distance(self.top_left).into();
+
             let adjustment = if shift > 0. {
                 HexPosition::UP_RIGHT
             } else if shift < 0. {
                 HexPosition::UP_LEFT
-            } else {
+            } else if shift == 0. {
                 HexPosition::ORIGIN
+            } else {
+                unreachable!()
             };
+
             self.top_left += HexPosition::UP_LEFT * (vertical_distance / 2)
                 + HexPosition::UP_RIGHT * (vertical_distance / 2)
                 + adjustment;
+
         } else if position.is_below(self.bottom_right) {
-            let vertical_distance = position.vertical_distance(self.bottom_right).abs();
-            let pos_offset = position
-                + HexPosition::RIGHT * position.horizontal_distance(self.bottom_right).ceil().abs();
+            let vertical_distance = vertical_distance_bottom_right;
+
+            let pos_offset = position + HexPosition::RIGHT * horizontal_distance_bottom_right;
+
             let shift: f64 = pos_offset.horizontal_distance(self.bottom_right).into();
+
             let adjustment = if shift > 0. {
                 HexPosition::DOWN_RIGHT
             } else if shift < 0. {
                 HexPosition::DOWN_LEFT
-            } else {
+            } else if shift == 0. {
                 HexPosition::ORIGIN
+            } else {
+                unreachable!()
             };
+
             self.bottom_right += HexPosition::DOWN_LEFT * (vertical_distance / 2)
                 + HexPosition::DOWN_RIGHT * (vertical_distance / 2)
                 + adjustment;
         }
     }
 
-    pub fn get_area<'a>(&'a self) -> impl Iterator<Item = HexPosition> {
+    pub fn corners(&self) -> CornerBounds {
+        CornerBounds::new(self)
+    }
+
+    pub fn edges(&self) -> EdgeBounds {
+        EdgeBounds::new(self)
+    }
+
+    pub fn area<'a>(&'a self) -> impl Iterator<Item = HexPosition> {
         HexArea::new(self)
     }
 }
