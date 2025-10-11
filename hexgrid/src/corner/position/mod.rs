@@ -74,6 +74,26 @@ impl CornerPosition<High> {
         downs: -1,
         height: PhantomData::<High>,
     };
+
+    pub fn go_right(self) -> CornerPosition<Low> {
+        self + CornerPosition::DOWN_RIGHT
+    }
+
+    pub fn go_left(self) -> CornerPosition<Low> {
+        self + CornerPosition::DOWN_LEFT
+    }
+
+    pub fn go_up(self) -> CornerPosition<Low> {
+        self + CornerPosition::UP
+    }
+
+    pub fn as_generic<H: Height>(&self) -> CornerPosition<H> {
+        CornerPosition {
+            rights: self.rights,
+            downs: self.downs,
+            height: PhantomData::<H>
+        }
+    }
 }
 
 impl CornerPosition<Low> {
@@ -94,6 +114,26 @@ impl CornerPosition<Low> {
         downs: 3,
         height: PhantomData::<Low>,
     };
+
+    pub fn go_right(self) -> CornerPosition<High> {
+        self + CornerPosition::UP_RIGHT
+    }
+
+    pub fn go_left(self) -> CornerPosition<High> {
+        self + CornerPosition::UP_LEFT
+    }
+
+    pub fn go_down(self) -> CornerPosition<High> {
+        self + CornerPosition::DOWN
+    }
+
+    pub fn as_generic<H: Height>(&self) -> CornerPosition<H> {
+        CornerPosition {
+            rights: self.rights,
+            downs: self.downs,
+            height: PhantomData::<H>
+        }
+    }
 }
 
 impl CornerPosition<Center> {
@@ -114,6 +154,14 @@ impl CornerPosition<Center> {
         downs: -2,
         height: PhantomData::<Center>,
     };
+
+    pub fn as_generic<H: Height>(&self) -> CornerPosition<H> {
+        CornerPosition {
+            rights: self.rights,
+            downs: self.downs,
+            height: PhantomData::<H>
+        }
+    }
 }
 
 impl<H> CornerPosition<H> {
