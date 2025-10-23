@@ -1,3 +1,5 @@
+use hexgrid::corner::position::{CornerPosition, High, Low};
+
 #[derive(Clone, Copy, PartialEq)]
 pub enum ResourceType {
     Wood,
@@ -21,6 +23,12 @@ pub enum TileType {
 pub enum TradeType {
     Resource(ResourceType),
     Any,
+}
+
+#[derive(Clone, Copy)]
+pub struct TradePort {
+    positions: (CornerPosition<Low>, CornerPosition<High>),
+    r#type: TradeType,
 }
 
 #[derive(Clone)]

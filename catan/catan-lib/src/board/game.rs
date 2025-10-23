@@ -4,7 +4,7 @@ use hexgrid::hex::{iterators::spiral::HexSpiral, position::HexPosition};
 use rand::seq::SliceRandom;
 
 use crate::{
-    objects::{ResourceType, TileData},
+    objects::{ResourceType, TileData, TradePort},
     resource::{ResourceDeck, ResourceDistribution},
 };
 
@@ -16,8 +16,13 @@ const ROLL_ORDER_EXP: [u8; 28] = [
 
 const ROLL_NUMBERS: [u8; 10] = [6, 8, 5, 9, 4, 10, 3, 11, 2, 12];
 
+// const TRADES_BASE: [TradeType; ?] = [];
+
+// const TRADES_EXP: [TradeType; ?] = [];
+
 pub trait GameEdition {
     fn get_tiles(&self) -> impl Iterator<Item = (HexPosition, TileData)> + Clone;
+    fn get_trades(&self) -> impl Iterator<Item = TradePort>;
 }
 
 pub struct BaseEdition {}
@@ -37,6 +42,10 @@ impl GameEdition for BaseEdition {
 
         HexSpiral::new(3, 5).zip(resource_deck)
     }
+
+    fn get_trades(&self) -> impl Iterator<Item = TradePort> {
+        todo!()
+    }
 }
 
 pub struct ExpansionEdition {}
@@ -55,6 +64,10 @@ impl GameEdition for ExpansionEdition {
             ResourceDeck::new(30, resource_distribution, &mut ROLL_ORDER_EXP.into_iter());
 
         HexSpiral::new(3, 6).zip(resource_deck)
+    }
+
+    fn get_trades(&self) -> impl Iterator<Item = TradePort> {
+        todo!()
     }
 }
 
@@ -82,6 +95,10 @@ impl GameEdition for CustomEdition {
 
         HexSpiral::new(self.shortest, self.longest).zip(resource_deck)
     }
+
+    fn get_trades(&self) -> impl Iterator<Item = TradePort> {
+        todo!();
+    }
 }
 
 pub struct CustomEditionBuilder {
@@ -89,6 +106,7 @@ pub struct CustomEditionBuilder {
     longest: u32,
     rsrc_distr: ResourceDistribution,
     roll_numbers: Vec<u8>,
+    trades: Vec<TradePort>,
 }
 
 impl CustomEditionBuilder {
@@ -107,6 +125,7 @@ impl CustomEditionBuilder {
             longest,
             rsrc_distr: Self::default_resource_distribution(shortest, longest),
             roll_numbers: Self::default_roll_numbers(shortest, longest),
+            trades: Self::default_trades(),
         }
     }
 
@@ -120,6 +139,11 @@ impl CustomEditionBuilder {
 
     pub fn with_roll_numbers(mut self, roll_numbers: Vec<u8>) -> CustomEditionBuilder {
         self.roll_numbers = roll_numbers;
+        self
+    }
+
+    pub fn with_trades(mut self, trades: Vec<TradePort>) -> CustomEditionBuilder {
+        self.trades = trades;
         self
     }
 
@@ -144,5 +168,9 @@ impl CustomEditionBuilder {
         roll_numbers.shuffle(&mut rand::rng());
 
         roll_numbers
+    }
+
+    fn default_trades() -> Vec<TradePort> {
+        todo!()
     }
 }

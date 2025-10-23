@@ -1,6 +1,5 @@
 use crate::corner::position::{CornerPosition, High, Low};
 
-
 #[derive(Clone, Copy, PartialEq)]
 enum Direction {
     Right,
@@ -41,11 +40,14 @@ pub struct CornerRing {
 impl CornerRing {
     pub fn new(start: CornerPosition<Low>, shortest: u32, longest: u32) -> Self {
         CornerRing {
-            positions: (start + CornerPosition::UP_LEFT + CornerPosition::DOWN_LEFT, start + CornerPosition::UP_LEFT),
+            positions: (
+                start + CornerPosition::UP_LEFT + CornerPosition::DOWN_LEFT,
+                start + CornerPosition::UP_LEFT,
+            ),
             shortest,
             longest,
             remaining: shortest,
-            direction: Direction::Right
+            direction: Direction::Right,
         }
     }
 
@@ -53,7 +55,9 @@ impl CornerRing {
         match self.direction {
             Direction::Right | Direction::Left => self.shortest,
             Direction::DownRight => self.longest - self.shortest + 1,
-            Direction::DownLeft | Direction::UpLeft | Direction::UpRight => self.longest - self.shortest
+            Direction::DownLeft | Direction::UpLeft | Direction::UpRight => {
+                self.longest - self.shortest
+            }
         }
     }
 
@@ -90,9 +94,7 @@ impl CornerRing {
                 }
             }
 
-            Direction::UpLeft => {
-                self.positions = (low.go_left().go_up(), high.go_up().go_left())
-            }
+            Direction::UpLeft => self.positions = (low.go_left().go_up(), high.go_up().go_left()),
 
             Direction::UpRight => {
                 let high = high.go_up().go_right();
@@ -115,7 +117,7 @@ impl Iterator for CornerRing {
             self.direction.next()?;
             self.remaining = self.get_remaining();
         }
-        
+
         self.move_in_direction();
         self.remaining -= 1;
         Some(self.positions)
