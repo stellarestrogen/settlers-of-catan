@@ -2,8 +2,11 @@ use rand::prelude::*;
 use std::iter;
 
 use super::objects::{ResourceType, TileData, TileType};
+use super::distribution::Distribution;
 
-static RESOURCES: [ResourceType; 5] = [
+pub const RESOURCE_NO: usize = 5;
+
+static RESOURCES: [ResourceType; RESOURCE_NO] = [
     ResourceType::Wood,
     ResourceType::Brick,
     ResourceType::Wheat,
@@ -11,26 +14,7 @@ static RESOURCES: [ResourceType; 5] = [
     ResourceType::Ore,
 ];
 
-#[derive(Clone)]
-pub struct ResourceDistribution {
-    distribution: [(ResourceType, u32); 5],
-}
-
-impl ResourceDistribution {
-    pub fn new(distribution: [(ResourceType, u32); 5]) -> Self {
-        ResourceDistribution { distribution }
-    }
-
-    pub fn for_resource(&self, resource: ResourceType) -> u32 {
-        let default = (resource, 0);
-        let (_, d) = self
-            .distribution
-            .iter()
-            .find(|(rsrc, _)| rsrc == &resource)
-            .unwrap_or(&default);
-        *d
-    }
-}
+pub type ResourceDistribution = Distribution<ResourceType, RESOURCE_NO>;
 
 /// Holds all of the resource and desert tiles.
 #[derive(Clone)]
@@ -58,7 +42,7 @@ impl ResourceDeck {
         for resource in RESOURCES {
             resources.extend(iter::repeat_n(
                 Some(resource),
-                distribution.for_resource(resource) as usize,
+                distribution.for_obj(resource) as usize,
             ));
         }
         resources.truncate(size);

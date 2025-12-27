@@ -4,8 +4,9 @@ use hexgrid::hex::{iterators::spiral::HexSpiral, position::HexPosition};
 use rand::seq::SliceRandom;
 
 use crate::{
+    distribution::Distribution,
     objects::{ResourceType, TileData, TradePort},
-    resource::{ResourceDeck, ResourceDistribution},
+    resource::{RESOURCE_NO, ResourceDeck, ResourceDistribution},
 };
 
 const ROLL_ORDER_BASE: [u8; 18] = [11, 3, 6, 5, 4, 9, 10, 8, 4, 11, 12, 9, 10, 8, 3, 6, 2, 5];
@@ -16,9 +17,9 @@ const ROLL_ORDER_EXP: [u8; 28] = [
 
 const ROLL_NUMBERS: [u8; 10] = [6, 8, 5, 9, 4, 10, 3, 11, 2, 12];
 
-// const TRADES_BASE: [TradeType; ?] = [];
+// const TRADES_BASE: [TradePort; ?] = [];
 
-// const TRADES_EXP: [TradeType; ?] = [];
+// const TRADES_EXP: [TradePort; ?] = [];
 
 pub trait GameEdition {
     fn get_tiles(&self) -> impl Iterator<Item = (HexPosition, TileData)> + Clone;
@@ -131,7 +132,7 @@ impl CustomEditionBuilder {
 
     pub fn with_resource_distribution(
         mut self,
-        distr: ResourceDistribution,
+        distr: Distribution<ResourceType, RESOURCE_NO>,
     ) -> CustomEditionBuilder {
         self.rsrc_distr = distr;
         self
@@ -147,7 +148,10 @@ impl CustomEditionBuilder {
         self
     }
 
-    fn default_resource_distribution(shortest: u32, longest: u32) -> ResourceDistribution {
+    fn default_resource_distribution(
+        shortest: u32,
+        longest: u32,
+    ) -> Distribution<ResourceType, RESOURCE_NO> {
         let size: f64 = ((longest - 1) * longest - (shortest - 1) * shortest + longest) as f64;
         ResourceDistribution::new([
             (ResourceType::Wood, (size / 5.).round() as u32),
