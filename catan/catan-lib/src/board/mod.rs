@@ -109,6 +109,7 @@ impl Board {
         Ok(())
     }
 
+    // TODO: Create error handler instead of expecting the position.
     fn create_tiles(edition: &impl GameEdition) -> HexTable<TileData> {
         let mut bounds = HexPerimeter::new();
         let iter = edition.get_tiles();
@@ -126,6 +127,7 @@ impl Board {
         tiles
     }
 
+    // TODO: Create error handler instead of expecting the position.
     fn create_trades(&mut self, edition: &impl GameEdition) {
         let trades = edition.get_trades();
         for trade in trades.into_iter() {
