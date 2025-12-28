@@ -14,4 +14,13 @@ impl<T: PartialEq, const A: usize> Distribution<T, A> {
         let (_, d) = val.unwrap_or(&default);
         *d
     }
+
+    pub fn size(&self) -> usize {
+        let mut size: usize = 0;
+        for (_, i) in &self.distribution {
+            size += *i as usize;
+        }
+
+        size
+    }
 }

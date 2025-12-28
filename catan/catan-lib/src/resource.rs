@@ -4,7 +4,7 @@ use std::iter;
 use super::objects::{ResourceType, TileData, TileType};
 use super::distribution::Distribution;
 
-pub const RESOURCE_NO: usize = 5;
+const RESOURCE_NO: usize = 5;
 
 static RESOURCES: [ResourceType; RESOURCE_NO] = [
     ResourceType::Wood,

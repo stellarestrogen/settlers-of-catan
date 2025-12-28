@@ -31,6 +31,15 @@ pub struct TradePort {
     r#type: TradeType,
 }
 
+impl TradePort {
+    pub fn new(r#type: TradeType, low_position: CornerPosition<Low>, high_position: CornerPosition<High>) -> Self {
+        Self {
+            positions: (low_position, high_position),
+            r#type
+        }
+    }
+}
+
 #[derive(Clone)]
 pub enum DevCardType {
     MoveRobber,

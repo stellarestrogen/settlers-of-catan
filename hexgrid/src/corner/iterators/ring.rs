@@ -1,4 +1,4 @@
-use crate::corner::position::{CornerPosition, High, Low};
+use crate::{corner::position::{CornerPosition, High, Low}, hex::position::HexPosition};
 
 #[derive(Clone, Copy, PartialEq)]
 enum Direction {
@@ -29,6 +29,7 @@ impl Iterator for Direction {
     }
 }
 
+#[derive(Clone, Copy)]
 pub struct CornerRing {
     positions: (CornerPosition<Low>, CornerPosition<High>),
     shortest: u32,
@@ -38,11 +39,11 @@ pub struct CornerRing {
 }
 
 impl CornerRing {
-    pub fn new(start: CornerPosition<Low>, shortest: u32, longest: u32) -> Self {
+    pub fn new(shortest: u32, longest: u32) -> Self {
         CornerRing {
             positions: (
-                start + CornerPosition::UP_LEFT + CornerPosition::DOWN_LEFT,
-                start + CornerPosition::UP_LEFT,
+                (HexPosition::ORIGIN + CornerPosition::TOP_LEFT) + CornerPosition::UP_LEFT + CornerPosition::DOWN_LEFT,
+                (HexPosition::ORIGIN + CornerPosition::TOP_LEFT) + CornerPosition::UP_LEFT,
             ),
             shortest,
             longest,

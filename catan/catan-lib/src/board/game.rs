@@ -4,9 +4,8 @@ use hexgrid::hex::{iterators::spiral::HexSpiral, position::HexPosition};
 use rand::seq::SliceRandom;
 
 use crate::{
-    distribution::Distribution,
     objects::{ResourceType, TileData, TradePort},
-    resource::{RESOURCE_NO, ResourceDeck, ResourceDistribution},
+    resource::{ResourceDeck, ResourceDistribution},
 };
 
 const ROLL_ORDER_BASE: [u8; 18] = [11, 3, 6, 5, 4, 9, 10, 8, 4, 11, 12, 9, 10, 8, 3, 6, 2, 5];
@@ -132,7 +131,7 @@ impl CustomEditionBuilder {
 
     pub fn with_resource_distribution(
         mut self,
-        distr: Distribution<ResourceType, RESOURCE_NO>,
+        distr: ResourceDistribution,
     ) -> CustomEditionBuilder {
         self.rsrc_distr = distr;
         self
@@ -151,7 +150,7 @@ impl CustomEditionBuilder {
     fn default_resource_distribution(
         shortest: u32,
         longest: u32,
-    ) -> Distribution<ResourceType, RESOURCE_NO> {
+    ) -> ResourceDistribution {
         let size: f64 = ((longest - 1) * longest - (shortest - 1) * shortest + longest) as f64;
         ResourceDistribution::new([
             (ResourceType::Wood, (size / 5.).round() as u32),
