@@ -30,7 +30,6 @@ pub struct TradePortDeck {
 
 impl TradePortDeck {
     pub fn new(
-        size: usize,
         hex_shortest: u32,
         hex_longest: u32,
         distribution: TradeDistribution,
@@ -40,9 +39,9 @@ impl TradePortDeck {
         let shortest = hex_shortest * 2 + 1;
 
         Self {
-            trades: Self::create_trades(distribution)
+            trades: Self::create_trades(distribution.clone())
                 .into_iter()
-                .zip(Self::trade_positions(size, shortest, longest, trade_gaps).into_iter())
+                .zip(Self::trade_positions(distribution.size(), shortest, longest, trade_gaps).into_iter())
                 .map(|(t, (p1, p2))| TradePort::new(t, p1, p2))
                 .collect(),
         }
@@ -88,5 +87,13 @@ impl TradePortDeck {
         }
 
         trades
+    }
+}
+
+impl Iterator for TradePortDeck {
+    type Item = TradePort;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        self.trades.pop()
     }
 }

@@ -4,8 +4,9 @@ use hexgrid::hex::{iterators::spiral::HexSpiral, position::HexPosition};
 use rand::seq::SliceRandom;
 
 use crate::{
-    objects::{ResourceType, TileData, TradePort},
+    objects::{ResourceType, TileData, TradePort, TradeType},
     resource::{ResourceDeck, ResourceDistribution},
+    trade::{TradeDistribution, TradePortDeck},
 };
 
 const ROLL_ORDER_BASE: [u8; 18] = [11, 3, 6, 5, 4, 9, 10, 8, 4, 11, 12, 9, 10, 8, 3, 6, 2, 5];
@@ -16,9 +17,9 @@ const ROLL_ORDER_EXP: [u8; 28] = [
 
 const ROLL_NUMBERS: [u8; 10] = [6, 8, 5, 9, 4, 10, 3, 11, 2, 12];
 
-// const TRADES_BASE: [TradePort; ?] = [];
+const TRADE_GAP_BASE: [u32; 9] = [0, 1, 2, 1, 1, 2, 1, 1, 2];
 
-// const TRADES_EXP: [TradePort; ?] = [];
+const TRADE_GAP_EXP: [u32; 11] = [0, 1, 1, 1, 1, 1, 1, 1, 3, 1, 2];
 
 pub trait GameEdition {
     fn get_tiles(&self) -> impl Iterator<Item = (HexPosition, TileData)> + Clone;
@@ -44,7 +45,19 @@ impl GameEdition for BaseEdition {
     }
 
     fn get_trades(&self) -> impl Iterator<Item = TradePort> {
-        todo!()
+        TradePortDeck::new(
+            3,
+            5,
+            TradeDistribution::new([
+                (TradeType::Resource(ResourceType::Wood), 1),
+                (TradeType::Resource(ResourceType::Brick), 1),
+                (TradeType::Resource(ResourceType::Wheat), 1),
+                (TradeType::Resource(ResourceType::Sheep), 1),
+                (TradeType::Resource(ResourceType::Ore), 1),
+                (TradeType::Any, 4),
+            ]),
+            &mut TRADE_GAP_BASE.into_iter(),
+        )
     }
 }
 
@@ -67,7 +80,19 @@ impl GameEdition for ExpansionEdition {
     }
 
     fn get_trades(&self) -> impl Iterator<Item = TradePort> {
-        todo!()
+        TradePortDeck::new(
+            3,
+            6,
+            TradeDistribution::new([
+                (TradeType::Resource(ResourceType::Wood), 1),
+                (TradeType::Resource(ResourceType::Brick), 1),
+                (TradeType::Resource(ResourceType::Wheat), 1),
+                (TradeType::Resource(ResourceType::Sheep), 2),
+                (TradeType::Resource(ResourceType::Ore), 1),
+                (TradeType::Any, 5),
+            ]),
+            &mut TRADE_GAP_EXP.into_iter(),
+        )
     }
 }
 
@@ -76,6 +101,8 @@ pub struct CustomEdition {
     longest: u32,
     rsrc_distr: ResourceDistribution,
     roll_numbers: Vec<u8>,
+    trade_distr: TradeDistribution,
+    trade_gaps: Vec<u32>,
 }
 
 impl CustomEdition {
@@ -97,7 +124,12 @@ impl GameEdition for CustomEdition {
     }
 
     fn get_trades(&self) -> impl Iterator<Item = TradePort> {
-        todo!();
+        TradePortDeck::new(
+            self.shortest,
+            self.longest,
+            self.trade_distr.clone(),
+            &mut self.trade_gaps.clone().into_iter(),
+        )
     }
 }
 
@@ -106,7 +138,8 @@ pub struct CustomEditionBuilder {
     longest: u32,
     rsrc_distr: ResourceDistribution,
     roll_numbers: Vec<u8>,
-    trades: Vec<TradePort>,
+    trade_distr: TradeDistribution,
+    trade_gaps: Vec<u32>,
 }
 
 impl CustomEditionBuilder {
@@ -116,6 +149,8 @@ impl CustomEditionBuilder {
             longest: self.longest,
             rsrc_distr: self.rsrc_distr,
             roll_numbers: self.roll_numbers,
+            trade_distr: self.trade_distr,
+            trade_gaps: self.trade_gaps,
         }
     }
 
@@ -125,7 +160,8 @@ impl CustomEditionBuilder {
             longest,
             rsrc_distr: Self::default_resource_distribution(shortest, longest),
             roll_numbers: Self::default_roll_numbers(shortest, longest),
-            trades: Self::default_trades(),
+            trade_distr: Self::default_trade_distribution(shortest, longest),
+            trade_gaps: Self::default_trade_gaps(shortest, longest),
         }
     }
 
@@ -142,15 +178,17 @@ impl CustomEditionBuilder {
         self
     }
 
-    pub fn with_trades(mut self, trades: Vec<TradePort>) -> CustomEditionBuilder {
-        self.trades = trades;
+    pub fn with_trade_distribution(mut self, distr: TradeDistribution) -> CustomEditionBuilder {
+        self.trade_distr = distr;
         self
     }
 
-    fn default_resource_distribution(
-        shortest: u32,
-        longest: u32,
-    ) -> ResourceDistribution {
+    pub fn with_trade_gaps(mut self, gaps: Vec<u32>) -> CustomEditionBuilder {
+        self.trade_gaps = gaps;
+        self
+    }
+
+    fn default_resource_distribution(shortest: u32, longest: u32) -> ResourceDistribution {
         let size: f64 = ((longest - 1) * longest - (shortest - 1) * shortest + longest) as f64;
         ResourceDistribution::new([
             (ResourceType::Wood, (size / 5.).round() as u32),
@@ -173,7 +211,32 @@ impl CustomEditionBuilder {
         roll_numbers
     }
 
-    fn default_trades() -> Vec<TradePort> {
-        todo!()
+    fn default_trade_distribution(shortest: u32, longest: u32) -> TradeDistribution {
+        // old unreduced formula.
+        // essentially calculates the perimeter of the hex-shaped grid, then uses that to calculate the number of corners on the perimeter.
+        // let total_corner_num = ((longest - shortest + 1) * 4 + shortest * 2 - 6) * 2 + 6;
+
+        let total_corner_num = (longest - shortest) * 8 + shortest * 4 + 2;
+        let total_trades = (total_corner_num/3) as f64;
+
+        TradeDistribution::new([
+            (TradeType::Resource(ResourceType::Wood), (total_trades/10.).ceil() as u32),
+            (TradeType::Resource(ResourceType::Brick), (total_trades/10.).round() as u32),
+            (TradeType::Resource(ResourceType::Wheat), (total_trades/10.).round() as u32),
+            (TradeType::Resource(ResourceType::Sheep), (total_trades/10.).ceil() as u32),
+            (TradeType::Resource(ResourceType::Ore), (total_trades/10.).round() as u32),
+            (TradeType::Any, (total_trades - ((total_trades/10.).ceil() * 2. + (total_trades/10.).round() * 3.)) as u32),
+        ])
+
+
+    }
+
+    // default behavior is to have all trades spaced by 1.
+    fn default_trade_gaps(shortest: u32, longest: u32) -> Vec<u32> {
+        let total_corner_num = (longest - shortest) * 8 + shortest * 4 + 2;
+        let mut gaps = Vec::<u32>::with_capacity((total_corner_num/3) as usize);
+        gaps.push(0);
+        gaps.extend(iter::repeat_n(1, (total_corner_num - 1) as usize));
+        gaps
     }
 }
