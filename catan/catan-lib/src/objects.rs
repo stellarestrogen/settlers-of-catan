@@ -38,6 +38,14 @@ impl TradePort {
             r#type
         }
     }
+
+    pub fn get_positions(&self) -> (CornerPosition<Low>, CornerPosition<High>) {
+        self.positions
+    }
+
+    pub fn get_type(&self) -> TradeType {
+        self.r#type
+    }
 }
 
 #[derive(Clone)]

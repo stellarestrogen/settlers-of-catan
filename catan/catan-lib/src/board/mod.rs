@@ -15,7 +15,9 @@ use hexgrid::{
     hex::{bounds::HexPerimeter, position::HexPosition, table::HexTable},
 };
 
-use crate::objects::{Building, CornerData, EdgeData, TileData, TileType, TradeType, Transport};
+use crate::objects::{
+    Building, CornerData, EdgeData, TileData, TileType, TradePort, TradeType, Transport,
+};
 
 pub struct Board {
     corners: CornerTable<CornerData>,
@@ -25,15 +27,20 @@ pub struct Board {
 
 impl Board {
     pub fn new(edition: impl GameEdition) -> Self {
-        let tiles = Self::create_tiles(edition);
+        let tiles = Self::create_tiles(&edition);
         let bounds = tiles.get_bounds();
         let corners = CornerTable::new(CornerBounds::new(bounds));
-        Board {
+        let mut board = Board {
             corners,
             edges: EdgeTable::new(EdgeBounds::new(bounds)),
             tiles,
-        }
+        };
+
+        board.create_trades(&edition);
+
+        board
     }
+
 
     pub fn get_tile(&self, position: HexPosition) -> TileData {
         if let Some(r) = self.tiles.get(position) {
@@ -78,7 +85,31 @@ impl Board {
         self.edges.set(position, EdgeData::new(transport))
     }
 
-    fn create_tiles(edition: impl GameEdition) -> HexTable<TileData> {
+    fn set_trade<H: Height>(
+        &mut self,
+        position: CornerPosition<H>,
+        trade: TradeType,
+    ) -> Result<(), ()> {
+        if let Some(data) = self.corners.get_mut(position) {
+            data.set_trade(trade);
+            Ok(())
+        } else {
+            let mut data = CornerData::new();
+            data.set_trade(trade);
+            self.corners.set(position, data)
+        }
+    }
+
+    fn set_trades(&mut self, trade_port: TradePort) -> Result<(), ()> {
+        let (p1, p2) = trade_port.get_positions();
+        let trade = trade_port.get_type();
+
+        self.set_trade(p1, trade)?;
+        self.set_trade(p2, trade)?;
+        Ok(())
+    }
+
+    fn create_tiles(edition: &impl GameEdition) -> HexTable<TileData> {
         let mut bounds = HexPerimeter::new();
         let iter = edition.get_tiles();
 
@@ -93,5 +124,13 @@ impl Board {
         }
 
         tiles
+    }
+
+    fn create_trades(&mut self, edition: &impl GameEdition) {
+        let trades = edition.get_trades();
+        for trade in trades.into_iter() {
+            self.set_trades(trade).expect("CornerPosition is out of bounds!");
+        }
+
     }
 }
