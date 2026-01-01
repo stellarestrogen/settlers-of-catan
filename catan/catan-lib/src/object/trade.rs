@@ -6,12 +6,42 @@ use hexgrid::corner::{
 };
 use rand::seq::SliceRandom;
 
-use crate::{
-    distribution::Distribution,
-    objects::{ResourceType, TradePort, TradeType},
-};
+use crate::{distribution::Distribution, object::resource::ResourceType};
 
 const TRADE_NO: usize = 6;
+
+#[derive(Clone, Copy, PartialEq)]
+pub enum TradeType {
+    Resource(ResourceType),
+    Any,
+}
+
+#[derive(Clone, Copy)]
+pub struct TradePort {
+    positions: (CornerPosition<Low>, CornerPosition<High>),
+    r#type: TradeType,
+}
+
+impl TradePort {
+    pub fn new(
+        r#type: TradeType,
+        low_position: CornerPosition<Low>,
+        high_position: CornerPosition<High>,
+    ) -> Self {
+        Self {
+            positions: (low_position, high_position),
+            r#type,
+        }
+    }
+
+    pub fn get_positions(&self) -> (CornerPosition<Low>, CornerPosition<High>) {
+        self.positions
+    }
+
+    pub fn get_type(&self) -> TradeType {
+        self.r#type
+    }
+}
 
 static TRADES: [TradeType; TRADE_NO] = [
     TradeType::Resource(ResourceType::Wood),
@@ -41,7 +71,10 @@ impl TradePortDeck {
         Self {
             trades: Self::create_trades(distribution.clone())
                 .into_iter()
-                .zip(Self::trade_positions(distribution.size(), shortest, longest, trade_gaps).into_iter())
+                .zip(
+                    Self::trade_positions(distribution.size(), shortest, longest, trade_gaps)
+                        .into_iter(),
+                )
                 .map(|(t, (p1, p2))| TradePort::new(t, p1, p2))
                 .collect(),
         }

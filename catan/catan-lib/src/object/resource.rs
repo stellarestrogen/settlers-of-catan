@@ -1,10 +1,19 @@
 use rand::prelude::*;
 use std::iter;
 
-use super::objects::{ResourceType, TileData, TileType};
-use super::distribution::Distribution;
+use super::{TileData, TileType};
+use crate::distribution::Distribution;
 
 const RESOURCE_NO: usize = 5;
+
+#[derive(Clone, Copy, PartialEq)]
+pub enum ResourceType {
+    Wood,
+    Brick,
+    Wheat,
+    Sheep,
+    Ore,
+}
 
 static RESOURCES: [ResourceType; RESOURCE_NO] = [
     ResourceType::Wood,
@@ -13,6 +22,8 @@ static RESOURCES: [ResourceType; RESOURCE_NO] = [
     ResourceType::Sheep,
     ResourceType::Ore,
 ];
+
+
 
 pub type ResourceDistribution = Distribution<ResourceType, RESOURCE_NO>;
 

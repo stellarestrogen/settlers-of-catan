@@ -1,13 +1,7 @@
-use hexgrid::corner::position::{CornerPosition, High, Low};
+pub mod resource;
+pub mod trade;
 
-#[derive(Clone, Copy, PartialEq)]
-pub enum ResourceType {
-    Wood,
-    Brick,
-    Wheat,
-    Sheep,
-    Ore,
-}
+use crate::object::{resource::ResourceType, trade::TradeType};
 
 #[derive(Clone, Copy)]
 pub enum TileType {
@@ -17,35 +11,6 @@ pub enum TileType {
     },
     Desert,
     Water,
-}
-
-#[derive(Clone, Copy, PartialEq)]
-pub enum TradeType {
-    Resource(ResourceType),
-    Any,
-}
-
-#[derive(Clone, Copy)]
-pub struct TradePort {
-    positions: (CornerPosition<Low>, CornerPosition<High>),
-    r#type: TradeType,
-}
-
-impl TradePort {
-    pub fn new(r#type: TradeType, low_position: CornerPosition<Low>, high_position: CornerPosition<High>) -> Self {
-        Self {
-            positions: (low_position, high_position),
-            r#type
-        }
-    }
-
-    pub fn get_positions(&self) -> (CornerPosition<Low>, CornerPosition<High>) {
-        self.positions
-    }
-
-    pub fn get_type(&self) -> TradeType {
-        self.r#type
-    }
 }
 
 #[derive(Clone)]

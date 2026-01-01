@@ -1,6 +1,6 @@
-pub mod game;
+pub mod edition;
 
-use game::GameEdition;
+use edition::GameEdition;
 use hexgrid::{
     corner::{
         bounds::CornerBounds,
@@ -15,9 +15,7 @@ use hexgrid::{
     hex::{bounds::HexPerimeter, position::HexPosition, table::HexTable},
 };
 
-use crate::objects::{
-    Building, CornerData, EdgeData, TileData, TileType, TradePort, TradeType, Transport,
-};
+use crate::object::{Building, CornerData, EdgeData, TileData, TileType, Transport, trade::*};
 
 pub struct Board {
     corners: CornerTable<CornerData>,
@@ -40,7 +38,6 @@ impl Board {
 
         board
     }
-
 
     pub fn get_tile(&self, position: HexPosition) -> TileData {
         if let Some(r) = self.tiles.get(position) {
@@ -131,8 +128,8 @@ impl Board {
     fn create_trades(&mut self, edition: &impl GameEdition) {
         let trades = edition.get_trades();
         for trade in trades.into_iter() {
-            self.set_trades(trade).expect("CornerPosition is out of bounds!");
+            self.set_trades(trade)
+                .expect("CornerPosition is out of bounds!");
         }
-
     }
 }

@@ -3,11 +3,7 @@ use std::iter;
 use hexgrid::hex::{iterators::spiral::HexSpiral, position::HexPosition};
 use rand::seq::SliceRandom;
 
-use crate::{
-    objects::{ResourceType, TileData, TradePort, TradeType},
-    resource::{ResourceDeck, ResourceDistribution},
-    trade::{TradeDistribution, TradePortDeck},
-};
+use crate::object::{TileData, resource::*, trade::*};
 
 const ROLL_ORDER_BASE: [u8; 18] = [11, 3, 6, 5, 4, 9, 10, 8, 4, 11, 12, 9, 10, 8, 3, 6, 2, 5];
 
@@ -217,24 +213,42 @@ impl CustomEditionBuilder {
         // let total_corner_num = ((longest - shortest + 1) * 4 + shortest * 2 - 6) * 2 + 6;
 
         let total_corner_num = (longest - shortest) * 8 + shortest * 4 + 2;
-        let total_trades = (total_corner_num/3) as f64;
+        let total_trades = (total_corner_num / 3) as f64;
 
         TradeDistribution::new([
-            (TradeType::Resource(ResourceType::Wood), (total_trades/10.).ceil() as u32),
-            (TradeType::Resource(ResourceType::Brick), (total_trades/10.).round() as u32),
-            (TradeType::Resource(ResourceType::Wheat), (total_trades/10.).round() as u32),
-            (TradeType::Resource(ResourceType::Sheep), (total_trades/10.).ceil() as u32),
-            (TradeType::Resource(ResourceType::Ore), (total_trades/10.).round() as u32),
-            (TradeType::Any, (total_trades - ((total_trades/10.).ceil() * 2. + (total_trades/10.).round() * 3.)) as u32),
+            (
+                TradeType::Resource(ResourceType::Wood),
+                (total_trades / 10.).ceil() as u32,
+            ),
+            (
+                TradeType::Resource(ResourceType::Brick),
+                (total_trades / 10.).round() as u32,
+            ),
+            (
+                TradeType::Resource(ResourceType::Wheat),
+                (total_trades / 10.).round() as u32,
+            ),
+            (
+                TradeType::Resource(ResourceType::Sheep),
+                (total_trades / 10.).ceil() as u32,
+            ),
+            (
+                TradeType::Resource(ResourceType::Ore),
+                (total_trades / 10.).round() as u32,
+            ),
+            (
+                TradeType::Any,
+                (total_trades
+                    - ((total_trades / 10.).ceil() * 2. + (total_trades / 10.).round() * 3.))
+                    as u32,
+            ),
         ])
-
-
     }
 
     // default behavior is to have all trades spaced by 1.
     fn default_trade_gaps(shortest: u32, longest: u32) -> Vec<u32> {
         let total_corner_num = (longest - shortest) * 8 + shortest * 4 + 2;
-        let mut gaps = Vec::<u32>::with_capacity((total_corner_num/3) as usize);
+        let mut gaps = Vec::<u32>::with_capacity((total_corner_num / 3) as usize);
         gaps.push(0);
         gaps.extend(iter::repeat_n(1, (total_corner_num - 1) as usize));
         gaps
