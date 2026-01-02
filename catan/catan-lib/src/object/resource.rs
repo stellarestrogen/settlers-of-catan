@@ -4,7 +4,7 @@ use std::iter;
 use super::{TileData, TileType};
 use crate::distribution::Distribution;
 
-const RESOURCE_NO: usize = 5;
+pub const RESOURCE_NO: usize = 5;
 
 #[derive(Clone, Copy, PartialEq)]
 pub enum ResourceType {
@@ -15,15 +15,13 @@ pub enum ResourceType {
     Ore,
 }
 
-static RESOURCES: [ResourceType; RESOURCE_NO] = [
+pub static RESOURCES: [ResourceType; RESOURCE_NO] = [
     ResourceType::Wood,
     ResourceType::Brick,
     ResourceType::Wheat,
     ResourceType::Sheep,
     ResourceType::Ore,
 ];
-
-
 
 pub type ResourceDistribution = Distribution<ResourceType, RESOURCE_NO>;
 

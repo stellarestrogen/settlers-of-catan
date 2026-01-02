@@ -1,6 +1,8 @@
 pub mod resource;
 pub mod trade;
 
+use hexgrid::hex::position::HexPosition;
+
 use crate::object::{resource::ResourceType, trade::TradeType};
 
 #[derive(Clone, Copy)]
@@ -13,13 +15,39 @@ pub enum TileType {
     Water,
 }
 
-#[derive(Clone)]
+#[derive(Clone, PartialEq)]
 pub enum DevCardType {
     MoveRobber,
     TakeTwoResources,
     Monopoly,
     VictoryPoint(String),
     BuildRoads,
+}
+
+pub struct DevelopmentCard {
+    r#type: DevCardType,
+    played: bool
+}
+
+impl DevelopmentCard {
+    pub fn new(r#type: DevCardType) -> Self {
+        Self {
+            r#type,
+            played: false
+        }
+    }
+
+    pub fn get_type(&self) -> DevCardType {
+        self.r#type.clone()
+    }
+
+    pub fn is_played(&self) -> bool {
+        self.played
+    }
+
+    pub fn play(&mut self) {
+        self.played = true
+    }
 }
 
 #[derive(Clone, Copy)]
@@ -67,6 +95,20 @@ impl ResourceCard {
         } else {
             self.count -= amt;
         }
+    }
+}
+
+pub struct Robber {
+    position: HexPosition
+}
+
+impl Robber {
+    pub fn new(position: HexPosition) -> Self {
+        Self { position }
+    }
+
+    pub fn r#move(&mut self, position: HexPosition) {
+        self.position = position
     }
 }
 

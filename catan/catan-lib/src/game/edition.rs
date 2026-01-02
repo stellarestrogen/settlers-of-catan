@@ -207,6 +207,7 @@ impl CustomEditionBuilder {
         roll_numbers
     }
 
+    /// Messy. No simple way of defining default trades unlike with resources where we can fill in gaps with TileType::Desert, there must always be some balance.
     fn default_trade_distribution(shortest: u32, longest: u32) -> TradeDistribution {
         // old unreduced formula.
         // essentially calculates the perimeter of the hex-shaped grid, then uses that to calculate the number of corners on the perimeter.

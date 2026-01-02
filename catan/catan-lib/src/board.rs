@@ -1,6 +1,3 @@
-pub mod edition;
-
-use edition::GameEdition;
 use hexgrid::{
     corner::{
         bounds::CornerBounds,
@@ -15,7 +12,7 @@ use hexgrid::{
     hex::{bounds::HexPerimeter, position::HexPosition, table::HexTable},
 };
 
-use crate::object::{Building, CornerData, EdgeData, TileData, TileType, Transport, trade::*};
+use crate::{game::edition::GameEdition, object::{Building, CornerData, EdgeData, TileData, TileType, Transport, trade::*}};
 
 pub struct Board {
     corners: CornerTable<CornerData>,
