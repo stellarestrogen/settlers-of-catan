@@ -20,7 +20,7 @@ pub enum DevCardType {
     MoveRobber,
     TakeTwoResources,
     Monopoly,
-    VictoryPoint(String),
+    VictoryPoint,
     BuildRoads,
 }
 

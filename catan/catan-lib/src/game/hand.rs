@@ -63,4 +63,15 @@ impl Hand {
         }
     }
 
+    pub fn count_victory_points(&self) -> u32 {
+        let mut points = 0;
+        for card in self.development_cards.iter() {
+            if card.get_type() == DevCardType::VictoryPoint && card.is_played() {
+                points += 1;
+            }
+        }
+
+        points
+    }
+
 }
