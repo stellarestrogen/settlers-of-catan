@@ -26,14 +26,14 @@ pub enum DevCardType {
 
 pub struct DevelopmentCard {
     r#type: DevCardType,
-    played: bool
+    played: bool,
 }
 
 impl DevelopmentCard {
     pub fn new(r#type: DevCardType) -> Self {
         Self {
             r#type,
-            played: false
+            played: false,
         }
     }
 
@@ -50,17 +50,42 @@ impl DevelopmentCard {
     }
 }
 
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, PartialEq, Eq)]
 pub enum Transport {
     Road,
     Boat,
 }
 
-#[derive(Clone, Copy)]
+impl Into<Structure> for Transport {
+    fn into(self) -> Structure {
+        match self {
+            Self::Road => Structure::Road,
+            Self::Boat => Structure::Boat,
+        }
+    }
+}
+
+#[derive(Clone, Copy, PartialEq, Eq)]
 pub enum Building {
     Settlement,
     City,
-    None,
+}
+
+impl Into<Structure> for Building {
+    fn into(self) -> Structure {
+        match self {
+            Self::Settlement => Structure::Settlement,
+            Self::City => Structure::City,
+        }
+    }
+}
+
+#[derive(Clone, Copy, PartialEq, Eq)]
+pub enum Structure {
+    Settlement,
+    City,
+    Road,
+    Boat,
 }
 
 #[derive(Clone, Copy)]
@@ -99,7 +124,7 @@ impl ResourceCard {
 }
 
 pub struct Robber {
-    position: HexPosition
+    position: HexPosition,
 }
 
 impl Robber {
