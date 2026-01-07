@@ -219,3 +219,9 @@ impl<Type> Clone for EdgePosition<Type> {
 }
 
 impl<Type> Copy for EdgePosition<Type> {}
+
+impl<Type> PartialEq for EdgePosition<Type> {
+    fn eq(&self, other: &Self) -> bool {
+        self.rights == other.rights && self.downs == other.downs && self.r#type == other.r#type
+    }
+}

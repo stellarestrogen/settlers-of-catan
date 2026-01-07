@@ -91,7 +91,7 @@ impl CornerPosition<High> {
         CornerPosition {
             rights: self.rights,
             downs: self.downs,
-            height: PhantomData::<H>
+            height: PhantomData::<H>,
         }
     }
 }
@@ -131,7 +131,7 @@ impl CornerPosition<Low> {
         CornerPosition {
             rights: self.rights,
             downs: self.downs,
-            height: PhantomData::<H>
+            height: PhantomData::<H>,
         }
     }
 }
@@ -159,7 +159,7 @@ impl CornerPosition<Center> {
         CornerPosition {
             rights: self.rights,
             downs: self.downs,
-            height: PhantomData::<H>
+            height: PhantomData::<H>,
         }
     }
 }
@@ -219,3 +219,9 @@ impl<H> Clone for CornerPosition<H> {
 }
 
 impl<H> Copy for CornerPosition<H> {}
+
+impl<H> PartialEq for CornerPosition<H> {
+    fn eq(&self, other: &Self) -> bool {
+        self.rights == other.rights && self.downs == other.downs && self.height == other.height
+    }
+}

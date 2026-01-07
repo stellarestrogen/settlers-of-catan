@@ -1,12 +1,12 @@
 use hexgrid::{
     corner::{
         bounds::CornerBounds,
-        position::{CornerPosition, Height},
+        position::{CornerPosition, Height, High, Low},
         table::CornerTable,
     },
     edge::{
         bounds::EdgeBounds,
-        position::{EdgePosition, Valid},
+        position::{EdgePosition, Even, Odd, Positive, Valid},
         table::EdgeTable,
     },
     hex::{bounds::HexPerimeter, position::HexPosition, table::HexTable},
@@ -128,5 +128,66 @@ impl Board {
             self.set_trades(trade)
                 .expect("CornerPosition is out of bounds!");
         }
+    }
+}
+
+struct PlayedBuildings {
+    settlements: Vec<(Option<CornerPosition<Low>>, Option<CornerPosition<High>>)>,
+    cities: Vec<(Option<CornerPosition<Low>>, Option<CornerPosition<High>>)>,
+}
+
+impl PlayedBuildings {
+    pub fn new() -> Self {
+        PlayedBuildings {
+            settlements: Vec::new(),
+            cities: Vec::new(),
+        }
+    }
+
+    pub fn build_settlement<H: Height>(&mut self, position: CornerPosition<H>) {
+        self.settlements
+            .push((position.as_low(), position.as_high()))
+    }
+
+    /// Tries to find a settlement at the position. If one does not exist, returns Err(()). Otherwise, replace it with a city.
+    pub fn build_city<H: Height>(&mut self, position: CornerPosition<H>) -> Result<(), ()> {
+        let settlement = self
+            .settlements
+            .iter()
+            .position(|(p1, p2)| &position.as_low() == p1 && &position.as_high() == p2)
+            .ok_or(())?;
+        self.settlements.swap_remove(settlement);
+        self.cities.push((position.as_low(), position.as_high()));
+        Ok(())
+    }
+}
+
+struct PlayedTransport {
+    roads: Vec<(
+        Option<EdgePosition<Even>>,
+        Option<EdgePosition<Odd>>,
+        Option<EdgePosition<Positive>>,
+    )>,
+    boats: Vec<(
+        Option<EdgePosition<Even>>,
+        Option<EdgePosition<Odd>>,
+        Option<EdgePosition<Positive>>,
+    )>,
+}
+
+impl PlayedTransport {
+    pub fn new() -> Self {
+        PlayedTransport {
+            roads: Vec::new(),
+            boats: Vec::new(),
+        }
+    }
+
+    pub fn build_road<T: Valid>(&mut self, position: EdgePosition<T>) {
+        self.roads.push((position.as_even(), position.as_odd(), position.as_positive()))
+    }
+
+    pub fn build_boat<T: Valid>(&mut self, position: EdgePosition<T>) {
+        self.boats.push((position.as_even(), position.as_odd(), position.as_positive()))
     }
 }
