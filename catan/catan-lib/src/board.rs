@@ -12,7 +12,10 @@ use hexgrid::{
     hex::{bounds::HexPerimeter, position::HexPosition, table::HexTable},
 };
 
-use crate::{game::edition::GameEdition, object::{Building, CornerData, EdgeData, TileData, TileType, Transport, trade::*}};
+use crate::{
+    game::edition::GameEdition,
+    object::{Building, CornerData, EdgeData, TileData, TileType, Transport, trade::*},
+};
 
 pub struct Board {
     corners: CornerTable<CornerData>,
@@ -131,16 +134,28 @@ impl Board {
     }
 }
 
-struct PlayedBuildings {
+struct PlayedStructures {
     settlements: Vec<(Option<CornerPosition<Low>>, Option<CornerPosition<High>>)>,
     cities: Vec<(Option<CornerPosition<Low>>, Option<CornerPosition<High>>)>,
+    roads: Vec<(
+        Option<EdgePosition<Even>>,
+        Option<EdgePosition<Odd>>,
+        Option<EdgePosition<Positive>>,
+    )>,
+    boats: Vec<(
+        Option<EdgePosition<Even>>,
+        Option<EdgePosition<Odd>>,
+        Option<EdgePosition<Positive>>,
+    )>,
 }
 
-impl PlayedBuildings {
+impl PlayedStructures {
     pub fn new() -> Self {
-        PlayedBuildings {
+        PlayedStructures {
             settlements: Vec::new(),
             cities: Vec::new(),
+            roads: Vec::new(),
+            boats: Vec::new(),
         }
     }
 
@@ -160,34 +175,20 @@ impl PlayedBuildings {
         self.cities.push((position.as_low(), position.as_high()));
         Ok(())
     }
-}
-
-struct PlayedTransport {
-    roads: Vec<(
-        Option<EdgePosition<Even>>,
-        Option<EdgePosition<Odd>>,
-        Option<EdgePosition<Positive>>,
-    )>,
-    boats: Vec<(
-        Option<EdgePosition<Even>>,
-        Option<EdgePosition<Odd>>,
-        Option<EdgePosition<Positive>>,
-    )>,
-}
-
-impl PlayedTransport {
-    pub fn new() -> Self {
-        PlayedTransport {
-            roads: Vec::new(),
-            boats: Vec::new(),
-        }
-    }
 
     pub fn build_road<T: Valid>(&mut self, position: EdgePosition<T>) {
-        self.roads.push((position.as_even(), position.as_odd(), position.as_positive()))
+        self.roads.push((
+            position.as_even(),
+            position.as_odd(),
+            position.as_positive(),
+        ))
     }
 
     pub fn build_boat<T: Valid>(&mut self, position: EdgePosition<T>) {
-        self.boats.push((position.as_even(), position.as_odd(), position.as_positive()))
+        self.boats.push((
+            position.as_even(),
+            position.as_odd(),
+            position.as_positive(),
+        ))
     }
 }
