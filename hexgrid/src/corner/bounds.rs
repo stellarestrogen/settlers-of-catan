@@ -1,9 +1,10 @@
-use crate::hex::{
-    bounds::HexPerimeter,
-    position::{HexPosition, HorizontalDistance},
+use crate::{
+    corner::position::{CornerPosition, Height},
+    hex::{
+        bounds::HexPerimeter,
+        position::{HexPosition, HorizontalDistance},
+    },
 };
-
-use super::position::{CornerPosition, Height};
 
 pub struct CornerBounds {
     bounds: HexPerimeter,

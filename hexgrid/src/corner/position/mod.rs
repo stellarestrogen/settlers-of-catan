@@ -1,8 +1,11 @@
 use std::marker::PhantomData;
 
+use crate::corner::position::r#type::CornerType;
+
 pub mod op_add;
 pub mod op_mul;
 pub mod op_sub;
+pub mod r#type;
 
 pub struct Low;
 pub struct High;
@@ -87,12 +90,8 @@ impl CornerPosition<High> {
         self + CornerPosition::UP
     }
 
-    pub fn as_generic<H: Height>(&self) -> CornerPosition<H> {
-        CornerPosition {
-            rights: self.rights,
-            downs: self.downs,
-            height: PhantomData::<H>,
-        }
+    pub fn into_type(self) -> CornerType {
+        CornerType::from_high(self)
     }
 }
 
@@ -127,12 +126,8 @@ impl CornerPosition<Low> {
         self + CornerPosition::DOWN
     }
 
-    pub fn as_generic<H: Height>(&self) -> CornerPosition<H> {
-        CornerPosition {
-            rights: self.rights,
-            downs: self.downs,
-            height: PhantomData::<H>,
-        }
+    pub fn into_type(self) -> CornerType {
+        CornerType::from_low(self)
     }
 }
 
@@ -154,14 +149,6 @@ impl CornerPosition<Center> {
         downs: -2,
         height: PhantomData::<Center>,
     };
-
-    pub fn as_generic<H: Height>(&self) -> CornerPosition<H> {
-        CornerPosition {
-            rights: self.rights,
-            downs: self.downs,
-            height: PhantomData::<H>,
-        }
-    }
 }
 
 impl<H> CornerPosition<H> {
