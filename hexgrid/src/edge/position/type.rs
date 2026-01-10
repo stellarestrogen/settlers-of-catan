@@ -30,4 +30,28 @@ impl EdgeType {
     pub fn from_positive(position: EdgePosition<Positive>) -> Self {
         EdgeType::Positive { position }
     }
+
+    pub fn get_even(&self) -> Option<EdgePosition<Even>> {
+        match *self {
+            EdgeType::Even { position } => Some(position),
+            EdgeType::Odd { position: _ } => None,
+            EdgeType::Positive { position: _ } => None,
+        }
+    }
+
+    pub fn get_odd(&self) -> Option<EdgePosition<Odd>> {
+        match *self {
+            EdgeType::Even { position: _ } => None,
+            EdgeType::Odd { position } => Some(position),
+            EdgeType::Positive { position: _ } => None,
+        }
+    }
+
+    pub fn get_positive(&self) -> Option<EdgePosition<Positive>> {
+        match *self {
+            EdgeType::Even { position: _ } => None,
+            EdgeType::Odd { position: _ } => None,
+            EdgeType::Positive { position } => Some(position),
+        }
+    }
 }

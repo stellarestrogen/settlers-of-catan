@@ -23,4 +23,18 @@ impl CornerType {
     pub fn from_high(position: CornerPosition<High>) -> Self {
         CornerType::High { position }
     }
+
+    pub fn get_low(&self) -> Option<CornerPosition<Low>> {
+        match *self {
+            CornerType::Low { position } => Some(position),
+            CornerType::High { position: _ } => None
+        }
+    }
+
+    pub fn get_high(&self) -> Option<CornerPosition<High>> {
+        match *self {
+            CornerType::Low { position: _ } => None,
+            CornerType::High { position } => Some(position)
+        }
+    }
 }
