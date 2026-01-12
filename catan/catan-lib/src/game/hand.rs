@@ -1,6 +1,5 @@
 use crate::object::{
-    DevCardType, DevelopmentCard, ResourceCard,
-    resource::{RESOURCE_NO, ResourceType},
+    card::{DevCardType, DevelopmentCard, ResourceCard}, resource::{RESOURCE_NO, ResourceType}
 };
 
 /// Controls and handles all of the cards and unplayed structures.
@@ -10,7 +9,7 @@ pub struct Hand {
 }
 
 impl Hand {
-    /// It is very unlikely to hold very many development cards at once, so we do not use `with_capacity`.
+    /// It is very unlikely to hold very many development cards, so we do not use `with_capacity`.
     pub fn new() -> Self {
         Self {
             rsrc_cards: [
@@ -25,17 +24,8 @@ impl Hand {
         }
     }
 
-    fn get_resource(&self, resource: ResourceType) -> &ResourceCard {
+    pub fn get_resource(&self, resource: ResourceType) -> &ResourceCard {
         for card in self.rsrc_cards.iter() {
-            if resource == card.get_resource() {
-                return card;
-            }
-        }
-        unreachable!()
-    }
-
-    fn get_mut_resource(&mut self, resource: ResourceType) -> &mut ResourceCard {
-        for card in self.rsrc_cards.iter_mut() {
             if resource == card.get_resource() {
                 return card;
             }
@@ -78,5 +68,14 @@ impl Hand {
         }
 
         points
+    }
+
+    fn get_mut_resource(&mut self, resource: ResourceType) -> &mut ResourceCard {
+        for card in self.rsrc_cards.iter_mut() {
+            if resource == card.get_resource() {
+                return card;
+            }
+        }
+        unreachable!()
     }
 }

@@ -3,7 +3,7 @@ use std::iter;
 use hexgrid::hex::{iterators::spiral::HexSpiral, position::HexPosition};
 use rand::seq::SliceRandom;
 
-use crate::object::{TileData, resource::*, trade::*};
+use crate::{game::structures::OwnedStructures, object::{TileData, resource::*, trade::*}};
 
 const ROLL_ORDER_BASE: [u8; 18] = [11, 3, 6, 5, 4, 9, 10, 8, 4, 11, 12, 9, 10, 8, 3, 6, 2, 5];
 
@@ -20,6 +20,7 @@ const TRADE_GAP_EXP: [u32; 11] = [0, 1, 1, 1, 1, 1, 1, 1, 3, 1, 2];
 pub trait GameEdition {
     fn get_tiles(&self) -> impl Iterator<Item = (HexPosition, TileData)> + Clone;
     fn get_trades(&self) -> impl Iterator<Item = TradePort>;
+    fn get_start_structures(&self) -> OwnedStructures;
 }
 
 pub struct BaseEdition {}
@@ -54,6 +55,10 @@ impl GameEdition for BaseEdition {
             ]),
             &mut TRADE_GAP_BASE.into_iter(),
         )
+    }
+
+    fn get_start_structures(&self) -> OwnedStructures {
+        OwnedStructures::new(5, 4, 15, 0)
     }
 }
 
@@ -90,6 +95,10 @@ impl GameEdition for ExpansionEdition {
             &mut TRADE_GAP_EXP.into_iter(),
         )
     }
+
+    fn get_start_structures(&self) -> OwnedStructures {
+        OwnedStructures::new(5, 4, 15, 0)
+    }
 }
 
 pub struct CustomEdition {
@@ -99,6 +108,7 @@ pub struct CustomEdition {
     roll_numbers: Vec<u8>,
     trade_distr: TradeDistribution,
     trade_gaps: Vec<u32>,
+    owned_structures: OwnedStructures
 }
 
 impl CustomEdition {
@@ -127,6 +137,10 @@ impl GameEdition for CustomEdition {
             &mut self.trade_gaps.clone().into_iter(),
         )
     }
+
+    fn get_start_structures(&self) -> OwnedStructures {
+        self.owned_structures
+    }
 }
 
 pub struct CustomEditionBuilder {
@@ -136,6 +150,7 @@ pub struct CustomEditionBuilder {
     roll_numbers: Vec<u8>,
     trade_distr: TradeDistribution,
     trade_gaps: Vec<u32>,
+    owned_structures: OwnedStructures
 }
 
 impl CustomEditionBuilder {
@@ -147,6 +162,8 @@ impl CustomEditionBuilder {
             roll_numbers: self.roll_numbers,
             trade_distr: self.trade_distr,
             trade_gaps: self.trade_gaps,
+            owned_structures: self.owned_structures
+
         }
     }
 
@@ -158,6 +175,7 @@ impl CustomEditionBuilder {
             roll_numbers: Self::default_roll_numbers(shortest, longest),
             trade_distr: Self::default_trade_distribution(shortest, longest),
             trade_gaps: Self::default_trade_gaps(shortest, longest),
+            owned_structures: Self::default_owned_structures(),
         }
     }
 
@@ -253,5 +271,9 @@ impl CustomEditionBuilder {
         gaps.push(0);
         gaps.extend(iter::repeat_n(1, (total_corner_num - 1) as usize));
         gaps
+    }
+
+    fn default_owned_structures() -> OwnedStructures {
+        OwnedStructures::new(5, 4, 15, 0)
     }
 }
