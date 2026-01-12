@@ -1,3 +1,5 @@
+use core::fmt;
+
 pub use horizontal_distance::HorizontalDistance;
 
 pub mod horizontal_distance;
@@ -91,5 +93,11 @@ impl HexPosition {
 
     pub fn is_above_or_equal(&self, other: Self) -> bool {
         self.vertical_distance(other) <= 0
+    }
+}
+
+impl fmt::Display for HexPosition {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        writeln!(f, "HexPosition ({}, {})", self.rights, self.downs)
     }
 }

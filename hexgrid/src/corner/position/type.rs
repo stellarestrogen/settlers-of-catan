@@ -1,3 +1,5 @@
+use core::fmt;
+
 use crate::corner::position::{CornerPosition, Height, High, Low};
 
 #[derive(Clone, Copy, PartialEq, Debug)]
@@ -35,6 +37,15 @@ impl CornerType {
         match *self {
             CornerType::Low { position: _ } => None,
             CornerType::High { position } => Some(position)
+        }
+    }
+}
+
+impl fmt::Display for CornerType {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            CornerType::Low { position } => write!(f, "CornerPosition<Low> ({}, {})", position.rights, position.downs),
+            CornerType::High { position } => write!(f, "CornerPosition<High> ({}, {}", position.rights, position.downs)
         }
     }
 }

@@ -1,3 +1,5 @@
+use core::fmt;
+
 use crate::edge::position::{EdgePosition, Even, Odd, Positive, Valid};
 
 #[derive(Clone, Copy, PartialEq, Debug)]
@@ -52,6 +54,16 @@ impl EdgeType {
             EdgeType::Even { position: _ } => None,
             EdgeType::Odd { position: _ } => None,
             EdgeType::Positive { position } => Some(position),
+        }
+    }
+}
+
+impl fmt::Display for EdgeType {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            EdgeType::Even { position } => write!(f, "EdgePosition<Even> ({}, {})", position.rights, position.downs),
+            EdgeType::Odd { position } => write!(f, "EdgePosition<Odd> ({}, {})", position.rights, position.downs),
+            EdgeType::Positive { position } => write!(f, "EdgePosition<Positive> ({}, {})", position.rights, position.downs)
         }
     }
 }
