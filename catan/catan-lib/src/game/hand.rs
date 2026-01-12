@@ -33,12 +33,12 @@ impl Hand {
         unreachable!()
     }
 
-    pub fn add_resource_card(&mut self, resource: ResourceType, count: i32) {
+    pub fn add_resource_card(&mut self, resource: ResourceType, count: u32) {
         let card = self.get_mut_resource(resource);
         card.add(count)
     }
 
-    pub fn sub_resource_card(&mut self, resource: ResourceType, count: i32) {
+    pub fn sub_resource_card(&mut self, resource: ResourceType, count: u32) {
         let card = self.get_mut_resource(resource);
         card.sub(count)
     }
