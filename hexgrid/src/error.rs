@@ -25,6 +25,15 @@ pub struct PositionError {
     position: PositionType,
 }
 
+impl PositionError {
+    pub fn error(error: TableError, position: PositionType) -> Self {
+        PositionError {
+            error,
+            position
+        }
+    }
+}
+
 impl fmt::Display for PositionError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let msg = match self.error {
