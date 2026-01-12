@@ -1,6 +1,6 @@
 use crate::corner::position::{CornerPosition, Height, High, Low};
 
-#[derive(Clone, Copy, PartialEq)]
+#[derive(Clone, Copy, PartialEq, Debug)]
 pub enum CornerType {
     Low { position: CornerPosition<Low> },
     High { position: CornerPosition<High> },

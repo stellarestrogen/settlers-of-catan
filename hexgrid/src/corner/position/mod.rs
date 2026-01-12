@@ -7,8 +7,13 @@ pub mod op_mul;
 pub mod op_sub;
 pub mod r#type;
 
+#[derive(Debug)]
 pub struct Low;
+
+#[derive(Debug)]
 pub struct High;
+
+
 pub struct Center;
 
 pub trait Height {
@@ -35,6 +40,7 @@ impl Height for High {
     }
 }
 
+#[derive(Debug)]
 pub struct CornerPosition<H> {
     rights: i32,
     downs: i32,

@@ -1,19 +1,20 @@
+use std::error::Error;
+use std::fmt;
 
-pub enum PositionErr {
-    Hex,
-    Corner,
-    Edge
+use crate::{
+    corner::position::r#type::CornerType, edge::position::r#type::EdgeType,
+    hex::position::HexPosition,
+};
+
+#[derive(Debug)]
+pub enum PositionType {
+    Hex { position: HexPosition },
+    Corner { position: CornerType },
+    Edge { position: EdgeType },
 }
 
-impl PositionErr {
-
-}
-
-pub enum GridErr {
-    OutOfBounds { r#type: PositionErr },
-    NoData { r#type: PositionErr },
-}
-
-impl GridErr {
-    
+#[derive(Debug)]
+pub enum TableError {
+    OutOfBounds { r#type: PositionType },
+    NoData { r#type: PositionType },
 }

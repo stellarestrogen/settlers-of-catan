@@ -5,13 +5,13 @@ pub mod op_mul;
 pub mod op_sub;
 pub mod r#type;
 
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, Debug)]
 pub struct Even;
 
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, Debug)]
 pub struct Odd;
 
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, Debug)]
 pub struct Positive;
 
 #[derive(Clone, Copy)]
@@ -63,6 +63,7 @@ impl Valid for Positive {
     }
 }
 
+#[derive(Debug)]
 pub struct EdgePosition<Type> {
     rights: i32,
     downs: i32,

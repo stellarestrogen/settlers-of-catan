@@ -1,6 +1,6 @@
 use crate::edge::position::{EdgePosition, Even, Odd, Positive, Valid};
 
-#[derive(Clone, Copy, PartialEq)]
+#[derive(Clone, Copy, PartialEq, Debug)]
 pub enum EdgeType {
     Even { position: EdgePosition<Even> },
     Odd { position: EdgePosition<Odd> },
