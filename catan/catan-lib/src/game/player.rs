@@ -3,7 +3,7 @@ use crate::{
         hand::Hand,
         structures::{OwnedStructures, PlayedStructures},
     },
-    object::{Structure, resource::ResourceType},
+    object::{Structure, resource::{RESOURCES, ResourceType}},
 };
 
 pub struct Player {
@@ -22,29 +22,33 @@ impl Player {
     }
 
     pub fn can_build_structure(&self, structure: Structure) -> bool {
-        match structure {
-            Structure::Settlement => {
-                self.count_resource(ResourceType::Wood) >= 1
-                    && self.count_resource(ResourceType::Brick) >= 1
-                    && self.count_resource(ResourceType::Wheat) >= 1
-                    && self.count_resource(ResourceType::Sheep) >= 1
-            }
-            Structure::City => {
-                self.count_resource(ResourceType::Wheat) >= 2
-                    && self.count_resource(ResourceType::Ore) >= 3
-            }
-            Structure::Road => {
-                self.count_resource(ResourceType::Wood) >= 1
-                    && self.count_resource(ResourceType::Brick) >= 1
-            }
-            Structure::Boat => {
-                self.count_resource(ResourceType::Wood) >= 1
-                    && self.count_resource(ResourceType::Sheep) >= 1
+        for rsrc in RESOURCES {
+            if self.count_resource(rsrc) >= structure.resource_cost(rsrc) {
+                continue;
+            } else {
+                return false;
             }
         }
+        return true;
+    }
+
+    pub fn try_build_structure(&mut self, structure: Structure) -> Result<(), ()> {
+        self.can_build_structure(structure).then_some(()).ok_or(())?;
+        for rsrc in RESOURCES {
+            self.sub_resource(rsrc, structure.resource_cost(rsrc));
+        }
+        Ok(())
     }
 
     pub fn count_resource(&self, resource: ResourceType) -> u32 {
         self.hand.get_resource(resource).get_count()
+    }
+
+    pub fn add_resource(&mut self, resource: ResourceType, count: u32) {
+        self.hand.add_resource_card(resource, count);
+    }
+
+    pub fn sub_resource(&mut self, resource: ResourceType, count: u32) {
+        self.hand.sub_resource_card(resource, count);
     }
 }

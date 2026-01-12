@@ -15,7 +15,7 @@ pub enum ResourceType {
     Ore,
 }
 
-pub static RESOURCES: [ResourceType; RESOURCE_NO] = [
+pub const RESOURCES: [ResourceType; RESOURCE_NO] = [
     ResourceType::Wood,
     ResourceType::Brick,
     ResourceType::Wheat,

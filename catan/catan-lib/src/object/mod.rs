@@ -4,7 +4,7 @@ pub mod trade;
 
 use hexgrid::hex::position::HexPosition;
 
-use crate::object::{resource::ResourceType, trade::TradeType};
+use crate::object::{resource::{RESOURCE_NO, ResourceType}, trade::TradeType};
 
 #[derive(Clone, Copy)]
 pub enum TileType {
@@ -52,6 +52,54 @@ pub enum Structure {
     City,
     Road,
     Boat,
+}
+
+impl Structure {
+    pub fn cost(&self) -> [(ResourceType, u32); RESOURCE_NO] {
+        match self {
+            Structure::Settlement => {
+                [
+                    (ResourceType::Wood, 1),
+                    (ResourceType::Brick, 1),
+                    (ResourceType::Wheat, 1),
+                    (ResourceType::Sheep, 1),
+                    (ResourceType::Ore, 0),
+                ]
+            }
+            Structure::City => {
+                [
+                    (ResourceType::Wood, 0),
+                    (ResourceType::Brick, 0),
+                    (ResourceType::Wheat, 2),
+                    (ResourceType::Sheep, 0),
+                    (ResourceType::Ore, 3),
+                ]
+            }
+            Structure::Road => {
+                [
+                    (ResourceType::Wood, 1),
+                    (ResourceType::Brick, 1),
+                    (ResourceType::Wheat, 0),
+                    (ResourceType::Sheep, 0),
+                    (ResourceType::Ore, 0),
+                ]
+            }
+            Structure::Boat => {
+                [
+                    (ResourceType::Wood, 1),
+                    (ResourceType::Brick, 0),
+                    (ResourceType::Wheat, 0),
+                    (ResourceType::Sheep, 1),
+                    (ResourceType::Ore, 0),
+                ]
+            }
+        }
+    }
+
+    pub fn resource_cost(&self, resource: ResourceType) -> u32 {
+        let (_, count) = self.cost().into_iter().find(|(r, _)| r == &resource).expect("Invalid ResourceType");
+        count
+    }
 }
 
 pub struct Robber {
