@@ -1,3 +1,5 @@
+use hexgrid::corner::position::{CornerPosition, Height};
+
 use crate::{
     game::{
         hand::Hand,
@@ -32,8 +34,9 @@ impl Player {
         return true;
     }
 
-    pub fn try_build_structure(&mut self, structure: Structure) -> Result<(), ()> {
+    pub fn try_build_structure<H: Height>(&mut self, structure: Structure, position: CornerPosition<H>) -> Result<(), ()> {
         self.can_build_structure(structure).then_some(()).ok_or(())?;
+        self.owned_structures.remove_structure(structure)?;
         for rsrc in RESOURCES {
             self.sub_resource(rsrc, structure.resource_cost(rsrc));
         }
