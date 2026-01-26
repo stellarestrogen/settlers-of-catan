@@ -10,7 +10,7 @@ pub enum EdgeType {
 }
 
 impl EdgeType {
-    pub fn into<Type: Valid>(position: EdgePosition<Type>) -> Self {
+    pub fn from<Type: Valid>(position: EdgePosition<Type>) -> Self {
         if let Some(p) = position.as_even() {
             return EdgeType::from_even(p);
         } else if let Some(p) = position.as_odd() {
@@ -61,9 +61,21 @@ impl EdgeType {
 impl fmt::Display for EdgeType {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            EdgeType::Even { position } => write!(f, "EdgePosition<Even> ({}, {})", position.rights, position.downs),
-            EdgeType::Odd { position } => write!(f, "EdgePosition<Odd> ({}, {})", position.rights, position.downs),
-            EdgeType::Positive { position } => write!(f, "EdgePosition<Positive> ({}, {})", position.rights, position.downs)
+            EdgeType::Even { position } => write!(
+                f,
+                "EdgePosition<Even> ({}, {})",
+                position.rights, position.downs
+            ),
+            EdgeType::Odd { position } => write!(
+                f,
+                "EdgePosition<Odd> ({}, {})",
+                position.rights, position.downs
+            ),
+            EdgeType::Positive { position } => write!(
+                f,
+                "EdgePosition<Positive> ({}, {})",
+                position.rights, position.downs
+            ),
         }
     }
 }

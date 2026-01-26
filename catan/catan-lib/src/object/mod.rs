@@ -2,9 +2,12 @@ pub mod card;
 pub mod resource;
 pub mod trade;
 
-use hexgrid::hex::position::HexPosition;
+use hexgrid::{corner::position::Height, edge::position::Valid, hex::position::HexPosition};
 
-use crate::object::{resource::{RESOURCE_NO, ResourceType}, trade::TradeType};
+use crate::{
+    game::structures::Structure,
+    object::{resource::ResourceType, trade::TradeType},
+};
 
 #[derive(Clone, Copy)]
 pub enum TileType {
@@ -22,11 +25,11 @@ pub enum Transport {
     Boat,
 }
 
-impl Into<Structure> for Transport {
-    fn into(self) -> Structure {
+impl<H: Height, T: Valid> Into<Structure<H, T>> for Transport {
+    fn into(self) -> Structure<H, T> {
         match self {
-            Self::Road => Structure::Road,
-            Self::Boat => Structure::Boat,
+            Self::Road => Structure::Road { position: None },
+            Self::Boat => Structure::Boat { position: None },
         }
     }
 }
@@ -37,68 +40,12 @@ pub enum Building {
     City,
 }
 
-impl Into<Structure> for Building {
-    fn into(self) -> Structure {
+impl<H: Height, T: Valid> Into<Structure<H, T>> for Building {
+    fn into(self) -> Structure<H, T> {
         match self {
-            Self::Settlement => Structure::Settlement,
-            Self::City => Structure::City,
+            Self::Settlement => Structure::Settlement { position: None },
+            Self::City => Structure::City { position: None },
         }
-    }
-}
-
-#[derive(Clone, Copy, PartialEq, Eq)]
-pub enum Structure {
-    Settlement,
-    City,
-    Road,
-    Boat,
-}
-
-impl Structure {
-    pub fn cost(&self) -> [(ResourceType, u32); RESOURCE_NO] {
-        match self {
-            Structure::Settlement => {
-                [
-                    (ResourceType::Wood, 1),
-                    (ResourceType::Brick, 1),
-                    (ResourceType::Wheat, 1),
-                    (ResourceType::Sheep, 1),
-                    (ResourceType::Ore, 0),
-                ]
-            }
-            Structure::City => {
-                [
-                    (ResourceType::Wood, 0),
-                    (ResourceType::Brick, 0),
-                    (ResourceType::Wheat, 2),
-                    (ResourceType::Sheep, 0),
-                    (ResourceType::Ore, 3),
-                ]
-            }
-            Structure::Road => {
-                [
-                    (ResourceType::Wood, 1),
-                    (ResourceType::Brick, 1),
-                    (ResourceType::Wheat, 0),
-                    (ResourceType::Sheep, 0),
-                    (ResourceType::Ore, 0),
-                ]
-            }
-            Structure::Boat => {
-                [
-                    (ResourceType::Wood, 1),
-                    (ResourceType::Brick, 0),
-                    (ResourceType::Wheat, 0),
-                    (ResourceType::Sheep, 1),
-                    (ResourceType::Ore, 0),
-                ]
-            }
-        }
-    }
-
-    pub fn resource_cost(&self, resource: ResourceType) -> u32 {
-        let (_, count) = self.cost().into_iter().find(|(r, _)| r == &resource).expect("Invalid ResourceType");
-        count
     }
 }
 
