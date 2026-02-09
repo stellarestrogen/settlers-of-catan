@@ -6,7 +6,7 @@ use crate::distribution::Distribution;
 
 pub const RESOURCE_NO: usize = 5;
 
-#[derive(Clone, Copy, PartialEq)]
+#[derive(Debug, Clone, Copy, PartialEq)]
 pub enum ResourceType {
     Wood,
     Brick,
@@ -22,6 +22,27 @@ pub const RESOURCES: [ResourceType; RESOURCE_NO] = [
     ResourceType::Sheep,
     ResourceType::Ore,
 ];
+
+pub struct Resources {
+    resources: [ResourceType; RESOURCE_NO]
+}
+
+impl Resources {
+    pub fn new() -> Self {
+        Self {
+            resources: RESOURCES
+        }
+    }
+}
+
+impl IntoIterator for Resources {
+    type Item = ResourceType;
+    type IntoIter = std::array::IntoIter<Self::Item, RESOURCE_NO>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        self.resources.into_iter()
+    }
+}
 
 pub type ResourceDistribution = Distribution<ResourceType, RESOURCE_NO>;
 

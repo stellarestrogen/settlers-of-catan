@@ -3,7 +3,10 @@ use hexgrid::{
     edge::position::{EdgePosition, Valid, r#type::EdgeType},
 };
 
-use crate::object::resource::{RESOURCE_NO, ResourceType};
+use crate::object::{
+    card::{ResourceCard, ResourceMap},
+    resource::{RESOURCE_NO, ResourceType},
+};
 
 #[derive(Clone)]
 pub struct PlayedStructures {
@@ -106,133 +109,54 @@ impl OwnedStructures {
         }
     }
 
-    pub fn add_structure<H: Height, T: Valid>(&mut self, structure: Structure<H, T>) {
+    pub fn add_structure(&mut self, structure: Structure) {
         match structure {
-            Structure::Settlement { position: _ } => self.settlements += 1,
-            Structure::City { position: _ } => self.cities += 1,
-            Structure::Road { position: _ } => self.roads += 1,
-            Structure::Boat { position: _ } => self.boats += 1,
+            Structure::Settlement => self.settlements += 1,
+            Structure::City => self.cities += 1,
+            Structure::Road => self.roads += 1,
+            Structure::Boat => self.boats += 1,
         };
     }
 
-    pub fn remove_structure<H: Height, T: Valid>(
-        &mut self,
-        structure: Structure<H, T>,
-    ) -> Result<(), ()> {
+    pub fn remove_structure(&mut self, structure: Structure) {
         match structure {
-            Structure::Settlement { position: _ } => self.settlements.checked_sub(1).ok_or(())?,
-            Structure::City { position: _ } => self.cities.checked_sub(1).ok_or(())?,
-            Structure::Boat { position: _ } => self.boats.checked_sub(1).ok_or(())?,
-            Structure::Road { position: _ } => self.roads.checked_sub(1).ok_or(())?,
-        };
+            Structure::Settlement => self.settlements = self.settlements.saturating_sub(1),
+            Structure::City => self.cities = self.cities.saturating_sub(1),
+            Structure::Boat => self.boats = self.boats.saturating_sub(1),
+            Structure::Road => self.roads = self.roads.saturating_sub(1),
+        }
 
-        Ok(())
     }
 
-    pub fn get_structure<H: Height, T: Valid>(&self, structure: Structure<H, T>) -> u32 {
+    pub fn get_structure(&self, structure: Structure) -> u32 {
         match structure {
-            Structure::Settlement { position: _ } => self.settlements,
-            Structure::City { position: _ } => self.cities,
-            Structure::Road { position: _ } => self.roads,
-            Structure::Boat { position: _ } => self.boats,
+            Structure::Settlement => self.settlements,
+            Structure::City => self.cities,
+            Structure::Road => self.roads,
+            Structure::Boat => self.boats,
         }
     }
 }
 
-#[derive(PartialEq)]
-pub enum Structure<H: Height, T: Valid> {
-    Settlement { position: Option<CornerPosition<H>> },
-    City { position: Option<CornerPosition<H>> },
-    Road { position: Option<EdgePosition<T>> },
-    Boat { position: Option<EdgePosition<T>> },
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub enum Structure {
+    Settlement,
+    City,
+    Road,
+    Boat,
 }
 
-impl<H: Height, T: Valid> Structure<H, T> {
-    pub fn settlement(position: CornerPosition<H>) -> Self {
-        Structure::Settlement {
-            position: Some(position),
-        }
-    }
-
-    pub fn city(position: CornerPosition<H>) -> Self {
-        Structure::City {
-            position: Some(position),
-        }
-    }
-
-    pub fn road(position: EdgePosition<T>) -> Self {
-        Structure::Road {
-            position: Some(position),
-        }
-    }
-
-    pub fn boat(position: EdgePosition<T>) -> Self {
-        Structure::Boat {
-            position: Some(position),
-        }
-    }
-
-    pub fn has_position(&self) -> bool {
+impl Structure {
+    pub fn cost(&self) -> ResourceMap {
         match self {
-            Structure::Settlement { position } => position.is_some(),
-            Structure::City { position } => position.is_some(),
-            Structure::Road { position } => position.is_some(),
-            Structure::Boat { position } => position.is_some()
-        }
-    }
-
-    pub fn cost(&self) -> [(ResourceType, u32); RESOURCE_NO] {
-        match self {
-            Structure::Settlement { position: _ } => [
-                (ResourceType::Wood, 1),
-                (ResourceType::Brick, 1),
-                (ResourceType::Wheat, 1),
-                (ResourceType::Sheep, 1),
-                (ResourceType::Ore, 0),
-            ],
-            Structure::City { position: _ } => [
-                (ResourceType::Wood, 0),
-                (ResourceType::Brick, 0),
-                (ResourceType::Wheat, 2),
-                (ResourceType::Sheep, 0),
-                (ResourceType::Ore, 3),
-            ],
-            Structure::Road { position: _ } => [
-                (ResourceType::Wood, 1),
-                (ResourceType::Brick, 1),
-                (ResourceType::Wheat, 0),
-                (ResourceType::Sheep, 0),
-                (ResourceType::Ore, 0),
-            ],
-            Structure::Boat { position: _ } => [
-                (ResourceType::Wood, 1),
-                (ResourceType::Brick, 0),
-                (ResourceType::Wheat, 0),
-                (ResourceType::Sheep, 1),
-                (ResourceType::Ore, 0),
-            ],
+            Structure::Settlement => ResourceMap::new(1, 1, 1, 1, 0),
+            Structure::City => ResourceMap::new(0, 0, 3, 0, 2),
+            Structure::Road => ResourceMap::new(1, 1, 0, 0, 0),
+            Structure::Boat => ResourceMap::new(1, 0, 0, 1, 0),
         }
     }
 
     pub fn resource_cost(&self, resource: ResourceType) -> u32 {
-        let (_, count) = self
-            .cost()
-            .into_iter()
-            .find(|(r, _)| r == &resource)
-            .expect("Invalid ResourceType");
-        count
+        self.cost().get(resource).get_count()
     }
 }
-
-impl<H: Height, T: Valid> Clone for Structure<H, T> {
-    fn clone(&self) -> Self {
-        match *self {
-            Structure::Settlement { position } => Self::Settlement { position },
-            Structure::City { position } => Self::City { position },
-            Structure::Road { position } => Self::Road { position },
-            Structure::Boat { position } => Self::Boat { position },
-        }
-    }
-}
-
-impl<H: Height, T: Valid> Copy for Structure<H, T> {}

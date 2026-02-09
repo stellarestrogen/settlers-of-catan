@@ -25,11 +25,11 @@ pub enum Transport {
     Boat,
 }
 
-impl<H: Height, T: Valid> Into<Structure<H, T>> for Transport {
-    fn into(self) -> Structure<H, T> {
+impl Into<Structure> for Transport {
+    fn into(self) -> Structure {
         match self {
-            Self::Road => Structure::Road { position: None },
-            Self::Boat => Structure::Boat { position: None },
+            Self::Road => Structure::Road,
+            Self::Boat => Structure::Boat,
         }
     }
 }
@@ -40,11 +40,11 @@ pub enum Building {
     City,
 }
 
-impl<H: Height, T: Valid> Into<Structure<H, T>> for Building {
-    fn into(self) -> Structure<H, T> {
+impl Into<Structure> for Building {
+    fn into(self) -> Structure {
         match self {
-            Self::Settlement => Structure::Settlement { position: None },
-            Self::City => Structure::City { position: None },
+            Self::Settlement => Structure::Settlement,
+            Self::City => Structure::City,
         }
     }
 }

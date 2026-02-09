@@ -1,20 +1,14 @@
-use hexgrid::{
-    corner::position::{CornerPosition, Height},
-    edge::position::Valid,
-};
-
 use crate::{
     game::{
         hand::Hand,
-        structures::{OwnedStructures, PlayedStructures, Structure},
+        structures::{OwnedStructures, Structure},
     },
-    object::resource::{RESOURCES, ResourceType},
+    object::resource::ResourceType,
 };
 
 pub struct Player {
     hand: Hand,
     owned_structures: OwnedStructures,
-    played_structures: PlayedStructures,
 }
 
 impl Player {
@@ -22,40 +16,14 @@ impl Player {
         Self {
             hand: Hand::new(),
             owned_structures,
-            played_structures: PlayedStructures::new(),
         }
     }
 
-    pub fn can_build_structure<H: Height, T: Valid>(&self, structure: Structure<H, T>) -> bool {
-        if !structure.has_position() {
-            return false;
+    pub fn play_structure(&mut self, structure: Structure) {
+        if structure == Structure::City {
+            self.owned_structures.add_structure(Structure::Settlement);
         }
-        
-        for rsrc in RESOURCES {
-            if self.count_resource(rsrc) >= structure.resource_cost(rsrc) {
-                continue;
-            } else {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-    pub fn try_build_structure<H: Height, T: Valid>(
-        &mut self,
-        structure: Structure<H, T>,
-    ) -> Result<(), ()> {
-        self.can_build_structure(structure)
-            .then_some(())
-            .ok_or(())?;
-
-        self.owned_structures.remove_structure(structure)?;
-
-        for rsrc in RESOURCES {
-            self.sub_resource(rsrc, structure.resource_cost(rsrc));
-        }
-        Ok(())
+        self.owned_structures.remove_structure(structure);
     }
 
     pub fn count_resource(&self, resource: ResourceType) -> u32 {
