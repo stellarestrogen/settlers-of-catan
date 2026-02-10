@@ -5,7 +5,7 @@ pub mod trade;
 use hexgrid::{corner::position::Height, edge::position::Valid, hex::position::HexPosition};
 
 use crate::{
-    game::structures::Structure,
+    game::structures::StructureType,
     object::{resource::ResourceType, trade::TradeType},
 };
 
@@ -25,11 +25,11 @@ pub enum Transport {
     Boat,
 }
 
-impl Into<Structure> for Transport {
-    fn into(self) -> Structure {
+impl Into<StructureType> for Transport {
+    fn into(self) -> StructureType {
         match self {
-            Self::Road => Structure::Road,
-            Self::Boat => Structure::Boat,
+            Self::Road => StructureType::Road,
+            Self::Boat => StructureType::Boat,
         }
     }
 }
@@ -40,11 +40,11 @@ pub enum Building {
     City,
 }
 
-impl Into<Structure> for Building {
-    fn into(self) -> Structure {
+impl Into<StructureType> for Building {
+    fn into(self) -> StructureType {
         match self {
-            Self::Settlement => Structure::Settlement,
-            Self::City => Structure::City,
+            Self::Settlement => StructureType::Settlement,
+            Self::City => StructureType::City,
         }
     }
 }

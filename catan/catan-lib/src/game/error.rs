@@ -1,12 +1,12 @@
 use core::fmt;
 use std::fmt::Debug;
 
-use crate::{game::structures::Structure, object::card::ResourceMap};
+use crate::{game::structures::StructureType, object::card::ResourceMap};
 
 #[derive(Debug, Clone, Copy)]
 pub enum BuildError {
     InsufficientResources {
-        structure: Structure,
+        structure: StructureType,
         resources: ResourceMap,
     },
     StructureAlreadyExists,
