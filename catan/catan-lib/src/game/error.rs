@@ -3,14 +3,17 @@ use std::fmt::Debug;
 
 use crate::{
     game::{player::OwnershipToken, structures::StructureType},
-    object::card::ResourceMap,
+    object::{
+        card::{ResourceCard, ResourceMap},
+        resource::Resources,
+    },
 };
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone)]
 pub enum BuildError {
     InsufficientResources {
         structure: StructureType,
-        resources: ResourceMap,
+        insufficient_resources: Vec<ResourceCard>,
     },
     StructureAlreadyExists,
     CityRequiresSettlement,
@@ -25,10 +28,15 @@ impl fmt::Display for BuildError {
         match self {
             BuildError::InsufficientResources {
                 structure,
-                resources,
+                insufficient_resources,
             } => {
-                // TODO!
-                write!(f, "The {:?} structure requires", structure)
+                write!(
+                    f,
+                    "The {:?} structure requires {:?} resources, but the following are insufficient: {:?}",
+                    structure,
+                    structure.cost(),
+                    insufficient_resources
+                )
             }
             BuildError::StructureAlreadyExists => write!(f, ""),
             BuildError::CityRequiresSettlement => write!(f, ""),
