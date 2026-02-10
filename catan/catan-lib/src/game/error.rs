@@ -3,10 +3,7 @@ use std::fmt::Debug;
 
 use crate::{
     game::{player::OwnershipToken, structures::StructureType},
-    object::{
-        card::{ResourceCard, ResourceMap},
-        resource::Resources,
-    },
+    object::card::ResourceCard,
 };
 
 #[derive(Debug, Clone)]

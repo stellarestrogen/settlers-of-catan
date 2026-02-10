@@ -4,6 +4,8 @@ pub mod hand;
 pub mod player;
 pub mod structures;
 
-pub struct Game {}
+pub struct Game {
+    
+}
 
 impl Game {}

@@ -84,11 +84,11 @@ impl Player {
         self.hand.get_resource(resource).get_count()
     }
 
-    fn add_resource(&mut self, resource: ResourceType, count: u32) {
+    pub fn add_resource(&mut self, resource: ResourceType, count: u32) {
         self.hand.add_resource_card(resource, count);
     }
 
-    fn sub_resource(&mut self, resource: ResourceType, count: u32) {
+    pub fn sub_resource(&mut self, resource: ResourceType, count: u32) {
         self.hand.sub_resource_card(resource, count);
     }
 }

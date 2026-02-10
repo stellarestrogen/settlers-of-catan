@@ -6,7 +6,7 @@ use crate::distribution::Distribution;
 
 pub const RESOURCE_NO: usize = 5;
 
-#[derive(Debug, Clone, Copy, PartialEq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ResourceType {
     Wood,
     Brick,

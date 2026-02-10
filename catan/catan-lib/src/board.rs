@@ -14,13 +14,14 @@ use hexgrid::{
 
 use crate::{
     game::edition::GameEdition,
-    object::{Building, CornerData, EdgeData, TileData, TileType, Transport, trade::*},
+    object::{Building, CornerData, EdgeData, Robber, TileData, TileType, Transport, trade::*},
 };
 
 pub struct Board {
     corners: CornerTable<CornerData>,
     edges: EdgeTable<EdgeData>,
     tiles: HexTable<TileData>,
+    robber: Robber,
 }
 
 impl Board {
@@ -32,9 +33,12 @@ impl Board {
             corners,
             edges: EdgeTable::new(EdgeBounds::new(bounds)),
             tiles,
+            robber: Robber::new(),
         };
 
         board.create_trades(&edition);
+
+        board.place_robber();
 
         board
     }
@@ -130,6 +134,16 @@ impl Board {
         for trade in trades.into_iter() {
             self.set_trades(trade)
                 .expect("CornerPosition is out of bounds!");
+        }
+    }
+
+    fn place_robber(&mut self) {
+        if let Some(desert_tile) = self
+            .tiles
+            .data()
+            .find(|p| self.tiles.get(*p).unwrap().get_resource_type() == TileType::Desert)
+        {
+            self.robber.r#move(desert_tile);
         }
     }
 }

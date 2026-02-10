@@ -2,14 +2,14 @@ pub mod card;
 pub mod resource;
 pub mod trade;
 
-use hexgrid::{corner::position::Height, edge::position::Valid, hex::position::HexPosition};
+use hexgrid::hex::position::HexPosition;
 
 use crate::{
     game::structures::StructureType,
     object::{resource::ResourceType, trade::TradeType},
 };
 
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, PartialEq, Eq)]
 pub enum TileType {
     Resource {
         resource: ResourceType,
@@ -54,8 +54,8 @@ pub struct Robber {
 }
 
 impl Robber {
-    pub fn new(position: HexPosition) -> Self {
-        Self { position }
+    pub fn new() -> Self {
+        Self { position: HexPosition::ORIGIN }
     }
 
     pub fn r#move(&mut self, position: HexPosition) {
