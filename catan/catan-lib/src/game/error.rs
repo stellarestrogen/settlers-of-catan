@@ -1,7 +1,10 @@
 use core::fmt;
 use std::fmt::Debug;
 
-use crate::{game::structures::StructureType, object::card::ResourceMap};
+use crate::{
+    game::{player::OwnershipToken, structures::StructureType},
+    object::card::ResourceMap,
+};
 
 #[derive(Debug, Clone, Copy)]
 pub enum BuildError {
@@ -11,6 +14,10 @@ pub enum BuildError {
     },
     StructureAlreadyExists,
     CityRequiresSettlement,
+    NoStructures {
+        token: OwnershipToken,
+        structure: StructureType,
+    },
 }
 
 impl fmt::Display for BuildError {
@@ -25,6 +32,11 @@ impl fmt::Display for BuildError {
             }
             BuildError::StructureAlreadyExists => write!(f, ""),
             BuildError::CityRequiresSettlement => write!(f, ""),
+            BuildError::NoStructures { token, structure } => write!(
+                f,
+                "The player with {:?} token has no {:?} structures left!",
+                token, structure
+            ),
         }
     }
 }

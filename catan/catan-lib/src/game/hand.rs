@@ -1,11 +1,11 @@
 use crate::object::{
-    card::{DevCardType, DevelopmentCard, ResourceCard},
-    resource::{RESOURCE_NO, ResourceType, Resources},
+    card::{DevCardType, DevelopmentCard, ResourceCard, ResourceMap},
+    resource::ResourceType,
 };
 
 /// Controls and handles all of the cards and unplayed structures.
 pub struct Hand {
-    rsrc_cards: [ResourceCard; RESOURCE_NO],
+    resource_cards: ResourceMap,
     development_cards: Vec<DevelopmentCard>,
 }
 
@@ -13,11 +13,7 @@ impl Hand {
     /// It is very unlikely to hold very many development cards, so we do not use `with_capacity`.
     pub fn new() -> Self {
         Self {
-            rsrc_cards: Resources::new()
-                .into_iter()
-                .map(ResourceCard::of_type)
-                .collect(),
-
+            resource_cards: ResourceMap::empty(),
             development_cards: Vec::new(),
         }
     }
@@ -53,17 +49,16 @@ impl Hand {
             .count()
     }
 
-    pub fn get_resource(&self, resource: ResourceType) -> &ResourceCard {
-        self.rsrc_cards
-            .iter()
-            .find(|c| c.get_resource() == resource)
-            .expect("I had an unreachable here :3")
+    pub fn get_resources(&self) -> ResourceMap {
+        self.resource_cards
     }
 
-    fn get_mut_resource(&mut self, resource: ResourceType) -> &mut ResourceCard {
-        self.rsrc_cards
-            .iter_mut()
-            .find(|c| c.get_resource() == resource)
-            .unwrap()
+    pub fn get_resource(&self, resource: ResourceType) -> ResourceCard {
+        self.resource_cards.get(resource)
     }
+
+    pub fn get_mut_resource(&mut self, resource: ResourceType) -> &mut ResourceCard {
+        self.resource_cards.get_mut(resource)
+    }
+
 }

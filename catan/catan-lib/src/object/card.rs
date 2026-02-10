@@ -1,6 +1,4 @@
-use std::ops::Add;
-
-use crate::object::resource::{self, RESOURCE_NO, ResourceType};
+use crate::object::resource::ResourceType;
 
 #[derive(Clone, PartialEq)]
 pub enum DevCardType {
@@ -90,18 +88,6 @@ impl ResourceCard {
     }
 }
 
-impl FromIterator<ResourceCard> for [ResourceCard; RESOURCE_NO] {
-    fn from_iter<T: IntoIterator<Item = ResourceCard>>(iter: T) -> Self {
-        let mut c = Vec::<ResourceCard>::new();
-
-        for i in iter {
-            c.push(i);
-        }
-
-        c.try_into().expect("Something has gone horribly wrong...")
-    }
-}
-
 #[derive(Debug, Clone, Copy)]
 pub struct ResourceMap {
     wood: ResourceCard,
@@ -148,6 +134,16 @@ impl ResourceMap {
             ResourceType::Wheat => self.wheat,
             ResourceType::Sheep => self.sheep,
             ResourceType::Ore => self.ore,
+        }
+    }
+
+    pub fn get_mut(&mut self, resource: ResourceType) -> &mut ResourceCard {
+        match resource {
+            ResourceType::Wood => &mut self.wood,
+            ResourceType::Brick => &mut self.brick,
+            ResourceType::Wheat => &mut self.wheat,
+            ResourceType::Sheep => &mut self.sheep,
+            ResourceType::Ore => &mut self.ore,
         }
     }
 }

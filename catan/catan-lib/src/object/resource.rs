@@ -23,6 +23,7 @@ pub const RESOURCES: [ResourceType; RESOURCE_NO] = [
     ResourceType::Ore,
 ];
 
+#[derive(Debug, Clone, Copy)]
 pub struct Resources {
     resources: [ResourceType; RESOURCE_NO]
 }

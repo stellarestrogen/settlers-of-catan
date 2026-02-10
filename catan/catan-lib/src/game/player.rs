@@ -2,10 +2,9 @@ use std::sync::atomic::{AtomicU64, Ordering};
 
 use crate::{
     game::{
-        hand::Hand,
-        structures::{OwnedStructures, StructureType},
+        error::BuildError, hand::Hand, structures::{OwnedStructures, StructureType}
     },
-    object::resource::ResourceType,
+    object::resource::{ResourceType, Resources},
 };
 
 static NEXT: AtomicU64 = AtomicU64::new(0);
@@ -38,12 +37,30 @@ impl Player {
         self.token
     }
 
-    pub fn play_structure(&mut self, structure: StructureType) {
+    pub fn try_play_structure(&self, structure: StructureType) -> Result<(), BuildError> {
+        if self.owned_structures.get_structure(structure) == 0 {
+            return Err(BuildError::NoStructures { token: self.token, structure })
+        }
+
+        for resource in Resources::new() {
+            if self.count_resource(resource) < structure.resource_cost(resource) {
+                return Err(BuildError::InsufficientResources { structure, resources: self.hand.get_resources() })
+            }
+        }
+
+        Ok(())
+    }
+
+    pub fn play_structure(&mut self, structure: StructureType) -> Result<(), BuildError> {
+        self.try_play_structure(structure)?;
+
         if structure == StructureType::City {
             self.owned_structures
                 .add_structure(StructureType::Settlement);
         }
         self.owned_structures.remove_structure(structure);
+        
+        Ok(())
     }
 
     pub fn count_resource(&self, resource: ResourceType) -> u32 {
