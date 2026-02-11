@@ -2,6 +2,7 @@ use std::ops::{Index, IndexMut};
 
 use super::{bounds::HexPerimeter, position::HexPosition};
 
+#[derive(Debug)]
 pub struct HexTable<T> {
     data: Vec<Option<T>>,
     bounds: HexPerimeter,

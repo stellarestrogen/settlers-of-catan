@@ -4,6 +4,7 @@ use crate::object::{
 };
 
 /// Controls and handles all of the cards and unplayed structures.
+#[derive(Debug)]
 pub struct Hand {
     resource_cards: ResourceMap,
     development_cards: Vec<DevelopmentCard>,

@@ -5,11 +5,11 @@ pub mod trade;
 use hexgrid::hex::position::HexPosition;
 
 use crate::{
-    game::structures::StructureType,
+    game::player::OwnershipToken,
     object::{resource::ResourceType, trade::TradeType},
 };
 
-#[derive(Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum TileType {
     Resource {
         resource: ResourceType,
@@ -19,43 +19,60 @@ pub enum TileType {
     Water,
 }
 
-#[derive(Clone, Copy, PartialEq, Eq)]
-pub enum Transport {
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum TransportType {
     Road,
     Boat,
 }
 
-impl Into<StructureType> for Transport {
-    fn into(self) -> StructureType {
-        match self {
-            Self::Road => StructureType::Road,
-            Self::Boat => StructureType::Boat,
-        }
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct Transport {
+    r#type: TransportType,
+    owner: OwnershipToken,
+}
+
+impl Transport {
+    pub fn new(r#type: TransportType, owner: OwnershipToken) -> Self {
+        Self { r#type, owner }
+    }
+
+    pub fn owner(&self) -> OwnershipToken {
+        self.owner
     }
 }
 
-#[derive(Clone, Copy, PartialEq, Eq)]
-pub enum Building {
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum BuildingType {
     Settlement,
     City,
 }
 
-impl Into<StructureType> for Building {
-    fn into(self) -> StructureType {
-        match self {
-            Self::Settlement => StructureType::Settlement,
-            Self::City => StructureType::City,
-        }
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct Building {
+    r#type: BuildingType,
+    owner: OwnershipToken,
+}
+
+impl Building {
+    pub fn new(r#type: BuildingType, owner: OwnershipToken) -> Self {
+        Self { r#type, owner }
+    }
+
+    pub fn owner(&self) -> OwnershipToken {
+        self.owner
     }
 }
 
+#[derive(Debug)]
 pub struct Robber {
     position: HexPosition,
 }
 
 impl Robber {
     pub fn new() -> Self {
-        Self { position: HexPosition::ORIGIN }
+        Self {
+            position: HexPosition::ORIGIN,
+        }
     }
 
     pub fn r#move(&mut self, position: HexPosition) {
@@ -63,7 +80,7 @@ impl Robber {
     }
 }
 
-#[derive(Clone, Copy)]
+#[derive(Debug, Clone, Copy)]
 pub struct CornerData {
     building: Option<Building>,
     trade_type: Option<TradeType>,
@@ -102,7 +119,7 @@ impl CornerData {
     }
 }
 
-#[derive(Clone, Copy)]
+#[derive(Debug, Clone, Copy)]
 pub struct EdgeData {
     transport: Transport,
 }
@@ -117,7 +134,7 @@ impl EdgeData {
     }
 }
 
-#[derive(Clone, Copy)]
+#[derive(Debug, Clone, Copy)]
 pub struct TileData {
     r#type: TileType,
 }

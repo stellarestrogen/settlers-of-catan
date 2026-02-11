@@ -7,6 +7,7 @@ use super::{
     position::{EdgePosition, Valid},
 };
 
+#[derive(Debug)]
 pub struct EdgeTable<T> {
     data: HexTable<(Option<T>, Option<T>, Option<T>)>,
     bounds: EdgeBounds,

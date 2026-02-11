@@ -10,7 +10,7 @@ use crate::{distribution::Distribution, object::resource::ResourceType};
 
 const TRADE_NO: usize = 6;
 
-#[derive(Clone, Copy, PartialEq)]
+#[derive(Debug, Clone, Copy, PartialEq)]
 pub enum TradeType {
     Resource(ResourceType),
     Any,

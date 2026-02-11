@@ -7,6 +7,7 @@ use super::{
     position::{CornerPosition, Height},
 };
 
+#[derive(Debug)]
 pub struct CornerTable<T> {
     data: HexTable<(Option<T>, Option<T>)>,
     bounds: CornerBounds,

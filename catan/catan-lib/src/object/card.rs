@@ -1,6 +1,6 @@
 use crate::object::resource::ResourceType;
 
-#[derive(Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq)]
 pub enum DevCardType {
     MoveRobber,
     TakeTwoResources,
@@ -9,6 +9,7 @@ pub enum DevCardType {
     BuildRoads,
 }
 
+#[derive(Debug)]
 pub struct DevelopmentCard {
     r#type: DevCardType,
     played: bool,

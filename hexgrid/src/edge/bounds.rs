@@ -5,6 +5,7 @@ use crate::hex::{
 
 use super::position::{EdgePosition, Valid};
 
+#[derive(Debug)]
 pub struct EdgeBounds {
     bounds: HexPerimeter,
 }

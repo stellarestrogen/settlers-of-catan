@@ -17,11 +17,14 @@ use crate::{
     object::{Building, CornerData, EdgeData, Robber, TileData, TileType, Transport, trade::*},
 };
 
+#[derive(Debug)]
 pub struct Board {
     corners: CornerTable<CornerData>,
     edges: EdgeTable<EdgeData>,
     tiles: HexTable<TileData>,
     robber: Robber,
+
+    
 }
 
 impl Board {

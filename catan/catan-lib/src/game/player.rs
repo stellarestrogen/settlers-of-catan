@@ -23,6 +23,7 @@ impl OwnershipToken {
     }
 }
 
+#[derive(Debug)]
 pub struct Player {
     hand: Hand,
     owned_structures: OwnedStructures,

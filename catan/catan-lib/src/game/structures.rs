@@ -3,7 +3,7 @@ use crate::{
     object::{card::ResourceMap, resource::ResourceType},
 };
 
-#[derive(Clone, Copy)]
+#[derive(Debug, Clone, Copy)]
 pub struct OwnedStructures {
     settlements: u32,
     cities: u32,
