@@ -25,13 +25,13 @@ pub const RESOURCES: [ResourceType; RESOURCE_NO] = [
 
 #[derive(Debug, Clone, Copy)]
 pub struct Resources {
-    resources: [ResourceType; RESOURCE_NO]
+    resources: [ResourceType; RESOURCE_NO],
 }
 
 impl Resources {
     pub fn new() -> Self {
         Self {
-            resources: RESOURCES
+            resources: RESOURCES,
         }
     }
 }

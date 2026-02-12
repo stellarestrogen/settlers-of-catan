@@ -1,14 +1,11 @@
 use std::sync::atomic::{AtomicU64, Ordering};
 
 use crate::{
-    game::{
-        error::BuildError,
-        hand::Hand,
-        structure::{OwnedStructures, StructureType},
-    },
+    game::{error::BuildError, hand::Hand},
     object::{
         card::ResourceCard,
         resource::{ResourceType, Resources},
+        structure::{OwnedStructures, StructureType},
     },
 };
 

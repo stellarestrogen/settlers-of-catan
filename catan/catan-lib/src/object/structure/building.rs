@@ -1,4 +1,7 @@
-use crate::game::{player::OwnershipToken, structure::{Structure, StructureType}};
+use crate::{
+    game::player::OwnershipToken,
+    object::structure::{Structure, StructureType},
+};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum BuildingType {

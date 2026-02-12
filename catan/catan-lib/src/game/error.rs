@@ -2,8 +2,8 @@ use core::fmt;
 use std::fmt::Debug;
 
 use crate::{
-    game::{player::OwnershipToken, structure::StructureType},
-    object::card::ResourceCard,
+    game::player::OwnershipToken,
+    object::{card::ResourceCard, structure::StructureType},
 };
 
 #[derive(Debug, Clone)]

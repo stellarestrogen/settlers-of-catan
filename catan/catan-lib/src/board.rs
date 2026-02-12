@@ -13,11 +13,12 @@ use hexgrid::{
 };
 
 use crate::{
-    game::{
-        edition::GameEdition,
+    game::edition::GameEdition,
+    object::{
+        CornerData, EdgeData, Robber, TileData, TileType,
         structure::{building::Building, transport::Transport},
+        trade::{TradePort, TradeType},
     },
-    object::{CornerData, EdgeData, Robber, TileData, TileType, trade::*},
 };
 
 #[derive(Debug)]

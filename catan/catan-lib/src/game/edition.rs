@@ -3,7 +3,12 @@ use std::iter;
 use hexgrid::hex::{iterators::spiral::HexSpiral, position::HexPosition};
 use rand::seq::SliceRandom;
 
-use crate::{game::structure::OwnedStructures, object::{TileData, resource::*, trade::*}};
+use crate::object::{
+    TileData,
+    resource::{ResourceDeck, ResourceDistribution, ResourceType},
+    structure::OwnedStructures,
+    trade::{TradeDistribution, TradePort, TradePortDeck, TradeType},
+};
 
 const ROLL_ORDER_BASE: [u8; 18] = [11, 3, 6, 5, 4, 9, 10, 8, 4, 11, 12, 9, 10, 8, 3, 6, 2, 5];
 
@@ -108,7 +113,7 @@ pub struct CustomEdition {
     roll_numbers: Vec<u8>,
     trade_distr: TradeDistribution,
     trade_gaps: Vec<u32>,
-    owned_structures: OwnedStructures
+    owned_structures: OwnedStructures,
 }
 
 impl CustomEdition {
@@ -150,7 +155,7 @@ pub struct CustomEditionBuilder {
     roll_numbers: Vec<u8>,
     trade_distr: TradeDistribution,
     trade_gaps: Vec<u32>,
-    owned_structures: OwnedStructures
+    owned_structures: OwnedStructures,
 }
 
 impl CustomEditionBuilder {
@@ -162,8 +167,7 @@ impl CustomEditionBuilder {
             roll_numbers: self.roll_numbers,
             trade_distr: self.trade_distr,
             trade_gaps: self.trade_gaps,
-            owned_structures: self.owned_structures
-
+            owned_structures: self.owned_structures,
         }
     }
 

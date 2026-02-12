@@ -1,10 +1,15 @@
 pub mod card;
 pub mod resource;
+pub mod structure;
 pub mod trade;
 
 use hexgrid::hex::position::HexPosition;
 
-use crate::{game::structure::{building::Building, transport::Transport}, object::{resource::ResourceType, trade::TradeType}};
+use crate::object::{
+    resource::ResourceType,
+    structure::{building::Building, transport::Transport},
+    trade::TradeType,
+};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum TileType {

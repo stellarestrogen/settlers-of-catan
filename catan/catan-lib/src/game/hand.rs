@@ -61,5 +61,4 @@ impl Hand {
     pub fn get_mut_resource(&mut self, resource: ResourceType) -> &mut ResourceCard {
         self.resource_cards.get_mut(resource)
     }
-
 }
