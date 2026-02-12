@@ -82,9 +82,9 @@ pub struct Structure {
 }
 
 impl Structure {
-    pub fn new(structure: StructureType, owner: OwnershipToken) -> Self {
+    pub fn new(r#type: StructureType, owner: OwnershipToken) -> Self {
         Self {
-            r#type: structure,
+            r#type,
             owner,
         }
     }

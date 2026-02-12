@@ -1,4 +1,4 @@
-use crate::{board::Board, game::player::Player};
+use crate::{board::Board, game::player::Player, object::structure::Structure};
 
 pub mod edition;
 pub mod error;
@@ -13,4 +13,8 @@ pub struct Game {
     // redundant data for ease of use
 }
 
-impl Game {}
+impl Game {
+    pub fn build_structure(&mut self, structure: Structure) {
+        
+    }
+}
