@@ -3,7 +3,7 @@ use std::iter;
 use hexgrid::hex::{iterators::spiral::HexSpiral, position::HexPosition};
 use rand::seq::SliceRandom;
 
-use crate::{game::structures::OwnedStructures, object::{TileData, resource::*, trade::*}};
+use crate::{game::structure::OwnedStructures, object::{TileData, resource::*, trade::*}};
 
 const ROLL_ORDER_BASE: [u8; 18] = [11, 3, 6, 5, 4, 9, 10, 8, 4, 11, 12, 9, 10, 8, 3, 6, 2, 5];
 

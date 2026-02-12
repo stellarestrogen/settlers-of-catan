@@ -13,8 +13,11 @@ use hexgrid::{
 };
 
 use crate::{
-    game::edition::GameEdition,
-    object::{Building, CornerData, EdgeData, Robber, TileData, TileType, Transport, trade::*},
+    game::{
+        edition::GameEdition,
+        structure::{building::Building, transport::Transport},
+    },
+    object::{CornerData, EdgeData, Robber, TileData, TileType, trade::*},
 };
 
 #[derive(Debug)]
@@ -23,8 +26,6 @@ pub struct Board {
     edges: EdgeTable<EdgeData>,
     tiles: HexTable<TileData>,
     robber: Robber,
-
-    
 }
 
 impl Board {

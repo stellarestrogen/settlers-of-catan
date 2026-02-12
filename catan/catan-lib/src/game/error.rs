@@ -2,7 +2,7 @@ use core::fmt;
 use std::fmt::Debug;
 
 use crate::{
-    game::{player::OwnershipToken, structures::StructureType},
+    game::{player::OwnershipToken, structure::StructureType},
     object::card::ResourceCard,
 };
 

@@ -1,3 +1,6 @@
+pub mod building;
+pub mod transport;
+
 use crate::{
     game::player::OwnershipToken,
     object::{card::ResourceMap, resource::ResourceType},

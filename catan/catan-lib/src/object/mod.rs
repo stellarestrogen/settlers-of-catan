@@ -4,10 +4,7 @@ pub mod trade;
 
 use hexgrid::hex::position::HexPosition;
 
-use crate::{
-    game::player::OwnershipToken,
-    object::{resource::ResourceType, trade::TradeType},
-};
+use crate::{game::structure::{building::Building, transport::Transport}, object::{resource::ResourceType, trade::TradeType}};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum TileType {
@@ -17,50 +14,6 @@ pub enum TileType {
     },
     Desert,
     Water,
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum TransportType {
-    Road,
-    Boat,
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub struct Transport {
-    r#type: TransportType,
-    owner: OwnershipToken,
-}
-
-impl Transport {
-    pub fn new(r#type: TransportType, owner: OwnershipToken) -> Self {
-        Self { r#type, owner }
-    }
-
-    pub fn owner(&self) -> OwnershipToken {
-        self.owner
-    }
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum BuildingType {
-    Settlement,
-    City,
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub struct Building {
-    r#type: BuildingType,
-    owner: OwnershipToken,
-}
-
-impl Building {
-    pub fn new(r#type: BuildingType, owner: OwnershipToken) -> Self {
-        Self { r#type, owner }
-    }
-
-    pub fn owner(&self) -> OwnershipToken {
-        self.owner
-    }
 }
 
 #[derive(Debug)]

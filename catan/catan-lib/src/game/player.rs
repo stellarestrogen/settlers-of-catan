@@ -4,7 +4,7 @@ use crate::{
     game::{
         error::BuildError,
         hand::Hand,
-        structures::{OwnedStructures, StructureType},
+        structure::{OwnedStructures, StructureType},
     },
     object::{
         card::ResourceCard,
