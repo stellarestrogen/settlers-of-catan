@@ -17,7 +17,7 @@ use crate::{
     object::{
         CornerData, EdgeData, Robber, TileData, TileType,
         structure::{building::Building, transport::Transport},
-        trade::{TradePort, TradeStore, TradeType},
+        trade::{TradeStore, TradeType},
     },
 };
 
@@ -90,30 +90,6 @@ impl Board {
         self.robber.r#move(position);
     }
 
-    fn set_trade<H: Height>(
-        &mut self,
-        position: CornerPosition<H>,
-        trade: TradeType,
-    ) -> Result<(), ()> {
-        if let Some(data) = self.corners.get_mut(position) {
-            data.set_trade(trade);
-            Ok(())
-        } else {
-            let mut data = CornerData::new();
-            data.set_trade(trade);
-            self.corners.set(position, data)
-        }
-    }
-
-    fn set_trades(&mut self, trade_port: TradePort) -> Result<(), ()> {
-        let (p1, p2) = trade_port.get_positions();
-        let trade = trade_port.get_type();
-
-        self.set_trade(p1, trade)?;
-        self.set_trade(p2, trade)?;
-        Ok(())
-    }
-
     // TODO: Create error handler instead of expecting the position.
     fn create_tiles(edition: &impl GameEdition) -> HexTable<TileData> {
         let mut bounds = HexPerimeter::new();
@@ -130,14 +106,5 @@ impl Board {
         }
 
         tiles
-    }
-
-    // TODO: Create error handler instead of expecting the position.
-    fn create_trades(&mut self, edition: &impl GameEdition) {
-        let trades = edition.get_trades();
-        for trade in trades.into_iter() {
-            self.set_trades(trade)
-                .expect("CornerPosition is out of bounds!");
-        }
     }
 }
