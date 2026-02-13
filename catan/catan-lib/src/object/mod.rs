@@ -3,7 +3,7 @@ pub mod resource;
 pub mod structure;
 pub mod trade;
 
-use hexgrid::hex::position::HexPosition;
+use hexgrid::hex::{position::HexPosition, table::HexTable};
 
 use crate::object::{
     resource::ResourceType,
@@ -27,9 +27,18 @@ pub struct Robber {
 }
 
 impl Robber {
-    pub fn new() -> Self {
-        Self {
-            position: HexPosition::ORIGIN,
+    pub fn place(tiles: &HexTable<TileData>) -> Self {
+        if let Some(desert_tile) = tiles
+            .data()
+            .find(|p| tiles.get(*p).unwrap().get_resource_type() == TileType::Desert)
+        {
+            Self {
+                position: desert_tile
+            }
+        } else {
+            Self {
+                position: HexPosition::ORIGIN
+            }
         }
     }
 

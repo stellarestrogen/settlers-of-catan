@@ -17,7 +17,7 @@ use crate::{
     object::{
         CornerData, EdgeData, Robber, TileData, TileType,
         structure::{building::Building, transport::Transport},
-        trade::{TradePort, TradeType},
+        trade::{TradePort, TradeStore, TradeType},
     },
 };
 
@@ -33,19 +33,14 @@ impl Board {
     pub fn new(edition: impl GameEdition) -> Self {
         let tiles = Self::create_tiles(&edition);
         let bounds = tiles.get_bounds();
-        let corners = CornerTable::new(CornerBounds::new(bounds));
-        let mut board = Board {
+        let corners = CornerTable::new(CornerBounds::new(bounds)).with_trades(&edition);
+        let robber = Robber::place(&tiles);
+        Board {
             corners,
             edges: EdgeTable::new(EdgeBounds::new(bounds)),
             tiles,
-            robber: Robber::new(),
-        };
-
-        board.create_trades(&edition);
-
-        board.place_robber();
-
-        board
+            robber,
+        }
     }
 
     pub fn get_tile(&self, position: HexPosition) -> TileData {
@@ -89,6 +84,10 @@ impl Board {
         transport: Transport,
     ) -> Result<(), ()> {
         self.edges.set(position, EdgeData::new(transport))
+    }
+
+    pub fn move_robber(&mut self, position: HexPosition) {
+        self.robber.r#move(position);
     }
 
     fn set_trade<H: Height>(
@@ -139,16 +138,6 @@ impl Board {
         for trade in trades.into_iter() {
             self.set_trades(trade)
                 .expect("CornerPosition is out of bounds!");
-        }
-    }
-
-    fn place_robber(&mut self) {
-        if let Some(desert_tile) = self
-            .tiles
-            .data()
-            .find(|p| self.tiles.get(*p).unwrap().get_resource_type() == TileType::Desert)
-        {
-            self.robber.r#move(desert_tile);
         }
     }
 }
