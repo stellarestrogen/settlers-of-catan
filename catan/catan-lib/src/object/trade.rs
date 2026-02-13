@@ -15,52 +15,6 @@ use crate::{
 
 const TRADE_NO: usize = 6;
 
-pub trait TradeStore {
-    fn with_trades(self, edition: &impl GameEdition) -> Self;
-    fn set_trades(&mut self, trade_port: TradePort) -> Result<(), ()>;
-    fn set_trade<H: Height>(
-        &mut self,
-        position: CornerPosition<H>,
-        trade: TradeType,
-    ) -> Result<(), ()>;
-}
-
-impl TradeStore for CornerTable<CornerData> {
-    fn with_trades(mut self, edition: &impl GameEdition) -> Self {
-        let trades = edition.get_trades();
-        for trade in trades.into_iter() {
-            self.set_trades(trade)
-                .expect("CornerPosition is out of bounds!");
-        }
-
-        self
-    }
-
-    fn set_trades(&mut self, trade_port: TradePort) -> Result<(), ()> {
-        let (p1, p2) = trade_port.get_positions();
-        let trade = trade_port.get_type();
-
-        self.set_trade(p1, trade)?;
-        self.set_trade(p2, trade)?;
-        Ok(())
-    }
-
-    fn set_trade<H: Height>(
-        &mut self,
-        position: CornerPosition<H>,
-        trade: TradeType,
-    ) -> Result<(), ()> {
-        if let Some(data) = self.get_mut(position) {
-            data.set_trade(trade);
-            Ok(())
-        } else {
-            let mut data = CornerData::new();
-            data.set_trade(trade);
-            self.set(position, data)
-        }
-    }
-}
-
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum TradeType {
     Resource(ResourceType),
@@ -179,5 +133,51 @@ impl Iterator for TradePortDeck {
 
     fn next(&mut self) -> Option<Self::Item> {
         self.trades.pop()
+    }
+}
+
+pub trait TradeStore {
+    fn with_trades(self, edition: &impl GameEdition) -> Self;
+    fn set_trades(&mut self, trade_port: TradePort) -> Result<(), ()>;
+    fn set_trade<H: Height>(
+        &mut self,
+        position: CornerPosition<H>,
+        trade: TradeType,
+    ) -> Result<(), ()>;
+}
+
+impl TradeStore for CornerTable<CornerData> {
+    fn with_trades(mut self, edition: &impl GameEdition) -> Self {
+        let trades = edition.get_trades();
+        for trade in trades.into_iter() {
+            self.set_trades(trade)
+                .expect("CornerPosition is out of bounds!");
+        }
+
+        self
+    }
+
+    fn set_trades(&mut self, trade_port: TradePort) -> Result<(), ()> {
+        let (p1, p2) = trade_port.get_positions();
+        let trade = trade_port.get_type();
+
+        self.set_trade(p1, trade)?;
+        self.set_trade(p2, trade)?;
+        Ok(())
+    }
+
+    fn set_trade<H: Height>(
+        &mut self,
+        position: CornerPosition<H>,
+        trade: TradeType,
+    ) -> Result<(), ()> {
+        if let Some(data) = self.get_mut(position) {
+            data.set_trade(trade);
+            Ok(())
+        } else {
+            let mut data = CornerData::new();
+            data.set_trade(trade);
+            self.set(position, data)
+        }
     }
 }
