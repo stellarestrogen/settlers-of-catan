@@ -1,6 +1,14 @@
+use hexgrid::corner::{
+    position::{CornerPosition, Height},
+    table::CornerTable,
+};
+
 use crate::{
     game::player::OwnershipToken,
-    object::structure::{Structure, StructureType},
+    object::{
+        CornerData,
+        structure::{Structure, StructureType},
+    },
 };
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -40,5 +48,35 @@ impl Into<StructureType> for Building {
             BuildingType::Settlement => StructureType::Settlement,
             BuildingType::City => StructureType::City,
         }
+    }
+}
+
+pub trait BuildingStore {
+    fn set_building<H: Height>(
+        &mut self,
+        position: CornerPosition<H>,
+        building: Building,
+    ) -> Result<(), ()>;
+    fn get_building<H: Height>(&self, position: CornerPosition<H>) -> Option<Building>;
+}
+
+impl BuildingStore for CornerTable<CornerData> {
+    fn set_building<H: Height>(
+        &mut self,
+        position: CornerPosition<H>,
+        building: Building,
+    ) -> Result<(), ()> {
+        if let Some(data) = self.get_mut(position) {
+            data.set_building(building);
+            Ok(())
+        } else {
+            let mut data = CornerData::new();
+            data.set_building(building);
+            self.set(position, data)
+        }
+    }
+
+    fn get_building<H: Height>(&self, position: CornerPosition<H>) -> Option<Building> {
+        self.get(position)?.get_building()
     }
 }

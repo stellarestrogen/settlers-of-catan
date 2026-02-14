@@ -16,7 +16,10 @@ use crate::{
     game::edition::GameEdition,
     object::{
         CornerData, EdgeData, Robber, TileData, TileType,
-        structure::{building::Building, transport::Transport},
+        structure::{
+            building::{Building, BuildingStore},
+            transport::{Transport, TransportStore},
+        },
         trade::{TradeStore, TradeType},
     },
 };
@@ -56,11 +59,11 @@ impl Board {
     }
 
     pub fn get_building<H: Height>(&self, position: CornerPosition<H>) -> Option<Building> {
-        self.corners.get(position)?.get_building()
+        self.corners.get_building(position)
     }
 
     pub fn get_transport<T: Valid>(&self, position: EdgePosition<T>) -> Option<Transport> {
-        Some(self.edges.get(position)?.get_transport())
+        self.edges.get_transport(position)
     }
 
     pub fn set_building<H: Height>(
@@ -68,14 +71,7 @@ impl Board {
         position: CornerPosition<H>,
         building: Building,
     ) -> Result<(), ()> {
-        if let Some(data) = self.corners.get_mut(position) {
-            data.set_building(building);
-            Ok(())
-        } else {
-            let mut data = CornerData::new();
-            data.set_building(building);
-            self.corners.set(position, data)
-        }
+        self.corners.set_building(position, building)
     }
 
     pub fn set_transport<T: Valid>(
@@ -83,7 +79,7 @@ impl Board {
         position: EdgePosition<T>,
         transport: Transport,
     ) -> Result<(), ()> {
-        self.edges.set(position, EdgeData::new(transport))
+        self.edges.set_transport(position, transport)
     }
 
     pub fn move_robber(&mut self, position: HexPosition) {
