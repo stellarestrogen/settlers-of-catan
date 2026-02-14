@@ -68,16 +68,16 @@ impl Board {
 
     pub fn set_building<H: Height>(
         &mut self,
-        position: CornerPosition<H>,
         building: Building,
+        position: CornerPosition<H>,
     ) -> Result<(), ()> {
         self.corners.set_building(position, building)
     }
 
     pub fn set_transport<T: Valid>(
         &mut self,
-        position: EdgePosition<T>,
         transport: Transport,
+        position: EdgePosition<T>,
     ) -> Result<(), ()> {
         self.edges.set_transport(position, transport)
     }
