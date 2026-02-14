@@ -144,6 +144,7 @@ pub trait TradeStore {
         position: CornerPosition<H>,
         trade: TradeType,
     ) -> Result<(), ()>;
+    fn get_trade<H: Height>(&self, position: CornerPosition<H>) -> Option<TradeType>;
 }
 
 impl TradeStore for CornerTable<CornerData> {
@@ -179,5 +180,9 @@ impl TradeStore for CornerTable<CornerData> {
             data.set_trade(trade);
             self.set(position, data)
         }
+    }
+
+    fn get_trade<H: Height>(&self, position: CornerPosition<H>) -> Option<TradeType> {
+        self.get(position)?.get_trade()
     }
 }

@@ -33,7 +33,7 @@ impl Board {
     pub fn new(edition: impl GameEdition) -> Self {
         let tiles = Self::create_tiles(&edition);
         let bounds = tiles.get_bounds();
-        let corners = CornerTable::new(CornerBounds::new(bounds)).with_trades(&edition);
+        let corners = Self::create_trades(bounds, &edition);
         let robber = Robber::place(&tiles);
         Board {
             corners,
@@ -52,7 +52,7 @@ impl Board {
     }
 
     pub fn get_trade<H: Height>(&self, position: CornerPosition<H>) -> Option<TradeType> {
-        self.corners.get(position)?.get_trade()
+        self.corners.get_trade(position)
     }
 
     pub fn get_building<H: Height>(&self, position: CornerPosition<H>) -> Option<Building> {
@@ -106,5 +106,9 @@ impl Board {
         }
 
         tiles
+    }
+
+    fn create_trades(bounds: &HexPerimeter, edition: &impl GameEdition) -> CornerTable<CornerData> {
+        CornerTable::new(CornerBounds::new(bounds)).with_trades(edition)
     }
 }
