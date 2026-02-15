@@ -1,5 +1,5 @@
 use crate::object::{
-    card::{DevCardType, DevelopmentCard, ResourceCard, ResourceMap},
+    card::{DevelopmentCard, DevelopmentCardType, ResourceCard, ResourceMap},
     resource::ResourceType,
 };
 
@@ -32,7 +32,7 @@ impl Hand {
     }
 
     /// Searches for the first card of the specified type that has not been played already.
-    pub fn play_development_card(&mut self, r#type: DevCardType) {
+    pub fn play_development_card(&mut self, r#type: DevelopmentCardType) {
         if let Some(card) = self
             .development_cards
             .iter_mut()

@@ -1,7 +1,7 @@
 use crate::object::resource::ResourceType;
 
 #[derive(Debug, Clone, PartialEq)]
-pub enum DevCardType {
+pub enum DevelopmentCardType {
     MoveRobber,
     TakeTwoResources,
     Monopoly,
@@ -11,19 +11,19 @@ pub enum DevCardType {
 
 #[derive(Debug)]
 pub struct DevelopmentCard {
-    r#type: DevCardType,
+    r#type: DevelopmentCardType,
     played: bool,
 }
 
 impl DevelopmentCard {
-    pub fn new(r#type: DevCardType) -> Self {
+    pub fn new(r#type: DevelopmentCardType) -> Self {
         Self {
             r#type,
             played: false,
         }
     }
 
-    pub fn get_type(&self) -> DevCardType {
+    pub fn get_type(&self) -> DevelopmentCardType {
         self.r#type.clone()
     }
 
@@ -40,7 +40,7 @@ impl DevelopmentCard {
     }
 
     pub fn is_victory_point(&self) -> bool {
-        self.r#type == DevCardType::VictoryPoint
+        self.r#type == DevelopmentCardType::VictoryPoint
     }
 }
 
