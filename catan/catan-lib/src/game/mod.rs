@@ -12,8 +12,7 @@ use hexgrid::{
 use crate::{
     board::Board,
     game::{
-        error::BuildError,
-        player::{OwnershipToken, Player},
+        dice::Dice, error::BuildError, player::{OwnershipToken, Player}
     },
     object::structure::{building::Building, transport::Transport},
 };

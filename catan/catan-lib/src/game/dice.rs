@@ -1,30 +1,17 @@
 use rand::prelude::*;
-use rand::rngs::SmallRng;
 
-#[derive(Debug, Clone)]
-pub struct Dice {
-    dice: [u8; 2],
-    rng: SmallRng,
-}
+#[derive(Debug, Clone, Copy)]
+pub struct Dice([u8; 2]);
 
 impl Dice {
-    pub fn with_seed(seed: u64) -> Self {
-        Self {
-            dice: [0, 0],
-            rng: SmallRng::seed_from_u64(seed),
-        }
-    }
+    pub fn roll(rng: &mut (impl SeedableRng + RngCore)) -> Self {
+        let first = rng.random_range(1..7);
+        let second = rng.random_range(1..7);
 
-    pub fn roll(&mut self) -> &Self {
-        let first = self.rng.random_range(1..7);
-        let second = self.rng.random_range(1..7);
-
-        self.dice = [first, second];
-
-        self
+        Dice([first, second])
     }
 
     pub fn sum(&self) -> u8 {
-        self.dice.iter().sum()
+        self.0.iter().sum()
     }
 }
