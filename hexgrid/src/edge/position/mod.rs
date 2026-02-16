@@ -3,7 +3,6 @@ use std::marker::PhantomData;
 pub mod op_add;
 pub mod op_mul;
 pub mod op_sub;
-pub mod r#type;
 
 #[derive(Clone, Copy, Debug)]
 pub struct Even;

@@ -68,4 +68,8 @@ impl Game {
 
         Ok(())
     }
+
+    pub fn distribute_resources(&mut self, roll: u8) {
+        
+    }
 }

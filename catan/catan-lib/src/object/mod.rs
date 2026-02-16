@@ -21,6 +21,15 @@ pub enum TileType {
     Water,
 }
 
+impl TileType {
+    pub fn get_roll_number(&self) -> Option<u32> {
+        match self {
+            TileType::Resource { resource: _, roll_number } => Some(*roll_number),
+            _ => None
+        }
+    }
+}
+
 #[derive(Debug)]
 pub struct Robber {
     position: HexPosition,
