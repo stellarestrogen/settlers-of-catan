@@ -86,6 +86,7 @@ impl<T> CornerTable<T> {
 
         Ok(())
     }
+
 }
 
 impl<T, H: Height> Index<CornerPosition<H>> for CornerTable<T> {

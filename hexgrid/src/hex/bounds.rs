@@ -2,7 +2,7 @@ use crate::{corner::bounds::CornerBounds, edge::bounds::EdgeBounds};
 
 use super::position::{HexPosition, HorizontalDistance};
 
-#[derive(Clone, Debug)]
+#[derive(Debug, Clone)]
 pub struct HexPerimeter {
     top_left: HexPosition,
     bottom_right: HexPosition,

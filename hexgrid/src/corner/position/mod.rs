@@ -1,5 +1,7 @@
 use std::marker::PhantomData;
 
+use crate::hex::position::HexPosition;
+
 pub mod op_add;
 pub mod op_mul;
 pub mod op_sub;
@@ -9,7 +11,6 @@ pub struct Low;
 
 #[derive(Debug)]
 pub struct High;
-
 
 pub struct Center;
 
@@ -92,7 +93,6 @@ impl CornerPosition<High> {
     pub fn go_up(self) -> CornerPosition<Low> {
         self + CornerPosition::UP
     }
-
 }
 
 impl CornerPosition<Low> {
@@ -125,7 +125,6 @@ impl CornerPosition<Low> {
     pub fn go_down(self) -> CornerPosition<High> {
         self + CornerPosition::DOWN
     }
-
 }
 
 impl CornerPosition<Center> {
@@ -188,6 +187,24 @@ impl<H: Height> CornerPosition<H> {
             })
         } else {
             None
+        }
+    }
+
+    pub fn neighboring_hex(&self) -> [HexPosition; 3] {
+        if let Some(p) = self.as_low() {
+            [
+                p + CornerPosition::UP,
+                p + CornerPosition::DOWN_LEFT,
+                p + CornerPosition::DOWN_RIGHT,
+            ]
+        } else if let Some(p) = self.as_high() {
+            [
+                p + CornerPosition::UP_LEFT,
+                p + CornerPosition::UP_RIGHT,
+                p + CornerPosition::DOWN,
+            ]
+        } else {
+            unreachable!()
         }
     }
 }
