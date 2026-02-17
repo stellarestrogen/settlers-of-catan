@@ -86,6 +86,19 @@ impl Board {
         self.robber.r#move(position);
     }
 
+    pub fn neighboring_hex_for_corner<H: Height>(
+        &self,
+        position: CornerPosition<H>,
+    ) -> impl Iterator<Item = HexPosition> {
+        let mut tiles: Vec<HexPosition> = Vec::with_capacity(3);
+        for t in position.neighboring_hex().into_iter() {
+            if self.tiles.get_bounds().contains(t) {
+                tiles.push(t)
+            }
+        }
+        tiles.into_iter()
+    }
+
     // TODO: Create error handler instead of expecting the position.
     fn create_tiles(edition: &impl GameEdition) -> HexTable<TileData> {
         let mut bounds = HexPerimeter::new();

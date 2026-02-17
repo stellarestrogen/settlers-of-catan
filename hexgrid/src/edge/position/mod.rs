@@ -1,5 +1,7 @@
 use std::marker::PhantomData;
 
+use crate::hex::position::HexPosition;
+
 pub mod op_add;
 pub mod op_mul;
 pub mod op_sub;
@@ -205,6 +207,18 @@ impl<Type: Valid> EdgePosition<Type> {
             })
         } else {
             None
+        }
+    }
+
+    pub fn neighboring_hex(&self) -> [HexPosition; 2] {
+        if let Some(p) = self.as_even() {
+            [p + EdgePosition::UP_LEFT, p + EdgePosition::DOWN_RIGHT]
+        } else if let Some(p) = self.as_odd() {
+            [p + EdgePosition::UP_RIGHT, p + EdgePosition::DOWN_LEFT]
+        } else if let Some(p) = self.as_positive() {
+            [p + EdgePosition::GO_LEFT, p + EdgePosition::GO_RIGHT]
+        } else {
+            unreachable!()
         }
     }
 }
