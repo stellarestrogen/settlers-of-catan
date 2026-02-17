@@ -6,13 +6,15 @@ pub mod player;
 
 use hexgrid::{
     corner::position::{CornerPosition, Height},
-    edge::position::{EdgePosition, Valid},
+    edge::position::{EdgePosition, Valid}, hex::position::HexPosition,
 };
 
 use crate::{
     board::Board,
     game::{
-        dice::Dice, error::BuildError, player::{OwnershipToken, Player}
+        dice::Dice,
+        error::BuildError,
+        player::{OwnershipToken, Player},
     },
     object::structure::{building::Building, transport::Transport},
 };
@@ -23,6 +25,8 @@ pub struct Game {
     board: Board,
     players: Vec<Player>,
     // redundant data for ease of use
+    buildings: Vec<(Building, Vec<HexPosition>)>,
+
 }
 
 impl Game {
@@ -49,6 +53,8 @@ impl Game {
         self.board
             .set_building(building, position)
             .expect("Invalid position!");
+
+        self.buildings.push((building, self.board.neighboring_hex_for_corner(position).collect()));
 
         Ok(())
     }

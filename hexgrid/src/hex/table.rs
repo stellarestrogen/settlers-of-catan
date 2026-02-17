@@ -69,8 +69,12 @@ impl<T> HexTable<T> {
         }
     }
 
-    pub fn data<'a>(&'a self) -> impl Iterator<Item = HexPosition> {
+    pub fn positions<'a>(&'a self) -> impl Iterator<Item = HexPosition> {
         HexData::new(self)
+    }
+
+    pub fn data(&self) -> impl Iterator<Item = &T> {
+        self.positions().map(|p| self.get(p)).flatten()
     }
 }
 

@@ -58,6 +58,7 @@ pub trait BuildingStore {
         building: Building,
     ) -> Result<(), ()>;
     fn get_building<H: Height>(&self, position: CornerPosition<H>) -> Option<Building>;
+    fn buildings(&self) -> impl Iterator<Item = Building>;
 }
 
 impl BuildingStore for CornerTable<CornerData> {
@@ -78,5 +79,9 @@ impl BuildingStore for CornerTable<CornerData> {
 
     fn get_building<H: Height>(&self, position: CornerPosition<H>) -> Option<Building> {
         self.get(position)?.get_building()
+    }
+
+    fn buildings(&self) -> impl Iterator<Item = Building> {
+        self.data().flat_map(|d| d.get_building())
     }
 }

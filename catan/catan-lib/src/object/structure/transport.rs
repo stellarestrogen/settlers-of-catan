@@ -58,6 +58,7 @@ pub trait TransportStore {
         transport: Transport,
     ) -> Result<(), ()>;
     fn get_transport<T: Valid>(&self, position: EdgePosition<T>) -> Option<Transport>;
+    fn transports(&self) -> impl Iterator<Item = Transport>;
 }
 
 impl TransportStore for EdgeTable<EdgeData> {
@@ -70,5 +71,8 @@ impl TransportStore for EdgeTable<EdgeData> {
     }
     fn get_transport<T: Valid>(&self, position: EdgePosition<T>) -> Option<Transport> {
         Some(self.get(position)?.get_transport())
+    }
+    fn transports(&self) -> impl Iterator<Item = Transport> {
+        self.data().map(|d| d.get_transport())
     }
 }

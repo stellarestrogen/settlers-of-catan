@@ -62,8 +62,16 @@ impl Board {
         self.corners.get_building(position)
     }
 
+    pub fn buildings(&self) -> impl Iterator<Item = Building> {
+        self.corners.buildings()
+    }
+
     pub fn get_transport<T: Valid>(&self, position: EdgePosition<T>) -> Option<Transport> {
         self.edges.get_transport(position)
+    }
+
+    pub fn transports(&self) -> impl Iterator<Item = Transport> {
+        self.edges.transports()
     }
 
     pub fn set_building<H: Height>(

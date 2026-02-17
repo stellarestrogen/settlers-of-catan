@@ -24,8 +24,11 @@ pub enum TileType {
 impl TileType {
     pub fn get_roll_number(&self) -> Option<u32> {
         match self {
-            TileType::Resource { resource: _, roll_number } => Some(*roll_number),
-            _ => None
+            TileType::Resource {
+                resource: _,
+                roll_number,
+            } => Some(*roll_number),
+            _ => None,
         }
     }
 }
@@ -38,15 +41,15 @@ pub struct Robber {
 impl Robber {
     pub fn place(tiles: &HexTable<TileData>) -> Self {
         if let Some(desert_tile) = tiles
-            .data()
+            .positions()
             .find(|p| tiles.get(*p).unwrap().get_resource_type() == TileType::Desert)
         {
             Self {
-                position: desert_tile
+                position: desert_tile,
             }
         } else {
             Self {
-                position: HexPosition::ORIGIN
+                position: HexPosition::ORIGIN,
             }
         }
     }

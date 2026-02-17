@@ -87,6 +87,10 @@ impl<T> CornerTable<T> {
         Ok(())
     }
 
+    pub fn data(&self) -> impl Iterator<Item = &T> {
+        self.data.data().flat_map(|(a, b)| [a, b]).flatten()
+    }
+
 }
 
 impl<T, H: Height> Index<CornerPosition<H>> for CornerTable<T> {

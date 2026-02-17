@@ -93,6 +93,10 @@ impl<T> EdgeTable<T> {
 
         Ok(())
     }
+
+    pub fn data(&self) -> impl Iterator<Item = &T> {
+        self.data.data().flat_map(|(a, b, c)| [a, b, c]).flatten()
+    }
 }
 
 impl<T, Type: Valid> Index<EdgePosition<Type>> for EdgeTable<T> {
