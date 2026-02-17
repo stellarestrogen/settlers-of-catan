@@ -3,7 +3,7 @@ use std::sync::atomic::{AtomicU64, Ordering};
 use crate::{
     game::{error::BuildError, hand::Hand},
     object::{
-        card::ResourceCard,
+        card::{ResourceCard, ResourceMap},
         resource::{ResourceType, Resources},
         structure::{OwnedStructures, StructureType},
     },
@@ -84,6 +84,10 @@ impl Player {
 
     pub fn add_resource(&mut self, resource: ResourceType, count: u32) {
         self.hand.add_resource_card(resource, count);
+    }
+
+    pub fn add_resources(&mut self, resources: ResourceMap) {
+        *self.hand.get_resources_mut() = self.hand.get_resources() + resources
     }
 
     pub fn sub_resource(&mut self, resource: ResourceType, count: u32) {

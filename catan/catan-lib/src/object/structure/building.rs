@@ -31,6 +31,10 @@ impl Building {
     pub fn owner(&self) -> OwnershipToken {
         self.owner
     }
+
+    pub fn r#type(&self) -> BuildingType {
+        self.r#type
+    }
 }
 
 impl Into<Structure> for Building {

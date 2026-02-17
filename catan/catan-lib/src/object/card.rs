@@ -1,3 +1,5 @@
+use std::ops::Add;
+
 use crate::object::resource::ResourceType;
 
 #[derive(Debug, Clone, PartialEq)]
@@ -123,6 +125,16 @@ impl ResourceMap {
         }
     }
 
+    pub fn add_resource(&mut self, resource: ResourceType, count: u32) {
+        match resource {
+            ResourceType::Wood => self.wood.add(count),
+            ResourceType::Brick => self.brick.add(count),
+            ResourceType::Wheat => self.wheat.add(count),
+            ResourceType::Sheep => self.sheep.add(count),
+            ResourceType::Ore => self.ore.add(count)
+        }
+    }
+
     pub fn with_resource(mut self, resource: ResourceType, count: u32) -> Self {
         self.set_resource_count(resource, count);
         self
@@ -146,5 +158,28 @@ impl ResourceMap {
             ResourceType::Sheep => &mut self.sheep,
             ResourceType::Ore => &mut self.ore,
         }
+    }
+}
+
+impl Add for ResourceMap {
+    type Output = ResourceMap;
+    fn add(self, rhs: Self) -> Self::Output {
+        ResourceMap::new(
+            self.wood.get_count() + rhs.wood.get_count(),
+            self.brick.get_count() + rhs.brick.get_count(),
+            self.wheat.get_count() + rhs.wheat.get_count(),
+            self.sheep.get_count() + rhs.sheep.get_count(),
+            self.ore.get_count() + rhs.ore.get_count(),
+        )
+    }
+}
+
+impl FromIterator<(ResourceType, u32)> for ResourceMap {
+    fn from_iter<T: IntoIterator<Item = (ResourceType, u32)>>(iter: T) -> Self {
+        let mut map = ResourceMap::empty();
+        for (r, c) in iter {
+            map.add_resource(r, c);
+        }
+        map
     }
 }

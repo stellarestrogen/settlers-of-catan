@@ -31,6 +31,16 @@ impl TileType {
             _ => None,
         }
     }
+
+    pub fn get_resource_type(&self) -> Option<ResourceType> {
+        match self {
+            TileType::Resource {
+                resource,
+                roll_number: _,
+            } => Some(*resource),
+            _ => None,
+        }
+    }
 }
 
 #[derive(Debug)]
@@ -42,7 +52,7 @@ impl Robber {
     pub fn place(tiles: &HexTable<TileData>) -> Self {
         if let Some(desert_tile) = tiles
             .positions()
-            .find(|p| tiles.get(*p).unwrap().get_resource_type() == TileType::Desert)
+            .find(|p| tiles.get(*p).unwrap().get_tile_type() == TileType::Desert)
         {
             Self {
                 position: desert_tile,
@@ -123,11 +133,21 @@ impl TileData {
         TileData { r#type }
     }
 
-    pub fn get_resource_type(&self) -> TileType {
+    pub fn get_tile_type(&self) -> TileType {
         self.r#type
     }
 
-    pub fn set_resource_type(&mut self, r#type: TileType) {
+    pub fn set_tile_type(&mut self, r#type: TileType) {
         self.r#type = r#type;
+    }
+
+    pub fn get_roll_number(&self) -> Option<u32> {
+        match self.r#type {
+            TileType::Resource {
+                resource: _,
+                roll_number,
+            } => Some(roll_number),
+            _ => None,
+        }
     }
 }

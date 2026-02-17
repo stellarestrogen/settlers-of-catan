@@ -6,17 +6,23 @@ pub mod player;
 
 use hexgrid::{
     corner::position::{CornerPosition, Height},
-    edge::position::{EdgePosition, Valid}, hex::position::HexPosition,
+    edge::position::{EdgePosition, Valid},
+    hex::position::HexPosition,
 };
 
 use crate::{
     board::Board,
     game::{
-        dice::Dice,
         error::BuildError,
         player::{OwnershipToken, Player},
     },
-    object::structure::{building::Building, transport::Transport},
+    object::{
+        card::ResourceMap,
+        structure::{
+            building::{Building, BuildingType},
+            transport::Transport,
+        },
+    },
 };
 
 #[derive(Debug)]
@@ -26,7 +32,6 @@ pub struct Game {
     players: Vec<Player>,
     // redundant data for ease of use
     buildings: Vec<(Building, Vec<HexPosition>)>,
-
 }
 
 impl Game {
@@ -54,7 +59,10 @@ impl Game {
             .set_building(building, position)
             .expect("Invalid position!");
 
-        self.buildings.push((building, self.board.neighboring_hex_for_corner(position).collect()));
+        self.buildings.push((
+            building,
+            self.board.neighboring_hex_for_corner(position).collect(),
+        ));
 
         Ok(())
     }
@@ -76,6 +84,34 @@ impl Game {
     }
 
     pub fn distribute_resources(&mut self, roll: u8) {
-        
+        for player in self.players.iter_mut() {
+            let resources: ResourceMap = self
+                .buildings
+                .iter()
+                .filter(|(b, _)| b.owner() == player.token())
+                .filter_map(|(b, pos)| {
+                    Some(pos.iter().filter_map(|p| {
+                        if self.board.get_tile(*p).get_roll_number()? == roll.into() {
+                            Some((
+                                self.board
+                                    .get_tile(*p)
+                                    .get_tile_type()
+                                    .get_resource_type()?,
+                                if b.r#type() == BuildingType::Settlement {
+                                    1
+                                } else {
+                                    2
+                                },
+                            ))
+                        } else {
+                            None
+                        }
+                    }))
+                })
+                .flatten()
+                .collect();
+
+            player.add_resources(resources);
+        }
     }
 }
