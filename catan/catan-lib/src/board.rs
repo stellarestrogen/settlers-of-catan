@@ -94,6 +94,10 @@ impl Board {
         self.robber.r#move(position);
     }
 
+    pub fn has_robber(&self, position: HexPosition) -> bool {
+        self.robber.position() == position
+    }
+
     pub fn neighboring_hex_for_corner<H: Height>(
         &self,
         position: CornerPosition<H>,

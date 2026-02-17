@@ -67,6 +67,10 @@ impl Robber {
     pub fn r#move(&mut self, position: HexPosition) {
         self.position = position
     }
+
+    pub fn position(&self) -> HexPosition {
+        self.position
+    }
 }
 
 #[derive(Debug, Clone, Copy)]

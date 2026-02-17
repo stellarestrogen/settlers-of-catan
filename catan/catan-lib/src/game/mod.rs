@@ -91,7 +91,9 @@ impl Game {
                 .filter(|(b, _)| b.owner() == player.token())
                 .filter_map(|(b, pos)| {
                     Some(pos.iter().filter_map(|p| {
-                        if self.board.get_tile(*p).get_roll_number()? == roll.into() {
+                        if self.board.get_tile(*p).get_roll_number()? == roll.into()
+                            && !self.board.has_robber(*p)
+                        {
                             Some((
                                 self.board
                                     .get_tile(*p)
