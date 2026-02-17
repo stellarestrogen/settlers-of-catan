@@ -87,7 +87,7 @@ impl Player {
     }
 
     pub fn add_resources(&mut self, resources: ResourceMap) {
-        *self.hand.get_resources_mut() = self.hand.get_resources() + resources
+        *self.hand.get_mut_resources() = self.hand.get_resources() + resources
     }
 
     pub fn sub_resource(&mut self, resource: ResourceType, count: u32) {

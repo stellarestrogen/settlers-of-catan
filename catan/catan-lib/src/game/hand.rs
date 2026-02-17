@@ -54,7 +54,7 @@ impl Hand {
         self.resource_cards
     }
 
-    pub fn get_resources_mut(&mut self) -> &mut ResourceMap {
+    pub fn get_mut_resources(&mut self) -> &mut ResourceMap {
         &mut self.resource_cards
     }
 
