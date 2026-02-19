@@ -46,11 +46,23 @@ impl Game {
             .unwrap()
     }
 
+    pub fn find_building<H: Height>(&self, position: CornerPosition<H>) -> Option<Building> {
+        self.board.get_building(position)
+    }
+
     pub fn play_building<H: Height>(
         &mut self,
         building: Building,
         position: CornerPosition<H>,
     ) -> Result<(), BuildError> {
+        if let Some(b) = self.find_building(position)
+            && (b.r#type() == BuildingType::City || b.r#type() == building.r#type())
+        {
+            return Err(BuildError::StructureAlreadyExists);
+        } else if building.r#type() == BuildingType::City {
+            return Err(BuildError::CityRequiresSettlement);
+        }
+
         let player = self.find_player_mut(building.owner());
 
         player.play_structure(building.into())?;
@@ -67,11 +79,20 @@ impl Game {
         Ok(())
     }
 
+    pub fn find_transport<T: Valid>(&self, position: EdgePosition<T>) -> Option<Transport> {
+        self.board.get_transport(position)
+    }
+
     pub fn play_transport<T: Valid>(
         &mut self,
         transport: Transport,
         position: EdgePosition<T>,
     ) -> Result<(), BuildError> {
+        // todo!
+        // figure out if the road to be built is contiguous, and account for edge cases
+        self.find_transport(position)
+            .ok_or(BuildError::StructureAlreadyExists)?;
+
         let player = self.find_player_mut(transport.owner());
 
         player.play_structure(transport.into())?;

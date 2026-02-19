@@ -18,6 +18,7 @@ pub enum BuildError {
         token: OwnershipToken,
         structure: StructureType,
     },
+    RoadsMustBeContiguous,
 }
 
 impl fmt::Display for BuildError {
@@ -42,6 +43,7 @@ impl fmt::Display for BuildError {
                 "The player with {:?} token has no {:?} structures left!",
                 token, structure
             ),
+            BuildError::RoadsMustBeContiguous => write!(f, "")
         }
     }
 }
