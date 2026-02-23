@@ -2,7 +2,7 @@ use std::iter;
 
 use hexgrid::corner::{
     iterators::ring::CornerRing,
-    position::{CornerPosition, Height, High, Low},
+    position::{CornerHeight, Height, High, Low},
     table::CornerTable,
 };
 use rand::seq::SliceRandom;
@@ -23,15 +23,15 @@ pub enum TradeType {
 
 #[derive(Clone, Copy)]
 pub struct TradePort {
-    positions: (CornerPosition<Low>, CornerPosition<High>),
+    positions: (CornerHeight<Low>, CornerHeight<High>),
     r#type: TradeType,
 }
 
 impl TradePort {
     pub fn new(
         r#type: TradeType,
-        low_position: CornerPosition<Low>,
-        high_position: CornerPosition<High>,
+        low_position: CornerHeight<Low>,
+        high_position: CornerHeight<High>,
     ) -> Self {
         Self {
             positions: (low_position, high_position),
@@ -39,7 +39,7 @@ impl TradePort {
         }
     }
 
-    pub fn get_positions(&self) -> (CornerPosition<Low>, CornerPosition<High>) {
+    pub fn get_positions(&self) -> (CornerHeight<Low>, CornerHeight<High>) {
         self.positions
     }
 
@@ -102,8 +102,8 @@ impl TradePortDeck {
         shortest: u32,
         longest: u32,
         trade_gaps: &mut impl Iterator<Item = u32>,
-    ) -> Vec<(CornerPosition<Low>, CornerPosition<High>)> {
-        let mut trades = Vec::<(CornerPosition<Low>, CornerPosition<High>)>::with_capacity(size);
+    ) -> Vec<(CornerHeight<Low>, CornerHeight<High>)> {
+        let mut trades = Vec::<(CornerHeight<Low>, CornerHeight<High>)>::with_capacity(size);
         let mut offset = false;
         let mut ring = CornerRing::new(shortest, longest).into_iter();
 
@@ -141,10 +141,10 @@ pub trait TradeStore {
     fn set_trades(&mut self, trade_port: TradePort) -> Result<(), ()>;
     fn set_trade<H: Height>(
         &mut self,
-        position: CornerPosition<H>,
+        position: CornerHeight<H>,
         trade: TradeType,
     ) -> Result<(), ()>;
-    fn get_trade<H: Height>(&self, position: CornerPosition<H>) -> Option<TradeType>;
+    fn get_trade<H: Height>(&self, position: CornerHeight<H>) -> Option<TradeType>;
 }
 
 impl TradeStore for CornerTable<CornerData> {
@@ -169,7 +169,7 @@ impl TradeStore for CornerTable<CornerData> {
 
     fn set_trade<H: Height>(
         &mut self,
-        position: CornerPosition<H>,
+        position: CornerHeight<H>,
         trade: TradeType,
     ) -> Result<(), ()> {
         if let Some(data) = self.get_mut(position) {
@@ -182,7 +182,7 @@ impl TradeStore for CornerTable<CornerData> {
         }
     }
 
-    fn get_trade<H: Height>(&self, position: CornerPosition<H>) -> Option<TradeType> {
+    fn get_trade<H: Height>(&self, position: CornerHeight<H>) -> Option<TradeType> {
         self.get(position)?.get_trade()
     }
 }

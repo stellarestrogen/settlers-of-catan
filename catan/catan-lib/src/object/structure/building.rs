@@ -1,5 +1,5 @@
 use hexgrid::corner::{
-    position::{CornerPosition, Height},
+    position::{CornerHeight, Height},
     table::CornerTable,
 };
 
@@ -58,17 +58,17 @@ impl Into<StructureType> for Building {
 pub trait BuildingStore {
     fn set_building<H: Height>(
         &mut self,
-        position: CornerPosition<H>,
+        position: CornerHeight<H>,
         building: Building,
     ) -> Result<(), ()>;
-    fn get_building<H: Height>(&self, position: CornerPosition<H>) -> Option<Building>;
+    fn get_building<H: Height>(&self, position: CornerHeight<H>) -> Option<Building>;
     fn buildings(&self) -> impl Iterator<Item = Building>;
 }
 
 impl BuildingStore for CornerTable<CornerData> {
     fn set_building<H: Height>(
         &mut self,
-        position: CornerPosition<H>,
+        position: CornerHeight<H>,
         building: Building,
     ) -> Result<(), ()> {
         if let Some(data) = self.get_mut(position) {
@@ -81,7 +81,7 @@ impl BuildingStore for CornerTable<CornerData> {
         }
     }
 
-    fn get_building<H: Height>(&self, position: CornerPosition<H>) -> Option<Building> {
+    fn get_building<H: Height>(&self, position: CornerHeight<H>) -> Option<Building> {
         self.get(position)?.get_building()
     }
 

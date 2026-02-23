@@ -2,15 +2,15 @@ use std::{marker::PhantomData, ops::Sub};
 
 use crate::hex::position::HexPosition;
 
-use super::{Center, CornerPosition, High, Low};
+use super::{Center, CornerHeight, High, Low};
 
 macro_rules! corner_sub {
     ($lhs: ty, $rhs: ty, $out: ty) => {
-        impl Sub<CornerPosition<$rhs>> for CornerPosition<$lhs> {
-            type Output = CornerPosition<$out>;
+        impl Sub<CornerHeight<$rhs>> for CornerHeight<$lhs> {
+            type Output = CornerHeight<$out>;
 
-            fn sub(self, rhs: CornerPosition<$rhs>) -> Self::Output {
-                CornerPosition::<$out> {
+            fn sub(self, rhs: CornerHeight<$rhs>) -> Self::Output {
+                CornerHeight::<$out> {
                     rights: self.rights - rhs.rights,
                     downs: self.downs - rhs.downs,
                     height: PhantomData::<$out>,
@@ -22,10 +22,10 @@ macro_rules! corner_sub {
 
 macro_rules! corner_to_hex {
     ($lhs: ty, $rhs: ty) => {
-        impl Sub<CornerPosition<$rhs>> for CornerPosition<$lhs> {
+        impl Sub<CornerHeight<$rhs>> for CornerHeight<$lhs> {
             type Output = HexPosition;
 
-            fn sub(self, rhs: CornerPosition<$rhs>) -> Self::Output {
+            fn sub(self, rhs: CornerHeight<$rhs>) -> Self::Output {
                 let rights = self.rights - rhs.rights;
                 let downs = self.downs - rhs.downs;
 
@@ -52,12 +52,12 @@ corner_to_hex!(High, Center);
 corner_to_hex!(Center, Low);
 corner_to_hex!(Low, High);
 
-impl Sub<HexPosition> for CornerPosition<High> {
-    type Output = CornerPosition<High>;
+impl Sub<HexPosition> for CornerHeight<High> {
+    type Output = CornerHeight<High>;
 
     fn sub(self, rhs: HexPosition) -> Self::Output {
         let shift: f64 = rhs.horizontal_distance(HexPosition::ORIGIN).into();
-        CornerPosition {
+        CornerHeight {
             rights: self.rights - (shift * 2.) as i32,
             downs: self.downs - rhs.vertical_distance(HexPosition::ORIGIN) * 3,
             height: PhantomData::<High>,
@@ -65,12 +65,12 @@ impl Sub<HexPosition> for CornerPosition<High> {
     }
 }
 
-impl Sub<HexPosition> for CornerPosition<Low> {
-    type Output = CornerPosition<Low>;
+impl Sub<HexPosition> for CornerHeight<Low> {
+    type Output = CornerHeight<Low>;
 
     fn sub(self, rhs: HexPosition) -> Self::Output {
         let shift: f64 = rhs.horizontal_distance(HexPosition::ORIGIN).into();
-        CornerPosition {
+        CornerHeight {
             rights: self.rights - (shift * 2.) as i32,
             downs: self.downs - rhs.vertical_distance(HexPosition::ORIGIN) * 3,
             height: PhantomData::<Low>,
@@ -78,12 +78,12 @@ impl Sub<HexPosition> for CornerPosition<Low> {
     }
 }
 
-impl Sub<CornerPosition<Low>> for HexPosition {
-    type Output = CornerPosition<High>;
+impl Sub<CornerHeight<Low>> for HexPosition {
+    type Output = CornerHeight<High>;
 
-    fn sub(self, rhs: CornerPosition<Low>) -> Self::Output {
+    fn sub(self, rhs: CornerHeight<Low>) -> Self::Output {
         let shift: f64 = self.horizontal_distance(HexPosition::ORIGIN).into();
-        CornerPosition {
+        CornerHeight {
             rights: rhs.rights - (shift * 2.) as i32,
             downs: rhs.downs - self.vertical_distance(HexPosition::ORIGIN) * 3,
             height: PhantomData::<High>,
@@ -91,12 +91,12 @@ impl Sub<CornerPosition<Low>> for HexPosition {
     }
 }
 
-impl Sub<CornerPosition<High>> for HexPosition {
-    type Output = CornerPosition<Low>;
+impl Sub<CornerHeight<High>> for HexPosition {
+    type Output = CornerHeight<Low>;
 
-    fn sub(self, rhs: CornerPosition<High>) -> Self::Output {
+    fn sub(self, rhs: CornerHeight<High>) -> Self::Output {
         let shift: f64 = self.horizontal_distance(HexPosition::ORIGIN).into();
-        CornerPosition {
+        CornerHeight {
             rights: rhs.rights - (shift * 2.) as i32,
             downs: rhs.downs - self.vertical_distance(HexPosition::ORIGIN) * 3,
             height: PhantomData::<Low>,

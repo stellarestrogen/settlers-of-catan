@@ -1,5 +1,5 @@
 use crate::{
-    corner::position::{CornerPosition, Height},
+    corner::position::{CornerHeight, CornerPosition},
     hex::{
         bounds::HexPerimeter,
         position::{HexPosition, HorizontalDistance},
@@ -47,20 +47,17 @@ impl CornerBounds {
         position == hex1 || position == hex2
     }
 
-    pub fn contains<H: Height>(&self, position: CornerPosition<H>) -> bool {
-        let top_row = self.bounds.get_top_left() + CornerPosition::BOTTOM_LEFT;
-        let bottom_row = self.bounds.get_bottom_right() + CornerPosition::TOP_LEFT;
+    pub fn contains(&self, position: CornerPosition) -> bool {
+        let top_row: CornerPosition = (self.bounds.get_top_left() + CornerHeight::BOTTOM_LEFT).into();
+        let bottom_row: CornerPosition = (self.bounds.get_bottom_right() + CornerHeight::TOP_LEFT).into();
 
         if top_row.vertical_distance(position) > 0 || bottom_row.vertical_distance(position) < 0 {
             return false;
         }
 
-        let hex = if let Some(p) = position.as_low() {
-            p + CornerPosition::DOWN_RIGHT
-        } else if let Some(p) = position.as_high() {
-            p + CornerPosition::UP_RIGHT
-        } else {
-            unreachable!()
+        let hex: HexPosition = match position {
+            CornerPosition::High(p) => p + CornerHeight::UP_RIGHT,
+            CornerPosition::Low(p) => p + CornerHeight::DOWN_RIGHT,
         };
 
         if self.is_invalid_hex(hex) {

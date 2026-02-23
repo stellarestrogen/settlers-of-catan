@@ -1,6 +1,6 @@
-use std::marker::PhantomData;
+use std::{any::Any, marker::PhantomData};
 
-use crate::hex::position::HexPosition;
+use crate::{corner::Corner, hex::position::HexPosition};
 
 pub mod op_add;
 pub mod op_mul;
@@ -38,126 +38,169 @@ impl Height for High {
     }
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum CornerPosition {
+    High(CornerHeight<High>),
+    Low(CornerHeight<Low>),
+}
+
+impl CornerPosition {
+    pub fn position(&self) -> &dyn Corner {
+        match self {
+            Self::High(p) => p,
+            Self::Low(p) => p,
+        }
+    }
+
+    pub fn horizontal_distance(&self, other: Self) -> i32 {
+        self.rights() - other.rights()
+    }
+
+    pub fn vertical_distance(&self, other: Self) -> i32 {
+        self.downs() - other.downs()
+    }
+
+    fn rights(&self) -> i32 {
+        match self {
+            Self::High(p) => p.rights,
+            Self::Low(p) => p.rights,
+        }
+    }
+
+    fn downs(&self) -> i32 {
+        match self {
+            Self::High(p) => p.downs,
+            Self::Low(p) => p.downs,
+        }
+    }
+}
+
 #[derive(Debug)]
-pub struct CornerPosition<H> {
+pub struct CornerHeight<H> {
     rights: i32,
     downs: i32,
     height: PhantomData<H>,
 }
 
-impl CornerPosition<High> {
-    pub const UP_LEFT: CornerPosition<High> = CornerPosition {
+impl CornerHeight<High> {
+    pub const UP_LEFT: CornerHeight<High> = CornerHeight {
         rights: -1,
         downs: -1,
         height: PhantomData::<High>,
     };
 
-    pub const UP_RIGHT: CornerPosition<High> = CornerPosition {
+    pub const UP_RIGHT: CornerHeight<High> = CornerHeight {
         rights: 1,
         downs: -1,
         height: PhantomData::<High>,
     };
 
-    pub const DOWN: CornerPosition<High> = CornerPosition {
+    pub const DOWN: CornerHeight<High> = CornerHeight {
         rights: 0,
         downs: 2,
         height: PhantomData::<High>,
     };
 
-    pub const BOTTOM_LEFT: CornerPosition<High> = CornerPosition {
+    pub const BOTTOM_LEFT: CornerHeight<High> = CornerHeight {
         rights: 0,
         downs: 2,
         height: PhantomData::<High>,
     };
 
-    pub const BOTTOM_RIGHT: CornerPosition<High> = CornerPosition {
+    pub const BOTTOM_RIGHT: CornerHeight<High> = CornerHeight {
         rights: 2,
         downs: 2,
         height: PhantomData::<High>,
     };
 
-    pub const TOP: CornerPosition<High> = CornerPosition {
+    pub const TOP: CornerHeight<High> = CornerHeight {
         rights: 1,
         downs: -1,
         height: PhantomData::<High>,
     };
 
-    pub fn go_right(self) -> CornerPosition<Low> {
-        self + CornerPosition::DOWN_RIGHT
+    pub fn go_right(self) -> CornerHeight<Low> {
+        self + CornerHeight::DOWN_RIGHT
     }
 
-    pub fn go_left(self) -> CornerPosition<Low> {
-        self + CornerPosition::DOWN_LEFT
+    pub fn go_left(self) -> CornerHeight<Low> {
+        self + CornerHeight::DOWN_LEFT
     }
 
-    pub fn go_up(self) -> CornerPosition<Low> {
-        self + CornerPosition::UP
+    pub fn go_up(self) -> CornerHeight<Low> {
+        self + CornerHeight::UP
     }
 }
 
-impl CornerPosition<Low> {
-    pub const TOP_LEFT: CornerPosition<Low> = CornerPosition {
+impl Into<CornerPosition> for CornerHeight<High> {
+    fn into(self) -> CornerPosition {
+        CornerPosition::High(self)
+    }
+}
+
+impl Corner for CornerHeight<High> {}
+
+impl CornerHeight<Low> {
+    pub const TOP_LEFT: CornerHeight<Low> = CornerHeight {
         rights: 0,
         downs: 0,
         height: PhantomData::<Low>,
     };
 
-    pub const TOP_RIGHT: CornerPosition<Low> = CornerPosition {
+    pub const TOP_RIGHT: CornerHeight<Low> = CornerHeight {
         rights: 2,
         downs: 0,
         height: PhantomData::<Low>,
     };
 
-    pub const BOTTOM: CornerPosition<Low> = CornerPosition {
+    pub const BOTTOM: CornerHeight<Low> = CornerHeight {
         rights: 1,
         downs: 3,
         height: PhantomData::<Low>,
     };
 
-    pub fn go_right(self) -> CornerPosition<High> {
-        self + CornerPosition::UP_RIGHT
+    pub fn go_right(self) -> CornerHeight<High> {
+        self + CornerHeight::UP_RIGHT
     }
 
-    pub fn go_left(self) -> CornerPosition<High> {
-        self + CornerPosition::UP_LEFT
+    pub fn go_left(self) -> CornerHeight<High> {
+        self + CornerHeight::UP_LEFT
     }
 
-    pub fn go_down(self) -> CornerPosition<High> {
-        self + CornerPosition::DOWN
+    pub fn go_down(self) -> CornerHeight<High> {
+        self + CornerHeight::DOWN
     }
 }
 
-impl CornerPosition<Center> {
-    pub const DOWN_LEFT: CornerPosition<Center> = CornerPosition {
+impl Into<CornerPosition> for CornerHeight<Low> {
+    fn into(self) -> CornerPosition {
+        CornerPosition::Low(self)
+    }
+}
+
+impl Corner for CornerHeight<Low> {}
+
+impl CornerHeight<Center> {
+    pub const DOWN_LEFT: CornerHeight<Center> = CornerHeight {
         rights: -1,
         downs: 1,
         height: PhantomData::<Center>,
     };
 
-    pub const DOWN_RIGHT: CornerPosition<Center> = CornerPosition {
+    pub const DOWN_RIGHT: CornerHeight<Center> = CornerHeight {
         rights: 1,
         downs: 1,
         height: PhantomData::<Center>,
     };
 
-    pub const UP: CornerPosition<Center> = CornerPosition {
+    pub const UP: CornerHeight<Center> = CornerHeight {
         rights: 0,
         downs: -2,
         height: PhantomData::<Center>,
     };
 }
 
-impl<H> CornerPosition<H> {
-    pub fn horizontal_distance<T>(&self, other: CornerPosition<T>) -> i32 {
-        self.rights - other.rights
-    }
-
-    pub fn vertical_distance<T>(&self, other: CornerPosition<T>) -> i32 {
-        self.downs - other.downs
-    }
-}
-
-impl<H: Height> CornerPosition<H> {
+impl<H: Height> CornerHeight<H> {
     pub fn is_low(&self) -> bool {
         H::is_low()
     }
@@ -166,9 +209,9 @@ impl<H: Height> CornerPosition<H> {
         H::is_high()
     }
 
-    pub fn as_low(&self) -> Option<CornerPosition<Low>> {
+    pub fn as_low(&self) -> Option<CornerHeight<Low>> {
         if self.is_low() {
-            Some(CornerPosition {
+            Some(CornerHeight {
                 rights: self.rights,
                 downs: self.downs,
                 height: PhantomData::<Low>,
@@ -178,9 +221,9 @@ impl<H: Height> CornerPosition<H> {
         }
     }
 
-    pub fn as_high(&self) -> Option<CornerPosition<High>> {
+    pub fn as_high(&self) -> Option<CornerHeight<High>> {
         if self.is_high() {
-            Some(CornerPosition {
+            Some(CornerHeight {
                 rights: self.rights,
                 downs: self.downs,
                 height: PhantomData::<High>,
@@ -193,15 +236,15 @@ impl<H: Height> CornerPosition<H> {
     pub fn neighboring_hex(&self) -> [HexPosition; 3] {
         if let Some(p) = self.as_low() {
             [
-                p + CornerPosition::UP,
-                p + CornerPosition::DOWN_LEFT,
-                p + CornerPosition::DOWN_RIGHT,
+                p + CornerHeight::UP,
+                p + CornerHeight::DOWN_LEFT,
+                p + CornerHeight::DOWN_RIGHT,
             ]
         } else if let Some(p) = self.as_high() {
             [
-                p + CornerPosition::UP_LEFT,
-                p + CornerPosition::UP_RIGHT,
-                p + CornerPosition::DOWN,
+                p + CornerHeight::UP_LEFT,
+                p + CornerHeight::UP_RIGHT,
+                p + CornerHeight::DOWN,
             ]
         } else {
             unreachable!()
@@ -209,9 +252,9 @@ impl<H: Height> CornerPosition<H> {
     }
 }
 
-impl<H> Clone for CornerPosition<H> {
+impl<H> Clone for CornerHeight<H> {
     fn clone(&self) -> Self {
-        CornerPosition::<H> {
+        CornerHeight::<H> {
             rights: self.rights,
             downs: self.downs,
             height: PhantomData::<H>,
@@ -219,10 +262,12 @@ impl<H> Clone for CornerPosition<H> {
     }
 }
 
-impl<H> Copy for CornerPosition<H> {}
+impl<H> Copy for CornerHeight<H> {}
 
-impl<H> PartialEq for CornerPosition<H> {
+impl<H> PartialEq for CornerHeight<H> {
     fn eq(&self, other: &Self) -> bool {
         self.rights == other.rights && self.downs == other.downs && self.height == other.height
     }
 }
+
+impl<H> Eq for CornerHeight<H> {}
