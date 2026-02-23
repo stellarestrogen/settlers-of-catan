@@ -153,6 +153,14 @@ impl Corner for CornerHeight<High> {
             *self + CornerHeight::DOWN,
         ]
     }
+
+    fn neighboring_corners(&self) -> Vec<Box<dyn Corner>> {
+        vec![
+            Box::new(*self + CornerHeight::UP),
+            Box::new(*self + CornerHeight::DOWN_LEFT),
+            Box::new(*self + CornerHeight::DOWN_RIGHT),
+        ]
+    }
 }
 
 impl CornerHeight<Low> {
@@ -207,6 +215,14 @@ impl Corner for CornerHeight<Low> {
             *self + CornerHeight::UP,
             *self + CornerHeight::DOWN_LEFT,
             *self + CornerHeight::DOWN_RIGHT,
+        ]
+    }
+
+    fn neighboring_corners(&self) -> Vec<Box<dyn Corner>> {
+        vec![
+            Box::new(*self + CornerHeight::DOWN),
+            Box::new(*self + CornerHeight::UP_LEFT),
+            Box::new(*self + CornerHeight::UP_RIGHT),
         ]
     }
 }

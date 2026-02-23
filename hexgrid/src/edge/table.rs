@@ -1,11 +1,11 @@
 use std::ops::{Index, IndexMut};
 
-use crate::{edge::position::EdgePosition, hex::{position::HexPosition, table::HexTable}};
-
-use super::{
-    bounds::EdgeBounds,
-    position::{EdgeOrientation},
+use crate::{
+    edge::position::EdgePosition,
+    hex::{position::HexPosition, table::HexTable},
 };
+
+use super::{bounds::EdgeBounds, position::EdgeOrientation};
 
 #[derive(Debug)]
 pub struct EdgeTable<T> {

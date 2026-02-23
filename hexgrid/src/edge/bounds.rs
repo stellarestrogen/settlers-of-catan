@@ -1,9 +1,12 @@
-use crate::{edge::position::EdgePosition, hex::{
-    bounds::HexPerimeter,
-    position::{HexPosition, HorizontalDistance},
-}};
+use crate::{
+    edge::position::EdgePosition,
+    hex::{
+        bounds::HexPerimeter,
+        position::{HexPosition, HorizontalDistance},
+    },
+};
 
-use super::position::{EdgeOrientation};
+use super::position::EdgeOrientation;
 
 #[derive(Debug, Clone)]
 pub struct EdgeBounds {
@@ -43,8 +46,10 @@ impl EdgeBounds {
     }
 
     pub fn contains(&self, position: EdgePosition) -> bool {
-        let top_row: EdgePosition = (self.bounds.get_top_left() + EdgeOrientation::BOTTOM_LEFT).into();
-        let bottom_row: EdgePosition = (self.bounds.get_bottom_right() + EdgeOrientation::TOP_LEFT).into();
+        let top_row: EdgePosition =
+            (self.bounds.get_top_left() + EdgeOrientation::BOTTOM_LEFT).into();
+        let bottom_row: EdgePosition =
+            (self.bounds.get_bottom_right() + EdgeOrientation::TOP_LEFT).into();
 
         if top_row.vertical_distance(position) > 0 || bottom_row.vertical_distance(position) < 0 {
             return false;

@@ -6,16 +6,16 @@ pub mod op_add;
 pub mod op_mul;
 pub mod op_sub;
 
-#[derive(Clone, Copy, Debug)]
+#[derive(Debug, Clone, Copy)]
 pub struct Even;
 
-#[derive(Clone, Copy, Debug)]
+#[derive(Debug, Clone, Copy)]
 pub struct Odd;
 
-#[derive(Clone, Copy, Debug)]
+#[derive(Debug, Clone, Copy)]
 pub struct Positive;
 
-#[derive(Clone, Copy)]
+#[derive(Debug, Clone, Copy)]
 pub struct Negative;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -43,17 +43,7 @@ impl EdgePosition {
     }
 
     pub fn neighboring_hex(&self) -> [HexPosition; 2] {
-        match *self {
-            Self::Even(p) => [
-                p + EdgeOrientation::UP_LEFT,
-                p + EdgeOrientation::DOWN_RIGHT,
-            ],
-            Self::Odd(p) => [
-                p + EdgeOrientation::UP_RIGHT,
-                p + EdgeOrientation::DOWN_LEFT,
-            ],
-            Self::Positive(p) => [p + EdgeOrientation::GO_LEFT, p + EdgeOrientation::GO_RIGHT],
-        }
+        self.position().neighboring_hex()
     }
 
     pub fn neighboring_edges(&self) -> [EdgePosition; 4] {
@@ -97,10 +87,10 @@ impl EdgePosition {
 }
 
 #[derive(Debug)]
-pub struct EdgeOrientation<Type> {
+pub struct EdgeOrientation<T> {
     rights: i32,
     downs: i32,
-    r#type: PhantomData<Type>,
+    r#type: PhantomData<T>,
 }
 
 impl EdgeOrientation<Even> {
@@ -136,7 +126,14 @@ impl Into<EdgePosition> for EdgeOrientation<Even> {
     }
 }
 
-impl Edge for EdgeOrientation<Even> {}
+impl Edge for EdgeOrientation<Even> {
+    fn neighboring_hex(&self) -> [HexPosition; 2] {
+        [
+            *self + EdgeOrientation::UP_LEFT,
+            *self + EdgeOrientation::DOWN_RIGHT,
+        ]
+    }
+}
 
 impl EdgeOrientation<Odd> {
     pub const GO_RIGHT: EdgeOrientation<Odd> = EdgeOrientation {
@@ -183,7 +180,14 @@ impl Into<EdgePosition> for EdgeOrientation<Odd> {
     }
 }
 
-impl Edge for EdgeOrientation<Odd> {}
+impl Edge for EdgeOrientation<Odd> {
+    fn neighboring_hex(&self) -> [HexPosition; 2] {
+        [
+            *self + EdgeOrientation::UP_RIGHT,
+            *self + EdgeOrientation::DOWN_LEFT,
+        ]
+    }
+}
 
 impl EdgeOrientation<Positive> {
     pub const DOWN_LEFT: EdgeOrientation<Positive> = EdgeOrientation {
@@ -230,7 +234,14 @@ impl Into<EdgePosition> for EdgeOrientation<Positive> {
     }
 }
 
-impl Edge for EdgeOrientation<Positive> {}
+impl Edge for EdgeOrientation<Positive> {
+    fn neighboring_hex(&self) -> [HexPosition; 2] {
+        [
+            *self + EdgeOrientation::GO_LEFT,
+            *self + EdgeOrientation::GO_RIGHT,
+        ]
+    }
+}
 
 impl EdgeOrientation<Negative> {
     pub const DOWN_RIGHT: EdgeOrientation<Negative> = EdgeOrientation {
