@@ -1,7 +1,7 @@
 use hexgrid::{
     corner::{
         bounds::CornerBounds,
-        position::{CornerHeight, Height},
+        position::{CornerHeight, CornerPosition, Height},
         table::CornerTable,
     },
     edge::{
@@ -54,19 +54,15 @@ impl Board {
         }
     }
 
-    pub fn get_trade<H: Height>(&self, position: CornerHeight<H>) -> Option<TradeType> {
+    pub fn get_trade(&self, position: CornerPosition) -> Option<TradeType> {
         self.corners.get_trade(position)
     }
 
-    pub fn get_building<H: Height>(&self, position: CornerHeight<H>) -> Option<Building> {
+    pub fn get_building(&self, position: CornerPosition) -> Option<Building> {
         self.corners.get_building(position)
     }
 
-    pub fn set_building<H: Height>(
-        &mut self,
-        building: Building,
-        position: CornerHeight<H>,
-    ) -> Result<(), ()> {
+    pub fn set_building(&mut self, building: Building, position: CornerPosition) -> Result<(), ()> {
         self.corners.set_building(position, building)
     }
 
@@ -98,9 +94,9 @@ impl Board {
         self.robber.position() == position
     }
 
-    pub fn neighboring_hex_for_corner<H: Height>(
+    pub fn neighboring_hex_for_corner(
         &self,
-        position: CornerHeight<H>,
+        position: CornerPosition,
     ) -> impl Iterator<Item = HexPosition> {
         let mut tiles: Vec<HexPosition> = Vec::with_capacity(3);
         for t in position.neighboring_hex().into_iter() {

@@ -5,7 +5,7 @@ pub mod hand;
 pub mod player;
 
 use hexgrid::{
-    corner::position::{CornerHeight, Height},
+    corner::position::{CornerHeight, CornerPosition, Height},
     edge::position::{EdgePosition, Valid},
     hex::position::HexPosition,
 };
@@ -46,14 +46,14 @@ impl Game {
             .unwrap()
     }
 
-    pub fn find_building<H: Height>(&self, position: CornerHeight<H>) -> Option<Building> {
+    pub fn find_building(&self, position: CornerPosition) -> Option<Building> {
         self.board.get_building(position)
     }
 
-    pub fn play_building<H: Height>(
+    pub fn play_building(
         &mut self,
         building: Building,
-        position: CornerHeight<H>,
+        position: CornerPosition,
     ) -> Result<(), BuildError> {
         if let Some(b) = self.find_building(position)
             && (b.r#type() == BuildingType::City || b.r#type() == building.r#type())

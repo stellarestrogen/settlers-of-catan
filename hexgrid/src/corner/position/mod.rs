@@ -60,6 +60,10 @@ impl CornerPosition {
         self.downs() - other.downs()
     }
 
+    pub fn neighboring_hex(&self) -> [HexPosition; 3] {
+        self.position().neighboring_hex()
+    }
+
     fn rights(&self) -> i32 {
         match self {
             Self::High(p) => p.rights,
@@ -138,7 +142,15 @@ impl Into<CornerPosition> for CornerHeight<High> {
     }
 }
 
-impl Corner for CornerHeight<High> {}
+impl Corner for CornerHeight<High> {
+    fn neighboring_hex(&self) -> [HexPosition; 3] {
+        [
+            *self + CornerHeight::UP_LEFT,
+            *self + CornerHeight::UP_RIGHT,
+            *self + CornerHeight::DOWN,
+        ]
+    }
+}
 
 impl CornerHeight<Low> {
     pub const TOP_LEFT: CornerHeight<Low> = CornerHeight {
@@ -178,7 +190,15 @@ impl Into<CornerPosition> for CornerHeight<Low> {
     }
 }
 
-impl Corner for CornerHeight<Low> {}
+impl Corner for CornerHeight<Low> {
+    fn neighboring_hex(&self) -> [HexPosition; 3] {
+        [
+            *self + CornerHeight::UP,
+            *self + CornerHeight::DOWN_LEFT,
+            *self + CornerHeight::DOWN_RIGHT,
+        ]
+    }
+}
 
 impl CornerHeight<Center> {
     pub const DOWN_LEFT: CornerHeight<Center> = CornerHeight {
