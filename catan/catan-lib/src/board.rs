@@ -7,12 +7,10 @@ use hexgrid::{
 use crate::{
     game::edition::GameEdition,
     object::{
-        CornerData, EdgeData, Robber, TileData, TileType,
-        structure::{
+        CornerData, EdgeData, Robber, TileData, TileType, resource::ResourceType, structure::{
             building::{Building, BuildingStore},
             transport::{Transport, TransportStore},
-        },
-        trade::{TradeStore, TradeType},
+        }, trade::{TradeStore, TradeType}
     },
 };
 
@@ -44,6 +42,14 @@ impl Board {
         } else {
             TileData::new(TileType::Water)
         }
+    }
+
+    pub fn get_resource_type(&self, position: HexPosition) -> Option<ResourceType> {
+        self.get_tile(position).get_tile_type().get_resource_type()
+    }
+
+    pub fn get_tile_roll_number(&self, position: HexPosition) -> Option<u32> {
+        self.get_tile(position).get_roll_number()
     }
 
     pub fn get_trade(&self, position: CornerPosition) -> Option<TradeType> {
