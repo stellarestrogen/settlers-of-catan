@@ -2,15 +2,15 @@ use std::marker::PhantomData;
 
 use std::ops::{Mul, MulAssign};
 
-use super::{EdgePosition, Even};
+use super::{EdgeOrientation, Even};
 
 macro_rules! scalar_operations {
     ($scalar: ty) => {
-        impl Mul<$scalar> for EdgePosition<Even> {
-            type Output = EdgePosition<Even>;
+        impl Mul<$scalar> for EdgeOrientation<Even> {
+            type Output = EdgeOrientation<Even>;
 
             fn mul(self, rhs: $scalar) -> Self::Output {
-                EdgePosition::<Even> {
+                EdgeOrientation::<Even> {
                     rights: self.rights * rhs as i32,
                     downs: self.downs * rhs as i32,
                     r#type: PhantomData::<Even>,
@@ -18,18 +18,18 @@ macro_rules! scalar_operations {
             }
         }
 
-        impl MulAssign<$scalar> for EdgePosition<Even> {
+        impl MulAssign<$scalar> for EdgeOrientation<Even> {
             fn mul_assign(&mut self, rhs: $scalar) {
                 self.rights *= rhs as i32;
                 self.downs *= rhs as i32;
             }
         }
 
-        impl Mul<EdgePosition<Even>> for $scalar {
-            type Output = EdgePosition<Even>;
+        impl Mul<EdgeOrientation<Even>> for $scalar {
+            type Output = EdgeOrientation<Even>;
 
-            fn mul(self, rhs: EdgePosition<Even>) -> EdgePosition<Even> {
-                EdgePosition::<Even> {
+            fn mul(self, rhs: EdgeOrientation<Even>) -> EdgeOrientation<Even> {
+                EdgeOrientation::<Even> {
                     rights: rhs.rights * self as i32,
                     downs: rhs.downs * self as i32,
                     r#type: PhantomData::<Even>,

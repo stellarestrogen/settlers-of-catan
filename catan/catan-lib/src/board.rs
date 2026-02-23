@@ -1,10 +1,6 @@
 use hexgrid::{
     corner::{bounds::CornerBounds, position::CornerPosition, table::CornerTable},
-    edge::{
-        bounds::EdgeBounds,
-        position::{EdgePosition, Valid},
-        table::EdgeTable,
-    },
+    edge::{bounds::EdgeBounds, position::EdgePosition, table::EdgeTable},
     hex::{bounds::HexPerimeter, position::HexPosition, table::HexTable},
 };
 
@@ -66,14 +62,14 @@ impl Board {
         self.corners.buildings()
     }
 
-    pub fn get_transport<T: Valid>(&self, position: EdgePosition<T>) -> Option<Transport> {
+    pub fn get_transport(&self, position: EdgePosition) -> Option<Transport> {
         self.edges.get_transport(position)
     }
 
-    pub fn set_transport<T: Valid>(
+    pub fn set_transport(
         &mut self,
         transport: Transport,
-        position: EdgePosition<T>,
+        position: EdgePosition,
     ) -> Result<(), ()> {
         self.edges.set_transport(position, transport)
     }

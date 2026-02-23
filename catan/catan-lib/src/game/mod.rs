@@ -5,9 +5,7 @@ pub mod hand;
 pub mod player;
 
 use hexgrid::{
-    corner::position::CornerPosition,
-    edge::position::{EdgePosition, Valid},
-    hex::position::HexPosition,
+    corner::position::CornerPosition, edge::position::EdgePosition, hex::position::HexPosition,
 };
 
 use crate::{
@@ -79,14 +77,14 @@ impl Game {
         Ok(())
     }
 
-    pub fn find_transport<T: Valid>(&self, position: EdgePosition<T>) -> Option<Transport> {
+    pub fn find_transport(&self, position: EdgePosition) -> Option<Transport> {
         self.board.get_transport(position)
     }
 
-    pub fn play_transport<T: Valid>(
+    pub fn play_transport(
         &mut self,
         transport: Transport,
-        position: EdgePosition<T>,
+        position: EdgePosition,
     ) -> Result<(), BuildError> {
         // todo!
         // figure out if the road to be built is contiguous, and account for edge cases

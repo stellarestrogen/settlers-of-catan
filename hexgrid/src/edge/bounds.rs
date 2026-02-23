@@ -1,9 +1,9 @@
-use crate::hex::{
+use crate::{edge::position::EdgePosition, hex::{
     bounds::HexPerimeter,
     position::{HexPosition, HorizontalDistance},
-};
+}};
 
-use super::position::{EdgePosition, Valid};
+use super::position::{EdgeOrientation};
 
 #[derive(Debug, Clone)]
 pub struct EdgeBounds {
@@ -42,22 +42,18 @@ impl EdgeBounds {
         position == hex1 || position == hex2
     }
 
-    pub fn contains<T: Valid>(&self, position: EdgePosition<T>) -> bool {
-        let top_row = self.bounds.get_top_left() + EdgePosition::BOTTOM_LEFT;
-        let bottom_row = self.bounds.get_bottom_right() + EdgePosition::TOP_LEFT;
+    pub fn contains(&self, position: EdgePosition) -> bool {
+        let top_row: EdgePosition = (self.bounds.get_top_left() + EdgeOrientation::BOTTOM_LEFT).into();
+        let bottom_row: EdgePosition = (self.bounds.get_bottom_right() + EdgeOrientation::TOP_LEFT).into();
 
         if top_row.vertical_distance(position) > 0 || bottom_row.vertical_distance(position) < 0 {
             return false;
         }
 
-        let hex = if let Some(p) = position.as_even() {
-            p + EdgePosition::DOWN_RIGHT
-        } else if let Some(p) = position.as_positive() {
-            p + EdgePosition::GO_RIGHT
-        } else if let Some(p) = position.as_odd() {
-            p + EdgePosition::UP_RIGHT
-        } else {
-            unreachable!()
+        let hex = match position {
+            EdgePosition::Even(p) => p + EdgeOrientation::DOWN_RIGHT,
+            EdgePosition::Odd(p) => p + EdgeOrientation::UP_RIGHT,
+            EdgePosition::Positive(p) => p + EdgeOrientation::GO_RIGHT,
         };
 
         if self.is_invalid_hex(hex) {

@@ -1,6 +1,6 @@
 use std::marker::PhantomData;
 
-use crate::hex::position::HexPosition;
+use crate::{edge::Edge, hex::position::HexPosition};
 
 pub mod op_add;
 pub mod op_mul;
@@ -18,214 +18,175 @@ pub struct Positive;
 #[derive(Clone, Copy)]
 pub struct Negative;
 
-pub trait Valid {
-    fn is_even() -> bool;
-    fn is_odd() -> bool;
-    fn is_positive() -> bool;
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum EdgePosition {
+    Even(EdgeOrientation<Even>),
+    Odd(EdgeOrientation<Odd>),
+    Positive(EdgeOrientation<Positive>),
 }
 
-impl Valid for Even {
-    fn is_even() -> bool {
-        true
+impl EdgePosition {
+    pub fn position(&self) -> &dyn Edge {
+        match self {
+            Self::Even(p) => p,
+            Self::Odd(p) => p,
+            Self::Positive(p) => p,
+        }
     }
 
-    fn is_odd() -> bool {
-        false
+    pub fn horizontal_distance(&self, other: Self) -> i32 {
+        self.rights() - other.rights()
     }
 
-    fn is_positive() -> bool {
-        false
-    }
-}
-impl Valid for Odd {
-    fn is_even() -> bool {
-        false
+    pub fn vertical_distance(&self, other: Self) -> i32 {
+        self.downs() - other.downs()
     }
 
-    fn is_odd() -> bool {
-        true
+    pub fn neighboring_hex(&self) -> [HexPosition; 2] {
+        match *self {
+            Self::Even(p) => [
+                p + EdgeOrientation::UP_LEFT,
+                p + EdgeOrientation::DOWN_RIGHT,
+            ],
+            Self::Odd(p) => [
+                p + EdgeOrientation::UP_RIGHT,
+                p + EdgeOrientation::DOWN_LEFT,
+            ],
+            Self::Positive(p) => [p + EdgeOrientation::GO_LEFT, p + EdgeOrientation::GO_RIGHT],
+        }
     }
 
-    fn is_positive() -> bool {
-        false
-    }
-}
-impl Valid for Positive {
-    fn is_even() -> bool {
-        false
-    }
-
-    fn is_odd() -> bool {
-        false
+    fn rights(&self) -> i32 {
+        match self {
+            Self::Even(p) => p.rights,
+            Self::Odd(p) => p.rights,
+            Self::Positive(p) => p.rights,
+        }
     }
 
-    fn is_positive() -> bool {
-        true
+    fn downs(&self) -> i32 {
+        match self {
+            Self::Even(p) => p.downs,
+            Self::Odd(p) => p.downs,
+            Self::Positive(p) => p.downs,
+        }
     }
 }
 
 #[derive(Debug)]
-pub struct EdgePosition<Type> {
+pub struct EdgeOrientation<Type> {
     rights: i32,
     downs: i32,
     r#type: PhantomData<Type>,
 }
 
-impl EdgePosition<Even> {
-    pub const TOP_LEFT: EdgePosition<Even> = EdgePosition {
+impl EdgeOrientation<Even> {
+    pub const TOP_LEFT: EdgeOrientation<Even> = EdgeOrientation {
         rights: 0,
         downs: 0,
         r#type: PhantomData::<Even>,
     };
 
-    pub const BOTTOM_RIGHT: EdgePosition<Even> = EdgePosition {
+    pub const BOTTOM_RIGHT: EdgeOrientation<Even> = EdgeOrientation {
         rights: 2,
         downs: 2,
         r#type: PhantomData::<Even>,
     };
 }
 
-impl EdgePosition<Odd> {
-    pub const GO_RIGHT: EdgePosition<Odd> = EdgePosition {
+impl Into<EdgePosition> for EdgeOrientation<Even> {
+    fn into(self) -> EdgePosition {
+        EdgePosition::Even(self)
+    }
+}
+
+impl Edge for EdgeOrientation<Even> {}
+
+impl EdgeOrientation<Odd> {
+    pub const GO_RIGHT: EdgeOrientation<Odd> = EdgeOrientation {
         rights: 2,
         downs: 0,
         r#type: PhantomData::<Odd>,
     };
 
-    pub const GO_LEFT: EdgePosition<Odd> = EdgePosition {
+    pub const GO_LEFT: EdgeOrientation<Odd> = EdgeOrientation {
         rights: -2,
         downs: 0,
         r#type: PhantomData::<Odd>,
     };
 
-    pub const BOTTOM_LEFT: EdgePosition<Odd> = EdgePosition {
+    pub const BOTTOM_LEFT: EdgeOrientation<Odd> = EdgeOrientation {
         rights: -1,
         downs: 1,
         r#type: PhantomData::<Odd>,
     };
 
-    pub const TOP_RIGHT: EdgePosition<Odd> = EdgePosition {
+    pub const TOP_RIGHT: EdgeOrientation<Odd> = EdgeOrientation {
         rights: 1,
         downs: -1,
         r#type: PhantomData::<Odd>,
     };
 }
 
-impl EdgePosition<Positive> {
-    pub const DOWN_LEFT: EdgePosition<Positive> = EdgePosition {
+impl Into<EdgePosition> for EdgeOrientation<Odd> {
+    fn into(self) -> EdgePosition {
+        EdgePosition::Odd(self)
+    }
+}
+
+impl Edge for EdgeOrientation<Odd> {}
+
+impl EdgeOrientation<Positive> {
+    pub const DOWN_LEFT: EdgeOrientation<Positive> = EdgeOrientation {
         rights: -1,
         downs: 1,
         r#type: PhantomData::<Positive>,
     };
 
-    pub const UP_RIGHT: EdgePosition<Positive> = EdgePosition {
+    pub const UP_RIGHT: EdgeOrientation<Positive> = EdgeOrientation {
         rights: 1,
         downs: -1,
         r#type: PhantomData::<Positive>,
     };
 
-    pub const LEFT: EdgePosition<Positive> = EdgePosition {
+    pub const LEFT: EdgeOrientation<Positive> = EdgeOrientation {
         rights: -1,
         downs: 1,
         r#type: PhantomData::<Positive>,
     };
 
-    pub const RIGHT: EdgePosition<Positive> = EdgePosition {
+    pub const RIGHT: EdgeOrientation<Positive> = EdgeOrientation {
         rights: 3,
         downs: 1,
         r#type: PhantomData::<Positive>,
     };
 }
 
-impl EdgePosition<Negative> {
-    pub const DOWN_RIGHT: EdgePosition<Negative> = EdgePosition {
+impl Into<EdgePosition> for EdgeOrientation<Positive> {
+    fn into(self) -> EdgePosition {
+        EdgePosition::Positive(self)
+    }
+}
+
+impl Edge for EdgeOrientation<Positive> {}
+
+impl EdgeOrientation<Negative> {
+    pub const DOWN_RIGHT: EdgeOrientation<Negative> = EdgeOrientation {
         rights: 1,
         downs: 1,
         r#type: PhantomData::<Negative>,
     };
 
-    pub const UP_LEFT: EdgePosition<Negative> = EdgePosition {
+    pub const UP_LEFT: EdgeOrientation<Negative> = EdgeOrientation {
         rights: -1,
         downs: -1,
         r#type: PhantomData::<Negative>,
     };
 }
 
-impl<Type> EdgePosition<Type> {
-    pub fn horizontal_distance<T>(&self, other: EdgePosition<T>) -> i32 {
-        self.rights - other.rights
-    }
-
-    pub fn vertical_distance<T>(&self, other: EdgePosition<T>) -> i32 {
-        self.downs - other.downs
-    }
-}
-
-impl<Type: Valid> EdgePosition<Type> {
-    pub fn is_even(&self) -> bool {
-        Type::is_even()
-    }
-
-    pub fn is_odd(&self) -> bool {
-        Type::is_odd()
-    }
-
-    pub fn is_positive(&self) -> bool {
-        Type::is_positive()
-    }
-
-    pub fn as_even(&self) -> Option<EdgePosition<Even>> {
-        if self.is_even() {
-            Some(EdgePosition {
-                rights: self.horizontal_distance(EdgePosition::TOP_LEFT),
-                downs: self.vertical_distance(EdgePosition::TOP_LEFT),
-                r#type: PhantomData::default(),
-            })
-        } else {
-            None
-        }
-    }
-
-    pub fn as_odd(&self) -> Option<EdgePosition<Odd>> {
-        if self.is_odd() {
-            Some(EdgePosition {
-                rights: self.horizontal_distance(EdgePosition::TOP_LEFT),
-                downs: self.vertical_distance(EdgePosition::TOP_LEFT),
-                r#type: PhantomData::default(),
-            })
-        } else {
-            None
-        }
-    }
-
-    pub fn as_positive(&self) -> Option<EdgePosition<Positive>> {
-        if self.is_positive() {
-            Some(EdgePosition {
-                rights: self.horizontal_distance(EdgePosition::TOP_LEFT),
-                downs: self.vertical_distance(EdgePosition::TOP_LEFT),
-                r#type: PhantomData::default(),
-            })
-        } else {
-            None
-        }
-    }
-
-    pub fn neighboring_hex(&self) -> [HexPosition; 2] {
-        if let Some(p) = self.as_even() {
-            [p + EdgePosition::UP_LEFT, p + EdgePosition::DOWN_RIGHT]
-        } else if let Some(p) = self.as_odd() {
-            [p + EdgePosition::UP_RIGHT, p + EdgePosition::DOWN_LEFT]
-        } else if let Some(p) = self.as_positive() {
-            [p + EdgePosition::GO_LEFT, p + EdgePosition::GO_RIGHT]
-        } else {
-            unreachable!()
-        }
-    }
-}
-
-impl<Type> Clone for EdgePosition<Type> {
+impl<T> Clone for EdgeOrientation<T> {
     fn clone(&self) -> Self {
-        EdgePosition::<Type> {
+        EdgeOrientation::<T> {
             rights: self.rights,
             downs: self.downs,
             r#type: self.r#type,
@@ -233,10 +194,12 @@ impl<Type> Clone for EdgePosition<Type> {
     }
 }
 
-impl<Type> Copy for EdgePosition<Type> {}
+impl<T> Copy for EdgeOrientation<T> {}
 
-impl<Type> PartialEq for EdgePosition<Type> {
+impl<T> PartialEq for EdgeOrientation<T> {
     fn eq(&self, other: &Self) -> bool {
         self.rights == other.rights && self.downs == other.downs && self.r#type == other.r#type
     }
 }
+
+impl<T> Eq for EdgeOrientation<T> {}

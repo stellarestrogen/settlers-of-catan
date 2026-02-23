@@ -41,7 +41,7 @@ impl CornerPosition {
         self.position().neighboring_hex()
     }
 
-    pub fn neighboring_corners(&self) -> impl Iterator<Item = CornerPosition> {
+    pub fn neighboring_corners(&self) -> [CornerPosition; 3] {
         let p: Vec<CornerPosition> = match self {
             Self::High(p) => p
                 .neighboring_corners()
@@ -55,7 +55,7 @@ impl CornerPosition {
                 .collect(),
         };
 
-        p.into_iter()
+        p.try_into().expect("Neighboring Corners is the incorrect size!")
     }
 
     fn rights(&self) -> i32 {
