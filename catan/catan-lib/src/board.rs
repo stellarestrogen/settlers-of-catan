@@ -62,18 +62,6 @@ impl Board {
         self.corners.get_building(position)
     }
 
-    pub fn buildings(&self) -> impl Iterator<Item = Building> {
-        self.corners.buildings()
-    }
-
-    pub fn get_transport<T: Valid>(&self, position: EdgePosition<T>) -> Option<Transport> {
-        self.edges.get_transport(position)
-    }
-
-    pub fn transports(&self) -> impl Iterator<Item = Transport> {
-        self.edges.transports()
-    }
-
     pub fn set_building<H: Height>(
         &mut self,
         building: Building,
@@ -82,12 +70,24 @@ impl Board {
         self.corners.set_building(position, building)
     }
 
+    pub fn buildings(&self) -> impl Iterator<Item = Building> {
+        self.corners.buildings()
+    }
+
+    pub fn get_transport<T: Valid>(&self, position: EdgePosition<T>) -> Option<Transport> {
+        self.edges.get_transport(position)
+    }
+
     pub fn set_transport<T: Valid>(
         &mut self,
         transport: Transport,
         position: EdgePosition<T>,
     ) -> Result<(), ()> {
         self.edges.set_transport(position, transport)
+    }
+
+    pub fn transports(&self) -> impl Iterator<Item = Transport> {
+        self.edges.transports()
     }
 
     pub fn move_robber(&mut self, position: HexPosition) {
