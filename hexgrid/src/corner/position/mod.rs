@@ -1,4 +1,4 @@
-use std::{any::Any, marker::PhantomData};
+use std::marker::PhantomData;
 
 use crate::{corner::Corner, hex::position::HexPosition};
 
@@ -39,6 +39,23 @@ impl CornerPosition {
 
     pub fn neighboring_hex(&self) -> [HexPosition; 3] {
         self.position().neighboring_hex()
+    }
+
+    pub fn neighboring_corners(&self) -> impl Iterator<Item = CornerPosition> {
+        let p: Vec<CornerPosition> = match self {
+            Self::High(p) => p
+                .neighboring_corners()
+                .into_iter()
+                .map(Into::<CornerPosition>::into)
+                .collect(),
+            Self::Low(p) => p
+                .neighboring_corners()
+                .into_iter()
+                .map(Into::<CornerPosition>::into)
+                .collect(),
+        };
+
+        p.into_iter()
     }
 
     fn rights(&self) -> i32 {
@@ -111,6 +128,14 @@ impl CornerHeight<High> {
     pub fn go_up(self) -> CornerHeight<Low> {
         self + CornerHeight::UP
     }
+
+    pub fn neighboring_corners(&self) -> [CornerHeight<Low>; 3] {
+        [
+            *self + CornerHeight::UP,
+            *self + CornerHeight::DOWN_LEFT,
+            *self + CornerHeight::DOWN_RIGHT,
+        ]
+    }
 }
 
 impl Into<CornerPosition> for CornerHeight<High> {
@@ -158,6 +183,14 @@ impl CornerHeight<Low> {
 
     pub fn go_down(self) -> CornerHeight<High> {
         self + CornerHeight::DOWN
+    }
+
+    pub fn neighboring_corners(&self) -> [CornerHeight<High>; 3] {
+        [
+            *self + CornerHeight::DOWN,
+            *self + CornerHeight::UP_LEFT,
+            *self + CornerHeight::UP_RIGHT,
+        ]
     }
 }
 
