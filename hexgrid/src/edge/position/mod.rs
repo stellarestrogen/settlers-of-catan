@@ -56,6 +56,29 @@ impl EdgePosition {
         }
     }
 
+    pub fn neighboring_edges(&self) -> [EdgePosition; 4] {
+        let p: Vec<EdgePosition> = match self {
+            Self::Even(p) => p
+                .neighboring_edges()
+                .into_iter()
+                .flat_map(|(a, b)| [a.into(), b.into()])
+                .collect(),
+            Self::Odd(p) => p
+                .neighboring_edges()
+                .into_iter()
+                .flat_map(|(a, b)| [a.into(), b.into()])
+                .collect(),
+            Self::Positive(p) => p
+                .neighboring_edges()
+                .into_iter()
+                .flat_map(|(a, b)| [a.into(), b.into()])
+                .collect(),
+        };
+
+        p.try_into()
+            .expect("Neighboring Edges is the incorrect size!")
+    }
+
     fn rights(&self) -> i32 {
         match self {
             Self::Even(p) => p.rights,
@@ -92,6 +115,19 @@ impl EdgeOrientation<Even> {
         downs: 2,
         r#type: PhantomData::<Even>,
     };
+
+    pub fn neighboring_edges(&self) -> [(EdgeOrientation<Odd>, EdgeOrientation<Positive>); 2] {
+        [
+            (
+                *self + EdgeOrientation::GO_LEFT,
+                *self + EdgeOrientation::UP_RIGHT,
+            ),
+            (
+                *self + EdgeOrientation::GO_RIGHT,
+                *self + EdgeOrientation::DOWN_LEFT,
+            ),
+        ]
+    }
 }
 
 impl Into<EdgePosition> for EdgeOrientation<Even> {
@@ -126,6 +162,19 @@ impl EdgeOrientation<Odd> {
         downs: -1,
         r#type: PhantomData::<Odd>,
     };
+
+    pub fn neighboring_edges(&self) -> [(EdgeOrientation<Even>, EdgeOrientation<Positive>); 2] {
+        [
+            (
+                *self + EdgeOrientation::GO_LEFT,
+                *self + EdgeOrientation::UP_LEFT,
+            ),
+            (
+                *self + EdgeOrientation::GO_RIGHT,
+                *self + EdgeOrientation::DOWN_RIGHT,
+            ),
+        ]
+    }
 }
 
 impl Into<EdgePosition> for EdgeOrientation<Odd> {
@@ -160,6 +209,19 @@ impl EdgeOrientation<Positive> {
         downs: 1,
         r#type: PhantomData::<Positive>,
     };
+
+    pub fn neighboring_edges(&self) -> [(EdgeOrientation<Even>, EdgeOrientation<Odd>); 2] {
+        [
+            (
+                *self + EdgeOrientation::UP_RIGHT,
+                *self + EdgeOrientation::UP_LEFT,
+            ),
+            (
+                *self + EdgeOrientation::DOWN_LEFT,
+                *self + EdgeOrientation::DOWN_RIGHT,
+            ),
+        ]
+    }
 }
 
 impl Into<EdgePosition> for EdgeOrientation<Positive> {

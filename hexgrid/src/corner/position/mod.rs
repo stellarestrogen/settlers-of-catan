@@ -55,7 +55,8 @@ impl CornerPosition {
                 .collect(),
         };
 
-        p.try_into().expect("Neighboring Corners is the incorrect size!")
+        p.try_into()
+            .expect("Neighboring Corners is the incorrect size!")
     }
 
     fn rights(&self) -> i32 {
