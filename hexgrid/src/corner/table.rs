@@ -1,11 +1,11 @@
 use std::ops::{Index, IndexMut};
 
-use crate::{corner::position::CornerPosition, hex::{position::HexPosition, table::HexTable}};
-
-use super::{
-    bounds::CornerBounds,
-    position::{CornerHeight, Height},
+use crate::{
+    corner::position::CornerPosition,
+    hex::{position::HexPosition, table::HexTable},
 };
+
+use super::{bounds::CornerBounds, position::CornerHeight};
 
 #[derive(Debug)]
 pub struct CornerTable<T> {
@@ -17,7 +17,7 @@ impl CornerPosition {
     fn structural_owner(&self) -> HexPosition {
         match *self {
             CornerPosition::High(p) => p + CornerHeight::UP_RIGHT,
-            CornerPosition::Low(p) => p + CornerHeight::DOWN_RIGHT
+            CornerPosition::Low(p) => p + CornerHeight::DOWN_RIGHT,
         }
     }
 }
@@ -41,7 +41,7 @@ impl<T> CornerTable<T> {
 
         match position {
             CornerPosition::High(_) => bottom.as_ref(),
-            CornerPosition::Low(_) => top.as_ref()
+            CornerPosition::Low(_) => top.as_ref(),
         }
     }
 
@@ -56,7 +56,7 @@ impl<T> CornerTable<T> {
 
         match position {
             CornerPosition::High(_) => bottom.as_mut(),
-            CornerPosition::Low(_) => top.as_mut()
+            CornerPosition::Low(_) => top.as_mut(),
         }
     }
 

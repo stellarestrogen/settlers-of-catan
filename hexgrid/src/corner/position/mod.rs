@@ -12,31 +12,8 @@ pub struct Low;
 #[derive(Debug)]
 pub struct High;
 
+#[derive(Debug)]
 pub struct Center;
-
-pub trait Height {
-    fn is_low() -> bool;
-    fn is_high() -> bool;
-}
-
-impl Height for Low {
-    fn is_low() -> bool {
-        true
-    }
-
-    fn is_high() -> bool {
-        false
-    }
-}
-impl Height for High {
-    fn is_low() -> bool {
-        false
-    }
-
-    fn is_high() -> bool {
-        true
-    }
-}
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum CornerPosition {
@@ -218,58 +195,6 @@ impl CornerHeight<Center> {
         downs: -2,
         height: PhantomData::<Center>,
     };
-}
-
-impl<H: Height> CornerHeight<H> {
-    pub fn is_low(&self) -> bool {
-        H::is_low()
-    }
-
-    pub fn is_high(&self) -> bool {
-        H::is_high()
-    }
-
-    pub fn as_low(&self) -> Option<CornerHeight<Low>> {
-        if self.is_low() {
-            Some(CornerHeight {
-                rights: self.rights,
-                downs: self.downs,
-                height: PhantomData::<Low>,
-            })
-        } else {
-            None
-        }
-    }
-
-    pub fn as_high(&self) -> Option<CornerHeight<High>> {
-        if self.is_high() {
-            Some(CornerHeight {
-                rights: self.rights,
-                downs: self.downs,
-                height: PhantomData::<High>,
-            })
-        } else {
-            None
-        }
-    }
-
-    pub fn neighboring_hex(&self) -> [HexPosition; 3] {
-        if let Some(p) = self.as_low() {
-            [
-                p + CornerHeight::UP,
-                p + CornerHeight::DOWN_LEFT,
-                p + CornerHeight::DOWN_RIGHT,
-            ]
-        } else if let Some(p) = self.as_high() {
-            [
-                p + CornerHeight::UP_LEFT,
-                p + CornerHeight::UP_RIGHT,
-                p + CornerHeight::DOWN,
-            ]
-        } else {
-            unreachable!()
-        }
-    }
 }
 
 impl<H> Clone for CornerHeight<H> {

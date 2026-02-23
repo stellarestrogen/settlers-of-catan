@@ -1,9 +1,5 @@
 use hexgrid::{
-    corner::{
-        bounds::CornerBounds,
-        position::{CornerHeight, CornerPosition, Height},
-        table::CornerTable,
-    },
+    corner::{bounds::CornerBounds, position::CornerPosition, table::CornerTable},
     edge::{
         bounds::EdgeBounds,
         position::{EdgePosition, Valid},

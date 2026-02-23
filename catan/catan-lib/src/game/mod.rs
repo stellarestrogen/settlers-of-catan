@@ -5,7 +5,7 @@ pub mod hand;
 pub mod player;
 
 use hexgrid::{
-    corner::position::{CornerHeight, CornerPosition, Height},
+    corner::position::CornerPosition,
     edge::position::{EdgePosition, Valid},
     hex::position::HexPosition,
 };

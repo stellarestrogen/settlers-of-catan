@@ -1,7 +1,4 @@
-use hexgrid::corner::{
-    position::{CornerHeight, CornerPosition, Height},
-    table::CornerTable,
-};
+use hexgrid::corner::{position::CornerPosition, table::CornerTable};
 
 use crate::{
     game::player::OwnershipToken,
