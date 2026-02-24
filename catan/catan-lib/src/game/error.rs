@@ -13,7 +13,9 @@ pub enum BuildError {
         insufficient_resources: Vec<ResourceCard>,
     },
     StructureAlreadyExists,
+    BuildingIsTooCloseToExisting,
     CityRequiresSettlement,
+    CityUpgradeTokenMismatch,
     NoStructures {
         token: OwnershipToken,
         structure: StructureType,
@@ -37,7 +39,9 @@ impl fmt::Display for BuildError {
                 )
             }
             BuildError::StructureAlreadyExists => write!(f, ""),
+            BuildError::BuildingIsTooCloseToExisting => write!(f, ""),
             BuildError::CityRequiresSettlement => write!(f, ""),
+            BuildError::CityUpgradeTokenMismatch => write!(f, ""),
             BuildError::NoStructures { token, structure } => write!(
                 f,
                 "The player with {:?} token has no {:?} structures left!",

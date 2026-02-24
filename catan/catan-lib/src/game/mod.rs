@@ -16,7 +16,6 @@ use crate::{
     },
     object::{
         card::ResourceMap,
-        resource::ResourceType,
         structure::{
             building::{Building, BuildingType},
             transport::Transport,
@@ -49,18 +48,39 @@ impl Game {
         self.board.get_building(position)
     }
 
+    pub fn can_play_building(
+        &self,
+        building: Building,
+        position: CornerPosition,
+    ) -> Result<(), BuildError> {
+        for p in self.board.neighboring_corners(position) {
+            if self.find_building(p).is_some() {
+                return Err(BuildError::BuildingIsTooCloseToExisting)
+            }
+        }
+
+        match (building.r#type(), self.find_building(position)) {
+            (BuildingType::Settlement, Some(_)) => Err(BuildError::StructureAlreadyExists),
+            (BuildingType::City, Some(b)) => {
+                if b.r#type() == BuildingType::City {
+                    Err(BuildError::StructureAlreadyExists)
+                } else if building.owner() != b.owner() {
+                    Err(BuildError::CityUpgradeTokenMismatch)
+                } else {
+                    Ok(())
+                }
+            }
+            (BuildingType::Settlement, None) => Ok(()),
+            (BuildingType::City, None) => Err(BuildError::CityRequiresSettlement),
+        }
+    }
+
     pub fn play_building(
         &mut self,
         building: Building,
         position: CornerPosition,
     ) -> Result<(), BuildError> {
-        if let Some(b) = self.find_building(position)
-            && (b.r#type() == BuildingType::City || b.r#type() == building.r#type())
-        {
-            return Err(BuildError::StructureAlreadyExists);
-        } else if building.r#type() == BuildingType::City {
-            return Err(BuildError::CityRequiresSettlement);
-        }
+        self.can_play_building(building, position)?;
 
         let player = self.find_player_mut(building.owner());
 

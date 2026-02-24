@@ -7,10 +7,13 @@ use hexgrid::{
 use crate::{
     game::edition::GameEdition,
     object::{
-        CornerData, EdgeData, Robber, TileData, TileType, resource::ResourceType, structure::{
+        CornerData, EdgeData, Robber, TileData, TileType,
+        resource::ResourceType,
+        structure::{
             building::{Building, BuildingStore},
             transport::{Transport, TransportStore},
-        }, trade::{TradeStore, TradeType}
+        },
+        trade::{TradeStore, TradeType},
     },
 };
 
@@ -103,6 +106,21 @@ impl Board {
             }
         }
         tiles.into_iter()
+    }
+
+    pub fn neighboring_corners(
+        &self,
+        position: CornerPosition,
+    ) -> impl Iterator<Item = CornerPosition> {
+        let mut corners: Vec<CornerPosition> = Vec::with_capacity(3);
+
+        for p in position.neighboring_corners().into_iter() {
+            if self.corners.get_bounds().contains(p) {
+                corners.push(p)
+            }
+        }
+
+        corners.into_iter()
     }
 
     // TODO: Create error handler instead of expecting the position.

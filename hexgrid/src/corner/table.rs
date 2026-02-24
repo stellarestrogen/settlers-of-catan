@@ -30,6 +30,10 @@ impl<T> CornerTable<T> {
         }
     }
 
+    pub fn get_bounds(&self) -> &CornerBounds {
+        &self.bounds
+    }
+
     pub fn get(&self, position: CornerPosition) -> Option<&T> {
         if !self.bounds.contains(position) {
             return None;
