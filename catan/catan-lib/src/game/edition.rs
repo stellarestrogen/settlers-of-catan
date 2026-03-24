@@ -1,7 +1,7 @@
 use std::iter;
 
 use hexgrid::hex::{iterators::spiral::HexSpiral, position::HexPosition};
-use rand::seq::SliceRandom;
+use rand::prelude::*;
 
 use crate::object::{
     TileData,

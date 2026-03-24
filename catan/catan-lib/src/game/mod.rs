@@ -28,11 +28,14 @@ pub struct Game {
     // main members
     board: Board,
     players: Vec<Player>,
+    current_turn: OwnershipToken,
     // redundant data for ease of use
     buildings: Vec<(Building, Vec<HexPosition>)>,
 }
 
 impl Game {
+    pub fn tick(&mut self, roll: u8) {}
+
     pub fn find_player(&self, token: OwnershipToken) -> &Player {
         self.players.iter().find(|p| p.token() == token).unwrap()
     }
@@ -44,6 +47,17 @@ impl Game {
             .unwrap()
     }
 
+    pub fn next_turn(&mut self) {
+        self.current_turn = self
+            .players
+            .iter()
+            .cycle()
+            .skip_while(|p| p.token() != self.current_turn)
+            .next()
+            .unwrap()
+            .token();
+    }
+
     pub fn find_building(&self, position: CornerPosition) -> Option<Building> {
         self.board.get_building(position)
     }
@@ -53,9 +67,13 @@ impl Game {
         building: Building,
         position: CornerPosition,
     ) -> Result<(), BuildError> {
+        // todo!
+        // check if the building is connected to at least 1 road of the same ownership, and
+        // that it is not able to cut off 2 roads of different ownership (only applies to settlements)
+
         for p in self.board.neighboring_corners(position) {
             if self.find_building(p).is_some() {
-                return Err(BuildError::BuildingIsTooCloseToExisting)
+                return Err(BuildError::BuildingIsTooCloseToExisting);
             }
         }
 
