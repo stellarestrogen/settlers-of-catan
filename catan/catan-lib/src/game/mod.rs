@@ -31,6 +31,7 @@ pub struct Game {
     current_turn: OwnershipToken,
     // redundant data for ease of use
     buildings: Vec<(Building, Vec<HexPosition>)>,
+    transports: Vec<(OwnershipToken, Vec<EdgePosition>)>,
 }
 
 impl Game {
@@ -138,6 +139,8 @@ impl Game {
             .set_transport(transport, position)
             .expect("Invalid position!");
 
+        self.get_transports_mut(transport.owner()).push(position);
+
         Ok(())
     }
 
@@ -170,5 +173,39 @@ impl Game {
 
             player.add_resources(resources);
         }
+    }
+
+    pub fn calculate_longest_road(&self, player_token: OwnershipToken) -> u32 {
+        let roads = self.get_transports(player_token);
+
+        let last_road = match roads.last() {
+            Some(r) => *r,
+            None => return 0,
+        };
+
+        let mut counted_roads = Vec::<EdgePosition>::with_capacity(roads.len());
+        counted_roads.push(last_road);
+
+        // now for the main logic...
+        
+        0
+    }
+
+    fn get_transports(&self, player_token: OwnershipToken) -> &Vec<EdgePosition> {
+        let (_, roads) = self
+            .transports
+            .iter()
+            .find(|(token, _)| player_token == *token)
+            .expect("Invalid OwnershipToken!");
+        roads
+    }
+
+    fn get_transports_mut(&mut self, player_token: OwnershipToken) -> &mut Vec<EdgePosition> {
+        let (_, roads) = self
+            .transports
+            .iter_mut()
+            .find(|(token, _)| player_token == *token)
+            .expect("Invalid OwnershipToken!");
+        roads
     }
 }
