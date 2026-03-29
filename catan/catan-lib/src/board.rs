@@ -99,28 +99,27 @@ impl Board {
         &self,
         position: CornerPosition,
     ) -> impl Iterator<Item = HexPosition> {
-        let mut tiles: Vec<HexPosition> = Vec::with_capacity(3);
-        for t in position.neighboring_hex().into_iter() {
-            if self.tiles.get_bounds().contains(t) {
-                tiles.push(t)
-            }
-        }
-        tiles.into_iter()
+        position
+            .neighboring_hex()
+            .into_iter()
+            .filter(|p| self.tiles.get_bounds().contains(*p))
     }
 
     pub fn neighboring_corners(
         &self,
         position: CornerPosition,
     ) -> impl Iterator<Item = CornerPosition> {
-        let mut corners: Vec<CornerPosition> = Vec::with_capacity(3);
+        position
+            .neighboring_corners()
+            .into_iter()
+            .filter(|p| self.corners.get_bounds().contains(*p))
+    }
 
-        for p in position.neighboring_corners().into_iter() {
-            if self.corners.get_bounds().contains(p) {
-                corners.push(p)
-            }
-        }
-
-        corners.into_iter()
+    pub fn neighboring_edges(&self, position: EdgePosition) -> impl Iterator<Item = EdgePosition> {
+        position
+            .neighboring_edges()
+            .into_iter()
+            .filter(|p| self.edges.get_bounds().contains(*p))
     }
 
     // TODO: Create error handler instead of expecting the position.

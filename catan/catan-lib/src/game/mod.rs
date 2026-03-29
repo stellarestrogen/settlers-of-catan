@@ -3,6 +3,7 @@ pub mod edition;
 pub mod error;
 pub mod hand;
 pub mod player;
+pub mod transport_segment;
 
 use hexgrid::{
     corner::position::CornerPosition, edge::position::EdgePosition, hex::position::HexPosition,
@@ -13,6 +14,7 @@ use crate::{
     game::{
         error::BuildError,
         player::{OwnershipToken, Player},
+        transport_segment::TransportSegment,
     },
     object::{
         card::ResourceMap,
@@ -31,7 +33,7 @@ pub struct Game {
     current_turn: OwnershipToken,
     // redundant data for ease of use
     buildings: Vec<(Building, Vec<HexPosition>)>,
-    transports: Vec<(OwnershipToken, Vec<EdgePosition>)>,
+    transports: Vec<(OwnershipToken, EdgePosition)>,
 }
 
 impl Game {
@@ -139,7 +141,7 @@ impl Game {
             .set_transport(transport, position)
             .expect("Invalid position!");
 
-        self.get_transports_mut(transport.owner()).push(position);
+        self.update_last_played_transport(transport.owner(), position);
 
         Ok(())
     }
@@ -175,37 +177,46 @@ impl Game {
         }
     }
 
-    pub fn calculate_longest_road(&self, player_token: OwnershipToken) -> u32 {
-        let roads = self.get_transports(player_token);
-
-        let last_road = match roads.last() {
-            Some(r) => *r,
+    pub fn calculate_longest_road(&self, owner: OwnershipToken) -> u32 {
+        let last_road = match self.get_last_played_transport(owner) {
+            Some(p) => p,
             None => return 0,
         };
 
-        let mut counted_roads = Vec::<EdgePosition>::with_capacity(roads.len());
-        counted_roads.push(last_road);
-
         // now for the main logic...
-        
+
         0
     }
 
-    fn get_transports(&self, player_token: OwnershipToken) -> &Vec<EdgePosition> {
-        let (_, roads) = self
-            .transports
-            .iter()
-            .find(|(token, _)| player_token == *token)
-            .expect("Invalid OwnershipToken!");
-        roads
+    fn advance_segments(
+        &self,
+        segments: impl Iterator<Item = TransportSegment>,
+    ) -> impl Iterator<Item = TransportSegment> {
     }
 
-    fn get_transports_mut(&mut self, player_token: OwnershipToken) -> &mut Vec<EdgePosition> {
-        let (_, roads) = self
-            .transports
-            .iter_mut()
-            .find(|(token, _)| player_token == *token)
-            .expect("Invalid OwnershipToken!");
-        roads
+    fn neighboring_transport(
+        &self,
+        owner: OwnershipToken,
+        position: EdgePosition,
+    ) -> impl Iterator<Item = EdgePosition> {
+        self.board.neighboring_edges(position).filter(move |p| {
+            self.board
+                .get_transport(*p)
+                .is_some_and(|t| t.owner() == owner)
+        })
+    }
+
+    fn update_last_played_transport(&mut self, owner: OwnershipToken, position: EdgePosition) {
+        if let Some((_, p)) = self.transports.iter_mut().find(|(o, _)| *o == owner) {
+            *p = position;
+        }
+    }
+
+    fn get_last_played_transport(&self, owner: OwnershipToken) -> Option<EdgePosition> {
+        if let Some((_, p)) = self.transports.iter().find(|(o, _)| *o == owner).copied() {
+            Some(p)
+        } else {
+            None
+        }
     }
 }

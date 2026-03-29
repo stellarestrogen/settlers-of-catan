@@ -31,6 +31,10 @@ impl<T> EdgeTable<T> {
         }
     }
 
+    pub fn get_bounds(&self) -> &EdgeBounds {
+        &self.bounds
+    }
+
     pub fn get(&self, position: EdgePosition) -> Option<&T> {
         if !self.bounds.contains(position) {
             return None;
