@@ -183,6 +183,9 @@ impl Game {
             None => return 0,
         };
 
+        let segment = TransportSegment::new(owner, last_road);
+        
+
         // now for the main logic...
 
         0
@@ -190,15 +193,35 @@ impl Game {
 
     fn advance_segments(
         &self,
-        segments: impl Iterator<Item = TransportSegment>,
-    ) -> impl Iterator<Item = TransportSegment> {
+        segments: impl Iterator<Item = TransportSegment> + Clone,
+    ) -> impl Iterator<Item = TransportSegment> + Clone {
+        let mut new_segments: Vec<TransportSegment> = Vec::with_capacity(segments.clone().count());
+
+        for segment in segments {
+            let next_positions =
+                self.neighboring_transport(segment.owner(), segment.current_position());
+            let next_positions = segment.next_positions(next_positions);
+
+            if next_positions.clone().count() == 0 {
+                new_segments.push(segment.clone());
+                continue;
+            }
+
+            for position in next_positions {
+                let mut new_segment = segment.clone();
+                new_segment.update(position);
+                new_segments.push(new_segment);
+            }
+        }
+
+        new_segments.into_iter()
     }
 
     fn neighboring_transport(
         &self,
         owner: OwnershipToken,
         position: EdgePosition,
-    ) -> impl Iterator<Item = EdgePosition> {
+    ) -> impl Iterator<Item = EdgePosition> + Clone {
         self.board.neighboring_edges(position).filter(move |p| {
             self.board
                 .get_transport(*p)

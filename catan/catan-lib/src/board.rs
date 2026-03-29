@@ -98,7 +98,7 @@ impl Board {
     pub fn neighboring_hex_for_corner(
         &self,
         position: CornerPosition,
-    ) -> impl Iterator<Item = HexPosition> {
+    ) -> impl Iterator<Item = HexPosition> + Clone {
         position
             .neighboring_hex()
             .into_iter()
@@ -108,14 +108,17 @@ impl Board {
     pub fn neighboring_corners(
         &self,
         position: CornerPosition,
-    ) -> impl Iterator<Item = CornerPosition> {
+    ) -> impl Iterator<Item = CornerPosition> + Clone {
         position
             .neighboring_corners()
             .into_iter()
             .filter(|p| self.corners.get_bounds().contains(*p))
     }
 
-    pub fn neighboring_edges(&self, position: EdgePosition) -> impl Iterator<Item = EdgePosition> {
+    pub fn neighboring_edges(
+        &self,
+        position: EdgePosition,
+    ) -> impl Iterator<Item = EdgePosition> + Clone {
         position
             .neighboring_edges()
             .into_iter()
