@@ -7,6 +7,7 @@ pub struct TransportSegment {
     history: Vec<EdgePosition>,
     current: EdgePosition,
     owner: OwnershipToken,
+    finished_advancing: bool,
 }
 
 impl TransportSegment {
@@ -15,13 +16,14 @@ impl TransportSegment {
             history: Vec::new(),
             current: position,
             owner,
+            finished_advancing: false,
         }
     }
 
     pub fn next_positions(
         &self,
         neighbors: impl Iterator<Item = EdgePosition> + Clone,
-    ) -> impl Iterator<Item = EdgePosition> + Clone{
+    ) -> impl Iterator<Item = EdgePosition> + Clone {
         neighbors.filter(|p| {
             self.history.iter().find(|h| **h == *p).is_none() && self.is_position_behind_current(*p)
         })
@@ -42,6 +44,10 @@ impl TransportSegment {
 
     pub fn current_position(&self) -> EdgePosition {
         self.current
+    }
+
+    pub fn finished(&mut self) {
+        self.finished_advancing = true;
     }
 
     fn is_position_behind_current(&self, position: EdgePosition) -> bool {

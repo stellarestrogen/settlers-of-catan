@@ -5,6 +5,8 @@ pub mod hand;
 pub mod player;
 pub mod transport_segment;
 
+use std::iter;
+
 use hexgrid::{
     corner::position::CornerPosition, edge::position::EdgePosition, hex::position::HexPosition,
 };
@@ -184,7 +186,8 @@ impl Game {
         };
 
         let segment = TransportSegment::new(owner, last_road);
-        
+
+        let mut segments = iter::once(segment);
 
         // now for the main logic...
 
@@ -203,7 +206,9 @@ impl Game {
             let next_positions = segment.next_positions(next_positions);
 
             if next_positions.clone().count() == 0 {
-                new_segments.push(segment.clone());
+                let mut new_segment = segment.clone();
+                new_segment.finished();
+                new_segments.push(new_segment);
                 continue;
             }
 
