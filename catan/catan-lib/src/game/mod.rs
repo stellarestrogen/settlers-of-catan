@@ -189,7 +189,9 @@ impl Game {
 
         let mut segments = iter::once(segment);
 
-        // now for the main logic...
+        while !self.all_segments_finished(segments.clone()) {
+            segments = self.advance_segments(segments);
+        }
 
         0
     }
@@ -234,6 +236,18 @@ impl Game {
         })
     }
 
+    fn all_segments_finished(&self, segments: impl Iterator<Item = TransportSegment> + Clone) -> bool {
+        for segment in segments {
+            if segment.is_finished() {
+                continue;
+            } else {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
     fn update_last_played_transport(&mut self, owner: OwnershipToken, position: EdgePosition) {
         if let Some((_, p)) = self.transports.iter_mut().find(|(o, _)| *o == owner) {
             *p = position;
@@ -248,3 +262,13 @@ impl Game {
         }
     }
 }
+
+/* 7,
+ * 7,
+ * 8, 
+ * 10,
+ * 6,
+ * 8,
+ * 9,
+ * 
+*/

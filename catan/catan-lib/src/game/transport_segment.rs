@@ -50,11 +50,15 @@ impl TransportSegment {
         self.finished_advancing = true;
     }
 
+    pub fn is_finished(&self) -> bool {
+        self.finished_advancing
+    }
+
     fn is_position_behind_current(&self, position: EdgePosition) -> bool {
-        position
-            .neighboring_edges()
-            .into_iter()
-            .find(|p| Some(*p) == self.history.last().copied())
-            .is_some()
+        if let Some(last) = self.history.last() {
+            position.is_neighbor(*last)
+        } else {
+            false
+        }
     }
 }

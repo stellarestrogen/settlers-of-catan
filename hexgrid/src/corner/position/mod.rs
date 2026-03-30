@@ -59,6 +59,10 @@ impl CornerPosition {
             .expect("Neighboring Corners is the incorrect size!")
     }
 
+    pub fn is_neighbor(&self, other: Self) -> bool {
+        (self.horizontal_distance(other).abs() + self.vertical_distance(other).abs()) == 2
+    }
+
     fn rights(&self) -> i32 {
         match self {
             Self::High(p) => p.rights,
