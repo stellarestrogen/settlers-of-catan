@@ -38,12 +38,17 @@ impl TransportSegment {
         self.history.iter().find(|p| **p == position).is_some()
     }
 
+    /// This function short-circuits; once it finds a position that is not shared by both, it returns the overlap.
+    /// This keeps the time <= O(n), where n is the length of the shorter segment.
+    /// If a segment overlaps later, it will (usually) produce a non-contiguous segment of transports.
     pub fn history_overlap(&self, other: &Self) -> u32 {
         let mut overlap = 0;
 
         for (first, second) in self.history.iter().zip(other.history.iter()) {
             if *first == *second {
                 overlap += 1;
+            } else {
+                break;
             }
         }
 
@@ -64,6 +69,24 @@ impl TransportSegment {
 
     pub fn is_finished(&self) -> bool {
         self.finished_advancing
+    }
+
+    pub fn length(&self) -> u32 {
+        self.history.len() as u32
+    }
+
+    pub fn is_continuous(&self) -> Option<bool> {
+        let mut history = self.history.iter();
+        let mut previous_position = *history.next()?;
+        for position in history {
+            if previous_position.is_neighbor(*position) {
+                previous_position = *position;
+                continue;
+            } else {
+                return Some(false);
+            }
+        }
+        Some(true)
     }
 
     fn is_position_behind_current(&self, position: EdgePosition) -> bool {

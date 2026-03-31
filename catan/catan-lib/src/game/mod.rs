@@ -14,6 +14,7 @@ use hexgrid::{
 use crate::{
     board::Board,
     game::{
+        edition::GameEdition,
         error::BuildError,
         player::{OwnershipToken, Player},
         transport_segment::TransportSegment,
@@ -39,6 +40,24 @@ pub struct Game {
 }
 
 impl Game {
+    pub fn new(edition: impl GameEdition, player_count: u32) -> Self {
+        let mut players = Vec::with_capacity(player_count as usize);
+        let owned_structures = edition.get_start_structures();
+        for _ in 0..player_count {
+            players.push(Player::new(owned_structures))
+        }
+
+        let current_turn = players.get(0).expect("Not enough players!").token();
+
+        Self {
+            board: Board::new(edition),
+            players,
+            current_turn,
+            buildings: Vec::new(),
+            transports: Vec::new(),
+        }
+    }
+
     pub fn tick(&mut self, roll: u8) {}
 
     pub fn find_player(&self, token: OwnershipToken) -> &Player {
@@ -195,11 +214,12 @@ impl Game {
 
         // the 2 longest segments with the least overlap combined is the longest road
 
-
         0
     }
 
-
+    fn find_longest_segment(&self, segments: impl Iterator<Item = TransportSegment> + Clone) -> TransportSegment {
+        
+    }
 
     fn advance_segments(
         &self,
