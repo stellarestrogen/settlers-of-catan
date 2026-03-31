@@ -1,15 +1,15 @@
 use std::marker::PhantomData;
 use std::ops::{Mul, MulAssign};
 
-use super::{CornerPosition, Low};
+use super::{CornerHeight, Low};
 
 macro_rules! scalar_operations {
     ($scalar: ty) => {
-        impl Mul<$scalar> for CornerPosition<Low> {
-            type Output = CornerPosition<Low>;
+        impl Mul<$scalar> for CornerHeight<Low> {
+            type Output = CornerHeight<Low>;
 
-            fn mul(self, rhs: $scalar) -> CornerPosition<Low> {
-                CornerPosition::<Low> {
+            fn mul(self, rhs: $scalar) -> CornerHeight<Low> {
+                CornerHeight::<Low> {
                     rights: self.rights * rhs as i32,
                     downs: self.downs * rhs as i32,
                     height: PhantomData::<Low>,
@@ -17,18 +17,18 @@ macro_rules! scalar_operations {
             }
         }
 
-        impl MulAssign<$scalar> for CornerPosition<Low> {
+        impl MulAssign<$scalar> for CornerHeight<Low> {
             fn mul_assign(&mut self, rhs: $scalar) {
                 self.rights *= rhs as i32;
                 self.downs *= rhs as i32;
             }
         }
 
-        impl Mul<CornerPosition<Low>> for $scalar {
-            type Output = CornerPosition<Low>;
+        impl Mul<CornerHeight<Low>> for $scalar {
+            type Output = CornerHeight<Low>;
 
-            fn mul(self, rhs: CornerPosition<Low>) -> CornerPosition<Low> {
-                CornerPosition::<Low> {
+            fn mul(self, rhs: CornerHeight<Low>) -> CornerHeight<Low> {
+                CornerHeight::<Low> {
                     rights: self as i32 * rhs.rights,
                     downs: self as i32 * rhs.downs,
                     height: PhantomData::<Low>,

@@ -3,15 +3,15 @@ use std::ops::Sub;
 
 use crate::hex::position::HexPosition;
 
-use super::{EdgePosition, Even, Negative, Odd, Positive, Valid};
+use super::{EdgeOrientation, Even, Negative, Odd, Positive};
 
 macro_rules! edge_sub {
     ($lhs: ty, $rhs: ty, $out: ty) => {
-        impl Sub<EdgePosition<$rhs>> for EdgePosition<$lhs> {
-            type Output = EdgePosition<$out>;
+        impl Sub<EdgeOrientation<$rhs>> for EdgeOrientation<$lhs> {
+            type Output = EdgeOrientation<$out>;
 
-            fn sub(self, rhs: EdgePosition<$rhs>) -> Self::Output {
-                EdgePosition::<$out> {
+            fn sub(self, rhs: EdgeOrientation<$rhs>) -> Self::Output {
+                EdgeOrientation::<$out> {
                     rights: self.rights - rhs.rights,
                     downs: self.downs - rhs.downs,
                     r#type: PhantomData::<$out>,
@@ -23,10 +23,10 @@ macro_rules! edge_sub {
 
 macro_rules! edge_to_hex {
     ($lhs: ty, $rhs: ty) => {
-        impl Sub<EdgePosition<$rhs>> for EdgePosition<$lhs> {
+        impl Sub<EdgeOrientation<$rhs>> for EdgeOrientation<$lhs> {
             type Output = HexPosition;
 
-            fn sub(self, rhs: EdgePosition<$rhs>) -> Self::Output {
+            fn sub(self, rhs: EdgeOrientation<$rhs>) -> Self::Output {
                 let rights = self.rights - rhs.rights;
                 let downs = self.downs - rhs.downs;
 
@@ -42,32 +42,36 @@ macro_rules! edge_to_hex {
     };
 }
 
-impl<Type: Valid> Sub<HexPosition> for EdgePosition<Type> {
-    type Output = EdgePosition<Type>;
+macro_rules! hex_to_edge {
+    ($t: ty) => {
+        impl Sub<HexPosition> for EdgeOrientation<$t> {
+            type Output = EdgeOrientation<$t>;
 
-    fn sub(self, rhs: HexPosition) -> Self::Output {
-        let shift: f64 = rhs.horizontal_distance(HexPosition::ORIGIN).into();
+            fn sub(self, rhs: HexPosition) -> Self::Output {
+                let shift: f64 = rhs.horizontal_distance(HexPosition::ORIGIN).into();
 
-        EdgePosition::<Type> {
-            rights: self.rights + (shift * 4.) as i32,
-            downs: self.downs + rhs.vertical_distance(HexPosition::ORIGIN) * 2,
-            r#type: PhantomData::<Type>,
+                EdgeOrientation::<$t> {
+                    rights: self.rights + (shift * 4.) as i32,
+                    downs: self.downs + rhs.vertical_distance(HexPosition::ORIGIN) * 2,
+                    r#type: PhantomData::<$t>,
+                }
+            }
         }
-    }
-}
 
-impl<Type: Valid> Sub<EdgePosition<Type>> for HexPosition {
-    type Output = EdgePosition<Type>;
+        impl Sub<EdgeOrientation<$t>> for HexPosition {
+            type Output = EdgeOrientation<$t>;
 
-    fn sub(self, rhs: EdgePosition<Type>) -> Self::Output {
-        let shift: f64 = self.horizontal_distance(HexPosition::ORIGIN).into();
+            fn sub(self, rhs: EdgeOrientation<$t>) -> Self::Output {
+                let shift: f64 = self.horizontal_distance(HexPosition::ORIGIN).into();
 
-        EdgePosition::<Type> {
-            rights: rhs.rights + (shift * 4.) as i32,
-            downs: rhs.downs + self.vertical_distance(HexPosition::ORIGIN) * 2,
-            r#type: PhantomData::<Type>,
+                EdgeOrientation::<$t> {
+                    rights: rhs.rights + (shift * 4.) as i32,
+                    downs: rhs.downs + self.vertical_distance(HexPosition::ORIGIN) * 2,
+                    r#type: PhantomData::<$t>,
+                }
+            }
         }
-    }
+    };
 }
 
 edge_sub!(Even, Even, Even);
@@ -90,3 +94,7 @@ edge_to_hex!(Even, Negative);
 edge_to_hex!(Negative, Even);
 edge_to_hex!(Odd, Positive);
 edge_to_hex!(Positive, Odd);
+
+hex_to_edge!(Even);
+hex_to_edge!(Odd);
+hex_to_edge!(Positive);

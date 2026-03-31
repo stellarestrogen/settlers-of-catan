@@ -1,4 +1,7 @@
-use crate::{corner::position::{CornerPosition, High, Low}, hex::position::HexPosition};
+use crate::{
+    corner::position::{CornerHeight, High, Low},
+    hex::position::HexPosition,
+};
 
 #[derive(Clone, Copy, PartialEq)]
 enum Direction {
@@ -31,7 +34,7 @@ impl Iterator for Direction {
 
 #[derive(Clone, Copy)]
 pub struct CornerRing {
-    positions: (CornerPosition<Low>, CornerPosition<High>),
+    positions: (CornerHeight<Low>, CornerHeight<High>),
     shortest: u32,
     longest: u32,
     remaining: u32,
@@ -42,8 +45,10 @@ impl CornerRing {
     pub fn new(shortest: u32, longest: u32) -> Self {
         CornerRing {
             positions: (
-                (HexPosition::ORIGIN + CornerPosition::TOP_LEFT) + CornerPosition::UP_LEFT + CornerPosition::DOWN_LEFT,
-                (HexPosition::ORIGIN + CornerPosition::TOP_LEFT) + CornerPosition::UP_LEFT,
+                (HexPosition::ORIGIN + CornerHeight::TOP_LEFT)
+                    + CornerHeight::UP_LEFT
+                    + CornerHeight::DOWN_LEFT,
+                (HexPosition::ORIGIN + CornerHeight::TOP_LEFT) + CornerHeight::UP_LEFT,
             ),
             shortest,
             longest,
@@ -111,7 +116,7 @@ impl CornerRing {
 }
 
 impl Iterator for CornerRing {
-    type Item = (CornerPosition<Low>, CornerPosition<High>);
+    type Item = (CornerHeight<Low>, CornerHeight<High>);
 
     fn next(&mut self) -> Option<Self::Item> {
         if self.remaining == 0 {

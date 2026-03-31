@@ -1,11 +1,11 @@
 use std::ops::{Index, IndexMut};
 
-use crate::hex::{position::HexPosition, table::HexTable};
-
-use super::{
-    bounds::CornerBounds,
-    position::{CornerPosition, Height},
+use crate::{
+    corner::position::CornerPosition,
+    hex::{position::HexPosition, table::HexTable},
 };
+
+use super::{bounds::CornerBounds, position::CornerHeight};
 
 #[derive(Debug)]
 pub struct CornerTable<T> {
@@ -13,14 +13,11 @@ pub struct CornerTable<T> {
     bounds: CornerBounds,
 }
 
-impl<H: Height> CornerPosition<H> {
+impl CornerPosition {
     fn structural_owner(&self) -> HexPosition {
-        if let Some(p) = self.as_low() {
-            p + CornerPosition::DOWN_RIGHT
-        } else if let Some(p) = self.as_high() {
-            p + CornerPosition::UP_RIGHT
-        } else {
-            unreachable!()
+        match *self {
+            CornerPosition::High(p) => p + CornerHeight::UP_RIGHT,
+            CornerPosition::Low(p) => p + CornerHeight::DOWN_RIGHT,
         }
     }
 }
@@ -33,7 +30,11 @@ impl<T> CornerTable<T> {
         }
     }
 
-    pub fn get<H: Height>(&self, position: CornerPosition<H>) -> Option<&T> {
+    pub fn get_bounds(&self) -> &CornerBounds {
+        &self.bounds
+    }
+
+    pub fn get(&self, position: CornerPosition) -> Option<&T> {
         if !self.bounds.contains(position) {
             return None;
         }
@@ -42,16 +43,13 @@ impl<T> CornerTable<T> {
 
         let (top, bottom) = &self.data.get(hex)?;
 
-        if position.is_low() {
-            top.as_ref()
-        } else if position.is_high() {
-            bottom.as_ref()
-        } else {
-            unreachable!()
+        match position {
+            CornerPosition::High(_) => bottom.as_ref(),
+            CornerPosition::Low(_) => top.as_ref(),
         }
     }
 
-    pub fn get_mut<H: Height>(&mut self, position: CornerPosition<H>) -> Option<&mut T> {
+    pub fn get_mut(&mut self, position: CornerPosition) -> Option<&mut T> {
         if !self.bounds.contains(position) {
             return None;
         }
@@ -60,28 +58,22 @@ impl<T> CornerTable<T> {
 
         let (top, bottom) = self.data.get_mut(hex)?;
 
-        if position.is_low() {
-            top.as_mut()
-        } else if position.is_high() {
-            bottom.as_mut()
-        } else {
-            unreachable!()
+        match position {
+            CornerPosition::High(_) => bottom.as_mut(),
+            CornerPosition::Low(_) => top.as_mut(),
         }
     }
 
-    pub fn set<H: Height>(&mut self, position: CornerPosition<H>, data: T) -> Result<(), ()> {
+    pub fn set(&mut self, position: CornerPosition, data: T) -> Result<(), ()> {
         if !self.bounds.contains(position) {
             return Err(());
         }
 
         let d = &mut self.data[position.structural_owner()];
 
-        if position.is_low() {
-            d.0 = Some(data);
-        } else if position.is_high() {
-            d.1 = Some(data);
-        } else {
-            unreachable!()
+        match position {
+            CornerPosition::High(_) => d.1 = Some(data),
+            CornerPosition::Low(_) => d.0 = Some(data),
         }
 
         Ok(())
@@ -90,20 +82,19 @@ impl<T> CornerTable<T> {
     pub fn data(&self) -> impl Iterator<Item = &T> {
         self.data.data().flat_map(|(a, b)| [a, b]).flatten()
     }
-
 }
 
-impl<T, H: Height> Index<CornerPosition<H>> for CornerTable<T> {
+impl<T> Index<CornerPosition> for CornerTable<T> {
     type Output = T;
 
-    fn index(&self, index: CornerPosition<H>) -> &Self::Output {
+    fn index(&self, index: CornerPosition) -> &Self::Output {
         self.get(index)
             .expect("No data at specified CornerPosition!")
     }
 }
 
-impl<T, H: Height> IndexMut<CornerPosition<H>> for CornerTable<T> {
-    fn index_mut(&mut self, index: CornerPosition<H>) -> &mut Self::Output {
+impl<T> IndexMut<CornerPosition> for CornerTable<T> {
+    fn index_mut(&mut self, index: CornerPosition) -> &mut Self::Output {
         self.get_mut(index)
             .expect("No data at specified CornerPosition!")
     }

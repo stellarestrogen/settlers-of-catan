@@ -1,7 +1,4 @@
-use hexgrid::edge::{
-    position::{EdgePosition, Valid},
-    table::EdgeTable,
-};
+use hexgrid::edge::{position::EdgePosition, table::EdgeTable};
 
 use crate::{
     game::player::OwnershipToken,
@@ -52,24 +49,16 @@ impl Into<StructureType> for Transport {
 }
 
 pub trait TransportStore {
-    fn set_transport<T: Valid>(
-        &mut self,
-        position: EdgePosition<T>,
-        transport: Transport,
-    ) -> Result<(), ()>;
-    fn get_transport<T: Valid>(&self, position: EdgePosition<T>) -> Option<Transport>;
+    fn set_transport(&mut self, position: EdgePosition, transport: Transport) -> Result<(), ()>;
+    fn get_transport(&self, position: EdgePosition) -> Option<Transport>;
     fn transports(&self) -> impl Iterator<Item = Transport>;
 }
 
 impl TransportStore for EdgeTable<EdgeData> {
-    fn set_transport<T: Valid>(
-        &mut self,
-        position: EdgePosition<T>,
-        transport: Transport,
-    ) -> Result<(), ()> {
+    fn set_transport(&mut self, position: EdgePosition, transport: Transport) -> Result<(), ()> {
         self.set(position, EdgeData::new(transport))
     }
-    fn get_transport<T: Valid>(&self, position: EdgePosition<T>) -> Option<Transport> {
+    fn get_transport(&self, position: EdgePosition) -> Option<Transport> {
         Some(self.get(position)?.get_transport())
     }
     fn transports(&self) -> impl Iterator<Item = Transport> {
