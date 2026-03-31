@@ -38,6 +38,18 @@ impl TransportSegment {
         self.history.iter().find(|p| **p == position).is_some()
     }
 
+    pub fn history_overlap(&self, other: &Self) -> u32 {
+        let mut overlap = 0;
+
+        for (first, second) in self.history.iter().zip(other.history.iter()) {
+            if *first == *second {
+                overlap += 1;
+            }
+        }
+
+        overlap
+    }
+
     pub fn owner(&self) -> OwnershipToken {
         self.owner
     }

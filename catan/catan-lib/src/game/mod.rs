@@ -187,25 +187,30 @@ impl Game {
 
         let segment = TransportSegment::new(owner, last_road);
 
-        let mut segments = iter::once(segment);
+        let mut segments: Vec<TransportSegment> = iter::once(segment).collect();
 
-        while !self.all_segments_finished(segments.clone()) {
-            segments = self.advance_segments(segments);
+        while !self.all_segments_finished(segments.clone().into_iter()) {
+            segments = self.advance_segments(segments.into_iter());
         }
+
+        // the 2 longest segments with the least overlap combined is the longest road
+
 
         0
     }
 
+
+
     fn advance_segments(
         &self,
         segments: impl Iterator<Item = TransportSegment> + Clone,
-    ) -> impl Iterator<Item = TransportSegment> + Clone {
+    ) -> Vec<TransportSegment> {
         let mut new_segments: Vec<TransportSegment> = Vec::with_capacity(segments.clone().count());
 
         for segment in segments {
-            let next_positions =
+            let neighboring_transport =
                 self.neighboring_transport(segment.owner(), segment.current_position());
-            let next_positions = segment.next_positions(next_positions);
+            let next_positions = segment.next_positions(neighboring_transport);
 
             if next_positions.clone().count() == 0 {
                 let mut new_segment = segment.clone();
@@ -221,7 +226,7 @@ impl Game {
             }
         }
 
-        new_segments.into_iter()
+        new_segments
     }
 
     fn neighboring_transport(
@@ -236,7 +241,10 @@ impl Game {
         })
     }
 
-    fn all_segments_finished(&self, segments: impl Iterator<Item = TransportSegment> + Clone) -> bool {
+    fn all_segments_finished(
+        &self,
+        segments: impl Iterator<Item = TransportSegment> + Clone,
+    ) -> bool {
         for segment in segments {
             if segment.is_finished() {
                 continue;
@@ -262,13 +270,3 @@ impl Game {
         }
     }
 }
-
-/* 7,
- * 7,
- * 8, 
- * 10,
- * 6,
- * 8,
- * 9,
- * 
-*/
