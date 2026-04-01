@@ -247,7 +247,11 @@ impl Game {
         let mut longest_segment: Option<TransportSegment> = None;
 
         for (first, second) in segment_candidates.into_iter() {
-            let combined = self.combine_segments(first, second)?;
+            let combined = match self.combine_segments(first, second) {
+                Some(s) => s,
+                None => continue,
+            };
+
             match &longest_segment {
                 Some(s) => {
                     if combined.length() > s.length() {
@@ -275,16 +279,19 @@ impl Game {
             second_history.remove(position);
         }
 
-        first_history.reverse();
-
         let pos1 = *first_history.get(0)?;
         let pos2 = *second_history.get(0)?;
+
+        first_history.reverse();
 
         if let Some(gap) = pos1.find_gap(pos2) {
             first.history().push(gap);
         }
-        
-        let combined_segment: Vec<EdgePosition> = first_history.into_iter().chain(second_history.into_iter()).collect();
+
+        let combined_segment: Vec<EdgePosition> = first_history
+            .into_iter()
+            .chain(second_history.into_iter())
+            .collect();
 
         let segment = TransportSegment::from_history(first.owner(), combined_segment);
 
@@ -293,7 +300,6 @@ impl Game {
         } else {
             None
         }
-        
     }
 
     fn advance_segments(
