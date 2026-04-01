@@ -5,7 +5,7 @@ pub mod hand;
 pub mod player;
 pub mod transport_segment;
 
-use std::iter;
+use std::{iter, usize::MAX};
 
 use hexgrid::{
     corner::position::CornerPosition, edge::position::EdgePosition, hex::position::HexPosition,
@@ -213,11 +213,86 @@ impl Game {
         }
 
         // the 2 longest segments with the least overlap combined is the longest road
-
-        0
+        if let Some(longest) = self.find_longest_segment(segments.into_iter()) {
+            longest.length()
+        } else {
+            0
+        }
     }
 
-    fn find_longest_segment(&self, segments: impl Iterator<Item = TransportSegment> + Clone) -> TransportSegment {
+    fn find_longest_segment(
+        &self,
+        mut segments: impl Iterator<Item = TransportSegment> + Clone,
+    ) -> Option<TransportSegment> {
+        let mut shortest_overlap: usize = MAX;
+        let mut segment_candidates: Vec<(TransportSegment, TransportSegment)> = Vec::new();
+
+        while let Some(segment) = segments.next() {
+            for other_segment in segments.clone() {
+                let overlap = segment.history_overlap(&other_segment).count();
+                if overlap < shortest_overlap {
+                    shortest_overlap = overlap;
+                    segment_candidates.clear();
+                    segment_candidates.push((segment.clone(), other_segment.clone()));
+                } else if overlap == shortest_overlap {
+                    segment_candidates.push((segment.clone(), other_segment.clone()));
+                }
+            }
+        }
+
+        if segment_candidates.len() == 0 {
+            return None;
+        }
+
+        let mut longest_segment: Option<TransportSegment> = None;
+
+        for (first, second) in segment_candidates.into_iter() {
+            let combined = self.combine_segments(first, second)?;
+            match &longest_segment {
+                Some(s) => {
+                    if combined.length() > s.length() {
+                        longest_segment = Some(combined);
+                    }
+                }
+                None => longest_segment = Some(combined),
+            }
+        }
+
+        longest_segment
+    }
+
+    fn combine_segments(
+        &self,
+        first: TransportSegment,
+        second: TransportSegment,
+    ) -> Option<TransportSegment> {
+        let overlap = first.history_overlap(&second);
+        let mut first_history = first.history();
+        let mut second_history = second.history();
+
+        for position in 0..overlap.count() {
+            first_history.remove(position);
+            second_history.remove(position);
+        }
+
+        first_history.reverse();
+
+        let pos1 = *first_history.get(0)?;
+        let pos2 = *second_history.get(0)?;
+
+        if let Some(gap) = pos1.find_gap(pos2) {
+            first.history().push(gap);
+        }
+        
+        let combined_segment: Vec<EdgePosition> = first_history.into_iter().chain(second_history.into_iter()).collect();
+
+        let segment = TransportSegment::from_history(first.owner(), combined_segment);
+
+        if segment.is_continuous()? {
+            Some(segment)
+        } else {
+            None
+        }
         
     }
 
