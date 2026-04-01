@@ -20,6 +20,16 @@ impl TransportSegment {
         }
     }
 
+    pub fn from_history(owner: OwnershipToken, history: Vec<EdgePosition>) -> Self {
+        let current = *history.last().unwrap();
+        Self {
+            history,
+            current,
+            owner,
+            finished_advancing: true,
+        }
+    }
+
     pub fn next_positions(
         &self,
         neighbors: impl Iterator<Item = EdgePosition> + Clone,
@@ -34,6 +44,10 @@ impl TransportSegment {
         self.current = position;
     }
 
+    pub fn history(&self) -> Vec<EdgePosition> {
+        self.history.clone()
+    }
+
     pub fn is_in_history(&self, position: EdgePosition) -> bool {
         self.history.iter().find(|p| **p == position).is_some()
     }
@@ -41,18 +55,18 @@ impl TransportSegment {
     /// This function short-circuits; once it finds a position that is not shared by both, it returns the overlap.
     /// This keeps the time <= O(n), where n is the length of the shorter segment.
     /// If a segment overlaps later, it will (usually) produce a non-contiguous segment of transports.
-    pub fn history_overlap(&self, other: &Self) -> u32 {
-        let mut overlap = 0;
+    pub fn history_overlap(&self, other: &Self) -> impl Iterator<Item = EdgePosition> + Clone {
+        let mut overlap: Vec<EdgePosition> = Vec::new();
 
         for (first, second) in self.history.iter().zip(other.history.iter()) {
             if *first == *second {
-                overlap += 1;
+                overlap.push(*first);
             } else {
                 break;
             }
         }
 
-        overlap
+        overlap.into_iter()
     }
 
     pub fn owner(&self) -> OwnershipToken {

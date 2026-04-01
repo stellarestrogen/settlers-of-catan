@@ -42,6 +42,17 @@ impl EdgePosition {
         self.downs() - other.downs()
     }
 
+    pub fn find_gap(&self, other: Self) -> Option<Self> {
+        if self.distance(other).abs() != 4 {
+            return None;
+        }
+
+        let rights = ((self.rights() as f32 + other.rights() as f32) / 2.).round_ties_even() as i32;
+        let downs = (self.downs() + other.downs()) / 2;
+
+        EdgePosition::from_rights_and_downs(rights, downs)
+    }
+
     pub fn neighboring_hex(&self) -> [HexPosition; 2] {
         self.position().neighboring_hex()
     }
@@ -71,6 +82,34 @@ impl EdgePosition {
 
     pub fn is_neighbor(&self, other: Self) -> bool {
         (self.horizontal_distance(other).abs() + self.vertical_distance(other).abs()) == 2
+    }
+
+    fn distance(&self, other: Self) -> i32 {
+        self.horizontal_distance(other) + self.vertical_distance(other)
+    }
+
+    fn from_rights_and_downs(rights: i32, downs: i32) -> Option<Self> {
+        if rights % 4 == 0 && downs % 2 == 0 {
+            Some(Self::Even(EdgeOrientation {
+                rights,
+                downs,
+                r#type: PhantomData,
+            }))
+        } else if rights % 4 == 1 && downs % 2 == 1 {
+            Some(Self::Positive(EdgeOrientation {
+                rights,
+                downs,
+                r#type: PhantomData,
+            }))
+        } else if rights % 4 == 2 && downs % 2 == 0 {
+            Some(Self::Odd(EdgeOrientation {
+                rights,
+                downs,
+                r#type: PhantomData,
+            }))
+        } else {
+            None
+        }
     }
 
     fn rights(&self) -> i32 {
