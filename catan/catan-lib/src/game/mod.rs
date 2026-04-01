@@ -232,7 +232,7 @@ impl Game {
         let mut longest_segment: Option<TransportSegment> = None;
 
         while let Some(segment) = segments.next() {
-            match longest_segment.clone() {
+            match &longest_segment {
                 Some(s) => {
                     if segment.length() > s.length() {
                         longest_segment = Some(segment.clone())
