@@ -209,6 +209,10 @@ impl Game {
         }
     }
 
+    /// Big boi!
+    ///
+    /// Iterates through all placed transports, keeping track when new branches appear, and then when all branches
+    /// are dead-ended, find the combination that is the biggest.
     pub fn calculate_longest_road(&self, owner: OwnershipToken) -> u32 {
         let last_road = match self.get_last_played_transport(owner) {
             Some(p) => p,
@@ -223,7 +227,6 @@ impl Game {
             segments = self.advance_segments(segments.into_iter());
         }
 
-        // the 2 longest segments with the least overlap combined is the longest road
         if let Some(longest) = self.find_longest_segment(segments.into_iter()) {
             longest.length()
         } else {
@@ -254,8 +257,18 @@ impl Game {
 
         let mut shortest_overlap: usize = MAX;
         let mut segment_candidates: Vec<(TransportSegment, TransportSegment)> = Vec::new();
+        let mut longest_segment: Option<TransportSegment> = None;
 
         while let Some(segment) = segments.next() {
+            match &longest_segment {
+                Some(s) => {
+                    if segment.length() > s.length() {
+                        longest_segment = Some(segment.clone())
+                    }
+                }
+                None => longest_segment = Some(segment.clone()),
+            }
+
             for other_segment in segments.clone() {
                 let overlap = segment.history_overlap(&other_segment).count();
                 if overlap < shortest_overlap {
