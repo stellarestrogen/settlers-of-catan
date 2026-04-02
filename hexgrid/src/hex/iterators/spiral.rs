@@ -28,7 +28,7 @@ impl Iterator for HexSpiral {
         if let Some(next) = self.ring.next() {
             self.position = next;
             Some(self.position)
-        } else if self.shortest > 0 && self.longest > 0 {
+        } else if self.shortest > 0 && self.longest > 1 {
             self.shortest -= 1;
             self.longest -= 2;
             self.position += HexPosition::RIGHT;

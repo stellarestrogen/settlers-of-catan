@@ -3,7 +3,7 @@ use crate::{
     hex::position::HexPosition,
 };
 
-#[derive(Clone, Copy, PartialEq)]
+#[derive(Debug, Clone, Copy, PartialEq)]
 enum Direction {
     Right,
     DownRight,
@@ -32,7 +32,7 @@ impl Iterator for Direction {
     }
 }
 
-#[derive(Clone, Copy)]
+#[derive(Debug, Clone, Copy)]
 pub struct CornerRing {
     positions: (CornerHeight<Low>, CornerHeight<High>),
     shortest: u32,
@@ -125,7 +125,7 @@ impl Iterator for CornerRing {
         }
 
         self.move_in_direction();
-        self.remaining -= 1;
+        self.remaining = self.remaining.checked_sub(1)?;
         Some(self.positions)
     }
 }

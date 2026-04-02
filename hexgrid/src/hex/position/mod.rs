@@ -59,6 +59,10 @@ impl HexPosition {
         }
     }
 
+    pub fn raw_horizontal_distance(&self, other: Self) -> i32 {
+        self.rights - other.rights
+    }
+
     pub fn vertical_distance(&self, other: Self) -> i32 {
         self.downs - other.downs
     }
@@ -71,12 +75,28 @@ impl HexPosition {
         self.horizontal_distance(other).ceil() >= 0
     }
 
+    pub fn is_right_raw(&self, other: Self) -> bool {
+        self.raw_horizontal_distance(other) > 0
+    }
+
+    pub fn is_right_or_equal_raw(&self, other: Self) -> bool {
+        self.raw_horizontal_distance(other) >= 0
+    }
+
     pub fn is_left(&self, other: Self) -> bool {
         self.horizontal_distance(other).ceil() < 0
     }
 
+    pub fn is_left_raw(&self, other: Self) -> bool {
+        self.raw_horizontal_distance(other) < 0
+    }
+
     pub fn is_left_or_equal(&self, other: Self) -> bool {
         self.horizontal_distance(other).ceil() <= 0
+    }
+
+    pub fn is_left_or_equal_raw(&self, other: Self) -> bool {
+        self.raw_horizontal_distance(other) <= 0
     }
 
     pub fn is_below(&self, other: Self) -> bool {

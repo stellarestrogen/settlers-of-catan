@@ -113,7 +113,7 @@ impl Mul<isize> for HorizontalDistance {
             Self::Shifted(a) if rhs % 2 == 0 => {
                 Self::Unshifted((a * rhs as i32) - (rhs / 2) as i32)
             }
-            Self::Shifted(a) => Self::Shifted((a * rhs as i32) - (rhs / 2) as i32 + 1),
+            Self::Shifted(a) => Self::Shifted((a * rhs as i32) - (rhs / 2) as i32),
         }
     }
 }

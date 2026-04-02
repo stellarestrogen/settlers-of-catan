@@ -24,10 +24,8 @@ impl CornerPosition {
 
 impl<T> CornerTable<T> {
     pub fn new(bounds: CornerBounds) -> Self {
-        CornerTable {
-            data: HexTable::new(bounds.get_hex_bounds()),
-            bounds,
-        }
+        let data = HexTable::new(bounds.get_hex_bounds());
+        CornerTable { data, bounds }
     }
 
     pub fn get_bounds(&self) -> &CornerBounds {
@@ -69,11 +67,15 @@ impl<T> CornerTable<T> {
             return Err(());
         }
 
-        let d = &mut self.data[position.structural_owner()];
+        if self.data.get_mut(position.structural_owner()).is_none() {
+            self.data.set(position.structural_owner(), (None, None))?;
+        }
+
+        let d = self.data.get_mut(position.structural_owner()).ok_or(())?;
 
         match position {
-            CornerPosition::High(_) => d.1 = Some(data),
             CornerPosition::Low(_) => d.0 = Some(data),
+            CornerPosition::High(_) => d.1 = Some(data),
         }
 
         Ok(())

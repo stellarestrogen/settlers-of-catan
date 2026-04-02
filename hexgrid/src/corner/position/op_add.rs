@@ -29,14 +29,8 @@ macro_rules! corner_to_hex {
                 let rights = self.rights + rhs.rights;
                 let downs = self.downs + rhs.downs;
 
-                if rights.signum() == downs.signum() {
-                    (HexPosition::RIGHT + HexPosition::DOWN_RIGHT) * ((downs - 1) / 3)
-                        + HexPosition::RIGHT * ((rights - downs) / 2)
-                } else {
-                    (HexPosition::LEFT + HexPosition::DOWN_LEFT) * ((downs - 1) / 3)
-                        + HexPosition::RIGHT * ((rights.abs() - downs.abs()) / 2)
-                        + HexPosition::UP_RIGHT
-                }
+                (HexPosition::RIGHT + HexPosition::DOWN_RIGHT) * ((downs - 1) / 3)
+                    + HexPosition::RIGHT * ((rights - downs) / 2)
             }
         }
     };

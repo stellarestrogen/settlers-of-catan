@@ -29,73 +29,67 @@ impl HexPerimeter {
             .horizontal_distance(self.top_left)
             .ceil()
             .abs()
+            + 1
     }
 
     pub fn get_width(&self) -> i32 {
-        self.bottom_right.vertical_distance(self.top_left).abs()
+        self.bottom_right.vertical_distance(self.top_left).abs() + 1
     }
 
     pub fn contains(&self, position: HexPosition) -> bool {
-        position.is_right_or_equal(self.top_left)
+        position.is_right_or_equal_raw(self.top_left)
             && position.is_below_or_equal(self.top_left)
-            && position.is_left_or_equal(self.bottom_right)
+            && position.is_left_or_equal_raw(self.bottom_right)
             && position.is_above_or_equal(self.bottom_right)
     }
 
     /// Expands the current HexPerimeter to include the newly inserted position. If the given position is in bounds, nothing happens.
     pub fn expand(&mut self, position: HexPosition) {
-        if self.contains(position) { return }
+        if self.contains(position) {
+            return;
+        }
 
-        let horizontal_distance_top_left = position.horizontal_distance(self.top_left).ceil().abs();
         let vertical_distance_top_left = position.vertical_distance(self.top_left).abs();
-
-        let horizontal_distance_bottom_right =
-            position.horizontal_distance(self.bottom_right).ceil().abs();
 
         let vertical_distance_bottom_right = position.vertical_distance(self.bottom_right).abs();
 
-        if position.is_left(self.top_left) {
-            self.top_left += HexPosition::LEFT * horizontal_distance_top_left;
-        } else if position.is_right(self.bottom_right) {
-            self.bottom_right += HexPosition::RIGHT * horizontal_distance_bottom_right;
+        if position.is_left_raw(self.top_left) {
+            self.top_left +=
+                HexPosition::LEFT * position.raw_horizontal_distance(self.top_left).abs();
+        } else if position.is_right_raw(self.bottom_right) {
+            self.bottom_right +=
+                HexPosition::RIGHT * position.raw_horizontal_distance(self.bottom_right).abs();
         }
 
         if position.is_above(self.top_left) {
             let vertical_distance = vertical_distance_top_left;
 
-            let pos_offset = position + HexPosition::LEFT * horizontal_distance_top_left;
+            let shift = self.bottom_right.horizontal_distance(HexPosition::ORIGIN);
 
-            let shift: f64 = pos_offset.horizontal_distance(self.top_left).into();
-
-            let adjustment = if shift > 0. {
-                HexPosition::UP_RIGHT
-            } else if shift < 0. {
-                HexPosition::UP_LEFT
-            } else if shift == 0. {
+            let adjustment = if vertical_distance % 2 == 0 {
                 HexPosition::ORIGIN
             } else {
-                unreachable!()
+                match shift {
+                    HorizontalDistance::Shifted(_) => HexPosition::UP_RIGHT,
+                    HorizontalDistance::Unshifted(_) => HexPosition::UP_LEFT,
+                }
             };
 
             self.top_left += HexPosition::UP_LEFT * (vertical_distance / 2)
                 + HexPosition::UP_RIGHT * (vertical_distance / 2)
                 + adjustment;
-
         } else if position.is_below(self.bottom_right) {
             let vertical_distance = vertical_distance_bottom_right;
 
-            let pos_offset = position + HexPosition::RIGHT * horizontal_distance_bottom_right;
+            let shift = self.bottom_right.horizontal_distance(HexPosition::ORIGIN);
 
-            let shift: f64 = pos_offset.horizontal_distance(self.bottom_right).into();
-
-            let adjustment = if shift > 0. {
-                HexPosition::DOWN_RIGHT
-            } else if shift < 0. {
-                HexPosition::DOWN_LEFT
-            } else if shift == 0. {
+            let adjustment = if vertical_distance % 2 == 0 {
                 HexPosition::ORIGIN
             } else {
-                unreachable!()
+                match shift {
+                    HorizontalDistance::Shifted(_) => HexPosition::DOWN_RIGHT,
+                    HorizontalDistance::Unshifted(_) => HexPosition::DOWN_LEFT,
+                }
             };
 
             self.bottom_right += HexPosition::DOWN_LEFT * (vertical_distance / 2)

@@ -71,12 +71,17 @@ impl<T> EdgeTable<T> {
         if !self.bounds.contains(position) {
             return Err(());
         }
-        let d = &mut self.data[position.structural_owner()];
+        
+        if self.data.get_mut(position.structural_owner()).is_none() {
+            self.data.set(position.structural_owner(), (None, None, None))?;
+        }
+
+        let d = self.data.get_mut(position.structural_owner()).ok_or(())?;
 
         match position {
             EdgePosition::Even(_) => d.0 = Some(data),
-            EdgePosition::Odd(_) => d.2 = Some(data),
             EdgePosition::Positive(_) => d.1 = Some(data),
+            EdgePosition::Odd(_) => d.2 = Some(data),
         }
 
         Ok(())

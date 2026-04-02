@@ -62,7 +62,7 @@ impl<T> HexTable<T> {
 
     pub fn set(&mut self, position: HexPosition, data: T) -> Result<(), ()> {
         if let Some(p) = self.calc_index(position) {
-            self.data[p] = Some(data);
+            *self.data.get_mut(p).ok_or(())? = Some(data);
             Ok(())
         } else {
             Err(())

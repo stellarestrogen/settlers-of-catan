@@ -1,3 +1,5 @@
+use std::fmt::Debug;
+
 use hexgrid::{
     corner::{bounds::CornerBounds, position::CornerPosition, table::CornerTable},
     edge::{bounds::EdgeBounds, position::EdgePosition, table::EdgeTable},
@@ -30,10 +32,11 @@ impl Board {
         let tiles = Self::create_tiles(&edition);
         let bounds = tiles.get_bounds();
         let corners = Self::create_trades(bounds, &edition);
+        let edges = EdgeTable::new(EdgeBounds::new(bounds));
         let robber = Robber::place(&tiles);
         Board {
             corners,
-            edges: EdgeTable::new(EdgeBounds::new(bounds)),
+            edges,
             tiles,
             robber,
         }
@@ -118,7 +121,7 @@ impl Board {
     pub fn neighboring_edges(
         &self,
         position: EdgePosition,
-    ) -> impl Iterator<Item = EdgePosition> + Clone {
+    ) -> impl Iterator<Item = EdgePosition> + Clone + Debug {
         position
             .neighboring_edges()
             .into_iter()

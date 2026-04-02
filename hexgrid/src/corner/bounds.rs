@@ -48,10 +48,12 @@ impl CornerBounds {
     }
 
     pub fn contains(&self, position: CornerPosition) -> bool {
-        let top_row: CornerPosition = (self.bounds.get_top_left() + CornerHeight::BOTTOM_LEFT).into();
-        let bottom_row: CornerPosition = (self.bounds.get_bottom_right() + CornerHeight::TOP_LEFT).into();
+        let top_row: CornerPosition =
+            (self.bounds.get_top_left() + CornerHeight::BOTTOM_LEFT).into();
+        let bottom_row: CornerPosition =
+            (self.bounds.get_bottom_right() + CornerHeight::TOP_LEFT).into();
 
-        if top_row.vertical_distance(position) > 0 || bottom_row.vertical_distance(position) < 0 {
+        if position.vertical_distance(top_row) < 0 || position.vertical_distance(bottom_row) > 0 {
             return false;
         }
 

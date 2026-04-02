@@ -18,7 +18,7 @@ pub struct Positive;
 #[derive(Debug, Clone, Copy)]
 pub struct Negative;
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Clone, Copy, PartialEq, Eq)]
 pub enum EdgePosition {
     Even(EdgeOrientation<Even>),
     Odd(EdgeOrientation<Odd>),
@@ -43,7 +43,7 @@ impl EdgePosition {
     }
 
     pub fn find_gap(&self, other: Self) -> Option<Self> {
-        if self.distance(other).abs() != 4 {
+        if self.distance(other) != 4 {
             return None;
         }
 
@@ -81,11 +81,11 @@ impl EdgePosition {
     }
 
     pub fn is_neighbor(&self, other: Self) -> bool {
-        (self.horizontal_distance(other).abs() + self.vertical_distance(other).abs()) == 2
+        (self.horizontal_distance(other).abs() + self.vertical_distance(other).abs()) == 2 && self.rights() != other.rights()
     }
 
     fn distance(&self, other: Self) -> i32 {
-        self.horizontal_distance(other) + self.vertical_distance(other)
+        self.horizontal_distance(other).abs() + self.vertical_distance(other).abs()
     }
 
     fn from_rights_and_downs(rights: i32, downs: i32) -> Option<Self> {
@@ -129,6 +129,34 @@ impl EdgePosition {
     }
 }
 
+impl std::fmt::Debug for EdgePosition {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            EdgePosition::Even(p) => {
+                write!(
+                    f,
+                    "EdgePosition::Even ( rights: {:?}, downs: {:?} )",
+                    p.rights, p.downs
+                )
+            }
+            EdgePosition::Odd(p) => {
+                write!(
+                    f,
+                    "EdgePosition::Odd ( rights: {:?}, downs: {:?} )",
+                    p.rights, p.downs
+                )
+            }
+            EdgePosition::Positive(p) => {
+                write!(
+                    f,
+                    "EdgePosition::Positive ( rights: {:?}, downs: {:?} )",
+                    p.rights, p.downs
+                )
+            }
+        }
+    }
+}
+
 #[derive(Debug)]
 pub struct EdgeOrientation<T> {
     rights: i32,
@@ -148,6 +176,22 @@ impl EdgeOrientation<Even> {
         downs: 2,
         r#type: PhantomData::<Even>,
     };
+
+    pub fn go_up_right(self) -> EdgeOrientation<Positive> {
+        self + EdgeOrientation::UP_RIGHT
+    }
+
+    pub fn go_right(self) -> EdgeOrientation<Odd> {
+        self + EdgeOrientation::GO_RIGHT
+    }
+
+    pub fn go_down_left(self) -> EdgeOrientation<Positive> {
+        self + EdgeOrientation::DOWN_LEFT
+    }
+
+    pub fn go_left(self) -> EdgeOrientation<Odd> {
+        self + EdgeOrientation::GO_LEFT
+    }
 
     pub fn neighboring_edges(&self) -> [(EdgeOrientation<Odd>, EdgeOrientation<Positive>); 2] {
         [
@@ -203,6 +247,22 @@ impl EdgeOrientation<Odd> {
         r#type: PhantomData::<Odd>,
     };
 
+    pub fn go_right(self) -> EdgeOrientation<Even> {
+        self + EdgeOrientation::GO_RIGHT
+    }
+
+    pub fn go_down_right(self) -> EdgeOrientation<Positive> {
+        self + EdgeOrientation::DOWN_RIGHT
+    }
+
+    pub fn go_left(self) -> EdgeOrientation<Even> {
+        self + EdgeOrientation::GO_LEFT
+    }
+
+    pub fn go_up_left(self) -> EdgeOrientation<Positive> {
+        self + EdgeOrientation::UP_LEFT
+    }
+
     pub fn neighboring_edges(&self) -> [(EdgeOrientation<Even>, EdgeOrientation<Positive>); 2] {
         [
             (
@@ -256,6 +316,22 @@ impl EdgeOrientation<Positive> {
         downs: 1,
         r#type: PhantomData::<Positive>,
     };
+
+    pub fn go_up_right(self) -> EdgeOrientation<Even> {
+        self + EdgeOrientation::UP_RIGHT
+    }
+
+    pub fn go_down_right(self) -> EdgeOrientation<Odd> {
+        self + EdgeOrientation::DOWN_RIGHT
+    }
+
+    pub fn go_up_left(self) -> EdgeOrientation<Odd> {
+        self + EdgeOrientation::UP_LEFT
+    }
+
+    pub fn go_down_left(self) -> EdgeOrientation<Even> {
+        self + EdgeOrientation::DOWN_LEFT
+    }
 
     pub fn neighboring_edges(&self) -> [(EdgeOrientation<Even>, EdgeOrientation<Odd>); 2] {
         [
