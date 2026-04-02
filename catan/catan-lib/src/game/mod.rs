@@ -242,31 +242,13 @@ impl Game {
             return segments.next();
         }
 
-        let mut longest_segment: Option<TransportSegment> = None;
-
-        for segment in segments.clone() {
-            match &longest_segment {
-                Some(t) => {
-                    if segment.length() > t.length() {
-                        longest_segment = Some(segment)
-                    }
-                }
-                None => longest_segment = Some(segment),
-            }
-        }
-
         let mut shortest_overlap: usize = MAX;
         let mut segment_candidates: Vec<(TransportSegment, TransportSegment)> = Vec::new();
-        let mut longest_segment: Option<TransportSegment> = None;
+        let mut longest_segment = segments.clone().next()?;
 
         while let Some(segment) = segments.next() {
-            match &longest_segment {
-                Some(s) => {
-                    if segment.length() > s.length() {
-                        longest_segment = Some(segment.clone())
-                    }
-                }
-                None => longest_segment = Some(segment.clone()),
+            if segment.length() > longest_segment.length() {
+                longest_segment = segment.clone();
             }
 
             for other_segment in segments.clone() {
@@ -291,17 +273,12 @@ impl Game {
                 None => continue,
             };
 
-            match &longest_segment {
-                Some(s) => {
-                    if combined.length() > s.length() {
-                        longest_segment = Some(combined);
-                    }
-                }
-                None => longest_segment = Some(combined),
+            if combined.length() > longest_segment.length() {
+                longest_segment = combined;
             }
         }
 
-        longest_segment
+        Some(longest_segment)
     }
 
     fn combine_segments(
