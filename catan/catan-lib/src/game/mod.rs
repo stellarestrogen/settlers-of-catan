@@ -23,7 +23,7 @@ use crate::{
         card::ResourceMap,
         structure::{
             building::{Building, BuildingType},
-            transport::{Transport, TransportType},
+            transport::Transport,
         },
     },
 };
@@ -167,7 +167,7 @@ impl Game {
 
         let player = self.find_player_mut(transport.owner());
 
-        // player.play_structure(transport.into())?;
+        player.play_structure(transport.into())?;
 
         self.board
             .set_transport(transport, position)
@@ -416,190 +416,4 @@ impl Game {
             None
         }
     }
-}
-
-use hexgrid::edge::position::EdgeOrientation;
-
-#[test]
-fn test() {
-    let edition = edition::BaseEdition {};
-    let mut game = Game::new(edition, 2);
-
-    let start = HexPosition::ORIGIN + EdgeOrientation::RIGHT;
-
-    let roads: [EdgePosition; 21] = [
-        start.into(),
-        start.go_down_left().into(),
-        start.go_down_left().go_down_left().into(),
-        start.go_down_left().go_down_left().go_down_right().into(),
-        start
-            .go_down_left()
-            .go_down_left()
-            .go_down_right()
-            .go_down_right()
-            .into(),
-        start
-            .go_down_left()
-            .go_down_left()
-            .go_down_right()
-            .go_down_right()
-            .go_down_right()
-            .into(),
-        start
-            .go_down_left()
-            .go_down_left()
-            .go_down_right()
-            .go_down_right()
-            .go_down_right()
-            .go_down_right()
-            .into(),
-        start
-            .go_down_left()
-            .go_down_left()
-            .go_down_right()
-            .go_down_right()
-            .go_down_right()
-            .go_down_right()
-            .go_down_right()
-            .into(),
-        start
-            .go_down_left()
-            .go_down_left()
-            .go_down_right()
-            .go_right()
-            .into(),
-        start
-            .go_down_left()
-            .go_down_left()
-            .go_down_right()
-            .go_right()
-            .go_right()
-            .into(),
-        start
-            .go_down_left()
-            .go_down_left()
-            .go_down_right()
-            .go_right()
-            .go_right()
-            .go_down_right()
-            .into(),
-        start
-            .go_down_left()
-            .go_down_left()
-            .go_down_right()
-            .go_right()
-            .go_right()
-            .go_down_right()
-            .go_down_left()
-            .into(),
-        start
-            .go_down_left()
-            .go_down_left()
-            .go_down_right()
-            .go_right()
-            .go_right()
-            .go_right()
-            .go_up_right()
-            .into(),
-        start
-            .go_down_left()
-            .go_down_left()
-            .go_down_right()
-            .go_right()
-            .go_right()
-            .go_right()
-            .go_right()
-            .into(),
-        start
-            .go_down_left()
-            .go_down_left()
-            .go_down_right()
-            .go_right()
-            .go_right()
-            .go_right()
-            .go_right()
-            .go_right()
-            .into(),
-        start
-            .go_down_left()
-            .go_down_left()
-            .go_down_right()
-            .go_right()
-            .go_right()
-            .go_right()
-            .go_right()
-            .go_right()
-            .go_up_right()
-            .into(),
-        start
-            .go_down_left()
-            .go_down_left()
-            .go_down_right()
-            .go_right()
-            .go_right()
-            .go_right()
-            .go_right()
-            .go_right()
-            .go_up_right()
-            .go_up_left()
-            .into(),
-        start
-            .go_down_left()
-            .go_down_left()
-            .go_down_right()
-            .go_right()
-            .go_right()
-            .go_right()
-            .go_right()
-            .go_right()
-            .go_up_right()
-            .go_up_left()
-            .go_up_left()
-            .into(),
-        start
-            .go_down_left()
-            .go_down_left()
-            .go_down_right()
-            .go_right()
-            .go_right()
-            .go_right()
-            .go_right()
-            .go_right()
-            .go_up_right()
-            .go_up_left()
-            .go_up_left()
-            .go_up_right()
-            .into(),
-        start
-            .go_down_left()
-            .go_down_left()
-            .go_down_right()
-            .go_down_right()
-            .go_down_right()
-            .go_down_right()
-            .go_down_right()
-            .go_right()
-            .into(),
-        start
-            .go_down_left()
-            .go_down_left()
-            .go_down_right()
-            .go_right()
-            .go_right()
-            .go_right()
-            .into(),
-    ];
-
-    let player1 = game.get_player(0).unwrap().token();
-
-    for road in roads {
-        println!("{:?}", road);
-        game.play_transport(Transport::new(TransportType::Road, player1), road)
-            .unwrap()
-    }
-
-    println!(
-        "The longest road was calculated to be {:}",
-        game.calculate_longest_road(player1)
-    );
 }
