@@ -1,3 +1,5 @@
+use std::fmt::Debug;
+
 use hexgrid::edge::position::EdgePosition;
 
 use crate::game::player::OwnershipToken;
@@ -32,10 +34,10 @@ impl TransportSegment {
 
     pub fn next_positions(
         &self,
-        neighbors: impl Iterator<Item = EdgePosition> + Clone,
-    ) -> impl Iterator<Item = EdgePosition> + Clone {
+        neighbors: impl Iterator<Item = EdgePosition> + Clone + Debug,
+    ) -> impl Iterator<Item = EdgePosition> + Clone + Debug {
         neighbors.filter(|p| {
-            self.history.iter().find(|h| **h == *p).is_none() && self.is_position_behind_current(*p)
+            !self.is_in_history(*p) && !self.is_position_behind_current(*p)
         })
     }
 
@@ -52,19 +54,22 @@ impl TransportSegment {
         self.history.iter().find(|p| **p == position).is_some()
     }
 
-    /// This function short-circuits; once it finds a position that is not shared by both, it returns the overlap.
-    /// This keeps the time <= O(n), where n is the length of the shorter segment.
-    /// If a segment overlaps later, it will (usually) produce a non-contiguous segment of transports.
     pub fn history_overlap(&self, other: &Self) -> impl Iterator<Item = EdgePosition> + Clone {
         let mut overlap: Vec<EdgePosition> = Vec::new();
 
-        for (first, second) in self.history.iter().zip(other.history.iter()) {
-            if *first == *second {
-                overlap.push(*first);
-            } else {
-                break;
+        for first in self.history.iter() {
+            for second in other.history.iter() {
+                if *first == *second {
+                    overlap.push(*first);
+                }
             }
         }
+
+        // for (first, second) in self.history.iter().zip(other.history.iter()) {
+        //     if *first == *second {
+        //         overlap.push(*first);
+        //     }
+        // }
 
         overlap.into_iter()
     }
@@ -79,6 +84,7 @@ impl TransportSegment {
 
     pub fn finished(&mut self) {
         self.finished_advancing = true;
+        self.history.push(self.current);
     }
 
     pub fn is_finished(&self) -> bool {

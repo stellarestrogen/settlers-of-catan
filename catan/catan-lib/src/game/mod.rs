@@ -5,7 +5,7 @@ pub mod hand;
 pub mod player;
 pub mod transport_segment;
 
-use std::{iter, usize::MAX};
+use std::{fmt::Debug, iter, usize::MAX};
 
 use hexgrid::{
     corner::position::CornerPosition, edge::position::EdgePosition, hex::position::HexPosition,
@@ -23,7 +23,7 @@ use crate::{
         card::ResourceMap,
         structure::{
             building::{Building, BuildingType},
-            transport::Transport,
+            transport::{Transport, TransportType},
         },
     },
 };
@@ -36,7 +36,7 @@ pub struct Game {
     current_turn: OwnershipToken,
     // redundant data for ease of use
     buildings: Vec<(Building, Vec<HexPosition>)>,
-    transports: Vec<(OwnershipToken, EdgePosition)>,
+    transports: Vec<(OwnershipToken, Option<EdgePosition>)>,
 }
 
 impl Game {
@@ -47,6 +47,12 @@ impl Game {
             players.push(Player::new(owned_structures))
         }
 
+        let mut transports = Vec::new();
+
+        for p in players.iter() {
+            transports.push((p.token(), None));
+        }
+
         let current_turn = players.get(0).expect("Not enough players!").token();
 
         Self {
@@ -54,11 +60,15 @@ impl Game {
             players,
             current_turn,
             buildings: Vec::new(),
-            transports: Vec::new(),
+            transports,
         }
     }
 
     pub fn tick(&mut self, roll: u8) {}
+
+    pub fn get_player(&self, player_number: usize) -> Option<&Player> {
+        self.players.get(player_number)
+    }
 
     pub fn find_player(&self, token: OwnershipToken) -> &Player {
         self.players.iter().find(|p| p.token() == token).unwrap()
@@ -151,12 +161,13 @@ impl Game {
     ) -> Result<(), BuildError> {
         // todo!
         // figure out if the road to be built is contiguous, and account for edge cases
-        self.find_transport(position)
-            .ok_or(BuildError::StructureAlreadyExists)?;
+        if self.find_transport(position).is_some() {
+            return Err(BuildError::StructureAlreadyExists);
+        }
 
         let player = self.find_player_mut(transport.owner());
 
-        player.play_structure(transport.into())?;
+        // player.play_structure(transport.into())?;
 
         self.board
             .set_transport(transport, position)
@@ -222,8 +233,25 @@ impl Game {
 
     fn find_longest_segment(
         &self,
-        mut segments: impl Iterator<Item = TransportSegment> + Clone,
+        mut segments: impl Iterator<Item = TransportSegment> + Clone + Debug,
     ) -> Option<TransportSegment> {
+        if segments.clone().count() == 1 {
+            return segments.next();
+        }
+
+        let mut longest_segment: Option<TransportSegment> = None;
+
+        for segment in segments.clone() {
+            match &longest_segment {
+                Some(t) => {
+                    if segment.length() > t.length() {
+                        longest_segment = Some(segment)
+                    }
+                }
+                None => longest_segment = Some(segment),
+            }
+        }
+
         let mut shortest_overlap: usize = MAX;
         let mut segment_candidates: Vec<(TransportSegment, TransportSegment)> = Vec::new();
 
@@ -244,10 +272,12 @@ impl Game {
             return None;
         }
 
-        let mut longest_segment: Option<TransportSegment> = None;
-
         for (first, second) in segment_candidates.into_iter() {
-            let combined = self.combine_segments(first, second)?;
+            let combined = match self.combine_segments(first, second) {
+                Some(segment) => segment,
+                None => continue,
+            };
+
             match &longest_segment {
                 Some(s) => {
                     if combined.length() > s.length() {
@@ -267,24 +297,28 @@ impl Game {
         second: TransportSegment,
     ) -> Option<TransportSegment> {
         let overlap = first.history_overlap(&second);
+
         let mut first_history = first.history();
         let mut second_history = second.history();
 
-        for position in 0..overlap.count() {
-            first_history.remove(position);
-            second_history.remove(position);
+        for _ in 0..overlap.count() {
+            first_history.remove(0);
+            second_history.remove(0);
         }
-
-        first_history.reverse();
 
         let pos1 = *first_history.get(0)?;
         let pos2 = *second_history.get(0)?;
 
+        first_history.reverse();
+
         if let Some(gap) = pos1.find_gap(pos2) {
-            first.history().push(gap);
+            first_history.push(gap);
         }
-        
-        let combined_segment: Vec<EdgePosition> = first_history.into_iter().chain(second_history.into_iter()).collect();
+
+        let combined_segment: Vec<EdgePosition> = first_history
+            .into_iter()
+            .chain(second_history.into_iter())
+            .collect();
 
         let segment = TransportSegment::from_history(first.owner(), combined_segment);
 
@@ -293,18 +327,23 @@ impl Game {
         } else {
             None
         }
-        
     }
 
     fn advance_segments(
         &self,
-        segments: impl Iterator<Item = TransportSegment> + Clone,
+        segments: impl Iterator<Item = TransportSegment> + Clone + Debug,
     ) -> Vec<TransportSegment> {
         let mut new_segments: Vec<TransportSegment> = Vec::with_capacity(segments.clone().count());
 
         for segment in segments {
+            if segment.is_finished() {
+                new_segments.push(segment);
+                continue;
+            }
+
             let neighboring_transport =
                 self.neighboring_transport(segment.owner(), segment.current_position());
+
             let next_positions = segment.next_positions(neighboring_transport);
 
             if next_positions.clone().count() == 0 {
@@ -328,7 +367,7 @@ impl Game {
         &self,
         owner: OwnershipToken,
         position: EdgePosition,
-    ) -> impl Iterator<Item = EdgePosition> + Clone {
+    ) -> impl Iterator<Item = EdgePosition> + Clone + Debug {
         self.board.neighboring_edges(position).filter(move |p| {
             self.board
                 .get_transport(*p)
@@ -353,15 +392,201 @@ impl Game {
 
     fn update_last_played_transport(&mut self, owner: OwnershipToken, position: EdgePosition) {
         if let Some((_, p)) = self.transports.iter_mut().find(|(o, _)| *o == owner) {
-            *p = position;
+            *p = Some(position);
         }
     }
 
     fn get_last_played_transport(&self, owner: OwnershipToken) -> Option<EdgePosition> {
         if let Some((_, p)) = self.transports.iter().find(|(o, _)| *o == owner).copied() {
-            Some(p)
+            p
         } else {
             None
         }
     }
+}
+
+use hexgrid::edge::position::EdgeOrientation;
+
+#[test]
+fn test() {
+    let edition = edition::BaseEdition {};
+    let mut game = Game::new(edition, 2);
+
+    let start = HexPosition::ORIGIN + EdgeOrientation::RIGHT;
+
+    let roads: [EdgePosition; 21] = [
+        start.into(),
+        start.go_down_left().into(),
+        start.go_down_left().go_down_left().into(),
+        start.go_down_left().go_down_left().go_down_right().into(),
+        start
+            .go_down_left()
+            .go_down_left()
+            .go_down_right()
+            .go_down_right()
+            .into(),
+        start
+            .go_down_left()
+            .go_down_left()
+            .go_down_right()
+            .go_down_right()
+            .go_down_right()
+            .into(),
+        start
+            .go_down_left()
+            .go_down_left()
+            .go_down_right()
+            .go_down_right()
+            .go_down_right()
+            .go_down_right()
+            .into(),
+        start
+            .go_down_left()
+            .go_down_left()
+            .go_down_right()
+            .go_down_right()
+            .go_down_right()
+            .go_down_right()
+            .go_down_right()
+            .into(),
+        start
+            .go_down_left()
+            .go_down_left()
+            .go_down_right()
+            .go_right()
+            .into(),
+        start
+            .go_down_left()
+            .go_down_left()
+            .go_down_right()
+            .go_right()
+            .go_right()
+            .into(),
+        start
+            .go_down_left()
+            .go_down_left()
+            .go_down_right()
+            .go_right()
+            .go_right()
+            .go_down_right()
+            .into(),
+        start
+            .go_down_left()
+            .go_down_left()
+            .go_down_right()
+            .go_right()
+            .go_right()
+            .go_down_right()
+            .go_down_left()
+            .into(),
+        start
+            .go_down_left()
+            .go_down_left()
+            .go_down_right()
+            .go_right()
+            .go_right()
+            .go_right()
+            .go_up_right()
+            .into(),
+        start
+            .go_down_left()
+            .go_down_left()
+            .go_down_right()
+            .go_right()
+            .go_right()
+            .go_right()
+            .go_right()
+            .into(),
+        start
+            .go_down_left()
+            .go_down_left()
+            .go_down_right()
+            .go_right()
+            .go_right()
+            .go_right()
+            .go_right()
+            .go_right()
+            .into(),
+        start
+            .go_down_left()
+            .go_down_left()
+            .go_down_right()
+            .go_right()
+            .go_right()
+            .go_right()
+            .go_right()
+            .go_right()
+            .go_up_right()
+            .into(),
+        start
+            .go_down_left()
+            .go_down_left()
+            .go_down_right()
+            .go_right()
+            .go_right()
+            .go_right()
+            .go_right()
+            .go_right()
+            .go_up_right()
+            .go_up_left()
+            .into(),
+        start
+            .go_down_left()
+            .go_down_left()
+            .go_down_right()
+            .go_right()
+            .go_right()
+            .go_right()
+            .go_right()
+            .go_right()
+            .go_up_right()
+            .go_up_left()
+            .go_up_left()
+            .into(),
+        start
+            .go_down_left()
+            .go_down_left()
+            .go_down_right()
+            .go_right()
+            .go_right()
+            .go_right()
+            .go_right()
+            .go_right()
+            .go_up_right()
+            .go_up_left()
+            .go_up_left()
+            .go_up_right()
+            .into(),
+        start
+            .go_down_left()
+            .go_down_left()
+            .go_down_right()
+            .go_down_right()
+            .go_down_right()
+            .go_down_right()
+            .go_down_right()
+            .go_right()
+            .into(),
+        start
+            .go_down_left()
+            .go_down_left()
+            .go_down_right()
+            .go_right()
+            .go_right()
+            .go_right()
+            .into(),
+    ];
+
+    let player1 = game.get_player(0).unwrap().token();
+
+    for road in roads {
+        println!("{:?}", road);
+        game.play_transport(Transport::new(TransportType::Road, player1), road)
+            .unwrap()
+    }
+
+    println!(
+        "The longest road was calculated to be {:}",
+        game.calculate_longest_road(player1)
+    );
 }

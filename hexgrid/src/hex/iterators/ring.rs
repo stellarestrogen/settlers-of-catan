@@ -1,6 +1,6 @@
 use crate::hex::position::HexPosition;
 
-#[derive(Clone, Copy)]
+#[derive(Debug, Clone, Copy)]
 enum Direction {
     Right,
     DownRight,
@@ -49,11 +49,13 @@ impl HexRing {
         }
     }
 
-    fn get_remaining(&self) -> u32 {
+    fn get_remaining(&self) -> Option<u32> {
         match self.direction {
-            Direction::Right | Direction::Left => self.shortest - 1,
-            Direction::DownRight | Direction::DownLeft | Direction::UpLeft => self.longest - self.shortest,
-            Direction::UpRight => self.longest - self.shortest - 1
+            Direction::Right | Direction::Left => self.shortest.checked_sub(1),
+            Direction::DownRight | Direction::DownLeft | Direction::UpLeft => {
+                self.longest.checked_sub(self.shortest)
+            }
+            Direction::UpRight => (self.longest.checked_sub(self.shortest)?).checked_sub(1),
         }
     }
 
@@ -64,7 +66,7 @@ impl HexRing {
             Direction::DownLeft => HexPosition::DOWN_LEFT,
             Direction::Left => HexPosition::LEFT,
             Direction::UpLeft => HexPosition::UP_LEFT,
-            Direction::UpRight => HexPosition::UP_RIGHT
+            Direction::UpRight => HexPosition::UP_RIGHT,
         };
 
         self.position += dir;
@@ -77,11 +79,11 @@ impl Iterator for HexRing {
     fn next(&mut self) -> Option<HexPosition> {
         if self.remaining == 0 {
             self.direction.next()?;
-            self.remaining = self.get_remaining();
+            self.remaining = self.get_remaining()?;
         }
 
+        self.remaining = self.remaining.checked_sub(1)?;
         self.move_in_direction();
-        self.remaining -= 1;
         Some(self.position)
     }
 }

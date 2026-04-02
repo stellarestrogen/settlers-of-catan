@@ -70,16 +70,12 @@ impl TradePortDeck {
         distribution: TradeDistribution,
         trade_gaps: &mut impl Iterator<Item = u32>,
     ) -> Self {
-        let longest = hex_longest * 2 + 1;
-        let shortest = hex_shortest * 2 + 1;
-
+        let trade_positions =
+            Self::trade_positions(distribution.size(), hex_shortest, hex_longest, trade_gaps);
         Self {
             trades: Self::create_trades(distribution.clone())
                 .into_iter()
-                .zip(
-                    Self::trade_positions(distribution.size(), shortest, longest, trade_gaps)
-                        .into_iter(),
-                )
+                .zip(trade_positions.into_iter())
                 .map(|(t, (p1, p2))| TradePort::new(t, p1, p2))
                 .collect(),
         }
@@ -112,18 +108,18 @@ impl TradePortDeck {
                 offset = !offset
             }
 
-            if offset == true {
+            if offset {
                 let high = ring
-                    .nth((gap / 2) as usize)
+                    .nth(((gap.saturating_sub(1)) / 2) as usize)
                     .expect("CornerRing is empty!")
                     .1;
                 let low = ring.next().expect("CornerRing is empty!").0;
                 trades.push((low, high));
             } else {
-                trades.push(ring.nth((gap / 2) as usize).expect("CornerRing is empty!"));
+                let positions = ring.nth((gap / 2) as usize).expect("CornerRing is empty!");
+                trades.push(positions);
             }
         }
-
         trades
     }
 }
