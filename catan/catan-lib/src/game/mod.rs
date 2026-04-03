@@ -223,11 +223,11 @@ impl Game {
 
         let mut segments: Vec<TransportSegment> = iter::once(segment).collect();
 
-        while !self.all_segments_finished(segments.clone().into_iter()) {
-            segments = self.advance_segments(segments.into_iter());
+        while !self.all_segments_finished(&segments) {
+            segments = self.advance_segments(segments);
         }
 
-        if let Some(longest) = self.find_longest_segment(segments.into_iter()) {
+        if let Some(longest) = self.find_longest_segment(segments) {
             longest.length()
         } else {
             0
@@ -236,12 +236,13 @@ impl Game {
 
     fn find_longest_segment(
         &self,
-        mut segments: impl Iterator<Item = TransportSegment> + Clone + Debug,
+        segments: Vec<TransportSegment>,
     ) -> Option<TransportSegment> {
-        if segments.clone().count() == 1 {
-            return segments.next();
+        if segments.len() == 1 {
+            return segments.get(0).cloned();
         }
 
+        let mut segments = segments.into_iter();
         let mut shortest_overlap: usize = MAX;
         let mut segment_candidates: Vec<(TransportSegment, TransportSegment)> = Vec::new();
         let mut longest_segment = segments.clone().next()?;
@@ -321,22 +322,23 @@ impl Game {
 
     fn advance_segments(
         &self,
-        segments: impl Iterator<Item = TransportSegment> + Clone + Debug,
+        segments: Vec<TransportSegment>,
     ) -> Vec<TransportSegment> {
-        let mut new_segments: Vec<TransportSegment> = Vec::with_capacity(segments.clone().count());
+        let mut new_segments: Vec<TransportSegment> = Vec::with_capacity(segments.len());
 
-        for segment in segments {
+        for segment in segments.iter() {
             if segment.is_finished() {
-                new_segments.push(segment);
+                new_segments.push(segment.clone());
                 continue;
             }
 
             let neighboring_transport =
                 self.neighboring_transport(segment.owner(), segment.current_position());
 
-            let next_positions = segment.next_positions(neighboring_transport);
+            
+            let next_positions: Vec<EdgePosition> = segment.next_positions(neighboring_transport).collect();
 
-            if next_positions.clone().count() == 0 {
+            if next_positions.len() == 0 {
                 let mut new_segment = segment.clone();
                 new_segment.finished();
                 new_segments.push(new_segment);
@@ -367,7 +369,7 @@ impl Game {
 
     fn all_segments_finished(
         &self,
-        segments: impl Iterator<Item = TransportSegment> + Clone,
+        segments: &Vec<TransportSegment>,
     ) -> bool {
         for segment in segments {
             if segment.is_finished() {

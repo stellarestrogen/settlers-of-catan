@@ -65,12 +65,6 @@ impl TransportSegment {
             }
         }
 
-        // for (first, second) in self.history.iter().zip(other.history.iter()) {
-        //     if *first == *second {
-        //         overlap.push(*first);
-        //     }
-        // }
-
         overlap.into_iter()
     }
 
