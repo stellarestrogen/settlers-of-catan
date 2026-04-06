@@ -283,12 +283,12 @@ impl Game {
         let mut first_history = first.history();
         let mut second_history = second.history();
 
-        for p in overlap {
-            if let Some(index) = first_history.iter().position(|p1| *p1 == p) {
+        for position in overlap {
+            if let Some(index) = first_history.iter().position(|p| *p == position) {
                 first_history.remove(index);
             }
 
-            if let Some(index) = second_history.iter().position(|p1| *p1 == p) {
+            if let Some(index) = second_history.iter().position(|p| *p == position) {
                 second_history.remove(index);
             }
         }
@@ -319,9 +319,9 @@ impl Game {
     fn advance_segments(&self, segments: Vec<TransportSegment>) -> Vec<TransportSegment> {
         let mut new_segments: Vec<TransportSegment> = Vec::with_capacity(segments.len());
 
-        for segment in segments.iter() {
+        for segment in segments {
             if segment.is_finished() {
-                new_segments.push(segment.clone());
+                new_segments.push(segment);
                 continue;
             }
 
