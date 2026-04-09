@@ -40,8 +40,8 @@ pub struct Game {
 }
 
 impl Game {
-    pub fn new(edition: impl GameEdition, player_count: u32) -> Self {
-        let mut players = Vec::with_capacity(player_count as usize);
+    pub fn new(edition: impl GameEdition, player_count: usize) -> Self {
+        let mut players = Vec::with_capacity(player_count);
         let owned_structures = edition.get_start_structures();
         for _ in 0..player_count {
             players.push(Player::new(owned_structures))
@@ -234,8 +234,67 @@ impl Game {
         }
     }
 
+    fn advance_segments(&self, segments: Vec<TransportSegment>) -> Vec<TransportSegment> {
+        let mut new_segments: Vec<TransportSegment> = Vec::with_capacity(segments.len());
+
+        for segment in segments {
+            if segment.is_finished() {
+                new_segments.push(segment);
+                continue;
+            }
+
+            let neighboring_transport =
+                self.neighboring_transport(segment.owner(), segment.current_position());
+
+            let next_positions: Vec<EdgePosition> =
+                segment.next_positions(neighboring_transport).collect();
+
+            if next_positions.len() == 0 {
+                let mut new_segment = segment.clone();
+                new_segment.finished();
+                new_segments.push(new_segment);
+                continue;
+            }
+
+            for position in next_positions {
+                let mut new_segment = segment.clone();
+                new_segment.update(position);
+                new_segments.push(new_segment);
+            }
+        }
+
+        new_segments
+    }
+
+    fn neighboring_transport(
+        &self,
+        owner: OwnershipToken,
+        position: EdgePosition,
+    ) -> impl Iterator<Item = EdgePosition> + Clone + Debug {
+        self.board.neighboring_edges(position).filter(move |p| {
+            self.board
+                .get_transport(*p)
+                .is_some_and(|t| t.owner() == owner)
+        })
+    }
+
+    fn update_last_played_transport(&mut self, owner: OwnershipToken, position: EdgePosition) {
+        if let Some((_, p)) = self.transports.iter_mut().find(|(o, _)| *o == owner) {
+            *p = Some(position);
+        }
+    }
+
+    fn get_last_played_transport(&self, owner: OwnershipToken) -> Option<EdgePosition> {
+        if let Some((_, p)) = self.transports.iter().find(|(o, _)| *o == owner).copied() {
+            p
+        } else {
+            None
+        }
+    }
+
     fn find_longest_segment(segments: Vec<TransportSegment>) -> Option<TransportSegment> {
-        let mut candidates: Vec<(TransportSegment, TransportSegment)> = Vec::with_capacity(segments.len());
+        let mut candidates: Vec<(TransportSegment, TransportSegment)> =
+            Vec::with_capacity(segments.len());
 
         let mut segments = segments.into_iter();
         let mut longest_segment = segments.clone().next()?;
@@ -243,7 +302,6 @@ impl Game {
         let mut shortest_overlap: usize = MAX;
 
         while let Some(segment) = segments.next() {
-
             if segment.length() > longest_segment.length() {
                 longest_segment = segment.clone();
             }
@@ -316,50 +374,6 @@ impl Game {
         }
     }
 
-    fn advance_segments(&self, segments: Vec<TransportSegment>) -> Vec<TransportSegment> {
-        let mut new_segments: Vec<TransportSegment> = Vec::with_capacity(segments.len());
-
-        for segment in segments {
-            if segment.is_finished() {
-                new_segments.push(segment);
-                continue;
-            }
-
-            let neighboring_transport =
-                self.neighboring_transport(segment.owner(), segment.current_position());
-
-            let next_positions: Vec<EdgePosition> =
-                segment.next_positions(neighboring_transport).collect();
-
-            if next_positions.len() == 0 {
-                let mut new_segment = segment.clone();
-                new_segment.finished();
-                new_segments.push(new_segment);
-                continue;
-            }
-
-            for position in next_positions {
-                let mut new_segment = segment.clone();
-                new_segment.update(position);
-                new_segments.push(new_segment);
-            }
-        }
-
-        new_segments
-    }
-
-    fn neighboring_transport(
-        &self,
-        owner: OwnershipToken,
-        position: EdgePosition,
-    ) -> impl Iterator<Item = EdgePosition> + Clone + Debug {
-        self.board.neighboring_edges(position).filter(move |p| {
-            self.board
-                .get_transport(*p)
-                .is_some_and(|t| t.owner() == owner)
-        })
-    }
-
     fn all_segments_finished(segments: &Vec<TransportSegment>) -> bool {
         for segment in segments {
             if segment.is_finished() {
@@ -370,19 +384,5 @@ impl Game {
         }
 
         return true;
-    }
-
-    fn update_last_played_transport(&mut self, owner: OwnershipToken, position: EdgePosition) {
-        if let Some((_, p)) = self.transports.iter_mut().find(|(o, _)| *o == owner) {
-            *p = Some(position);
-        }
-    }
-
-    fn get_last_played_transport(&self, owner: OwnershipToken) -> Option<EdgePosition> {
-        if let Some((_, p)) = self.transports.iter().find(|(o, _)| *o == owner).copied() {
-            p
-        } else {
-            None
-        }
     }
 }
