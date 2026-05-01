@@ -153,7 +153,6 @@ impl TradeStore for CornerTable<CornerData> {
     fn set_trades(&mut self, trade_port: TradePort) -> Result<(), ()> {
         let (p1, p2) = trade_port.get_positions();
         let trade = trade_port.get_type();
-
         self.set_trade(p1.into(), trade)?;
         self.set_trade(p2.into(), trade)?;
         Ok(())

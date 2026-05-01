@@ -124,7 +124,7 @@ impl CustomEdition {
 
 impl GameEdition for CustomEdition {
     fn get_tiles(&self) -> impl Iterator<Item = (HexPosition, TileData)> + Clone {
-        let size: usize = ((self.longest - self.shortest) * 2 + 1) as usize;
+        let size: usize = ((self.longest - 1) * self.longest - (self.shortest - 1) * self.shortest + self.longest) as usize;
         let resource_deck = ResourceDeck::new(
             size,
             self.rsrc_distr.clone(),
@@ -206,6 +206,11 @@ impl CustomEditionBuilder {
         self
     }
 
+    pub fn with_owned_structures(mut self, structures: OwnedStructures) -> CustomEditionBuilder {
+        self.owned_structures = structures;
+        self
+    }
+
     fn default_resource_distribution(shortest: u32, longest: u32) -> ResourceDistribution {
         let size: f64 = ((longest - 1) * longest - (shortest - 1) * shortest + longest) as f64;
         ResourceDistribution::new([
@@ -273,7 +278,7 @@ impl CustomEditionBuilder {
         let total_corner_num = (longest - shortest) * 8 + shortest * 4 + 2;
         let mut gaps = Vec::<u32>::with_capacity((total_corner_num / 3) as usize);
         gaps.push(0);
-        gaps.extend(iter::repeat_n(1, (total_corner_num - 1) as usize));
+        gaps.extend(iter::repeat_n(1, ((total_corner_num / 3) - 1) as usize));
         gaps
     }
 

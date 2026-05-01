@@ -1,4 +1,4 @@
-#[derive(Clone)]
+#[derive(Debug, Clone)]
 pub struct Distribution<T, const A: usize> {
     distribution: [(T, u32); A],
 }
