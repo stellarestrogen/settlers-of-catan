@@ -1,6 +1,10 @@
 use std::marker::PhantomData;
 
-use crate::{edge::Edge, hex::position::HexPosition};
+use crate::{
+    corner::position::{CornerHeight, CornerPosition},
+    edge::Edge,
+    hex::position::HexPosition,
+};
 
 pub mod op_add;
 pub mod op_mul;
@@ -80,8 +84,35 @@ impl EdgePosition {
             .expect("Neighboring Edges is the incorrect size!")
     }
 
+    pub fn neighboring_corners(&self) -> [CornerPosition; 2] {
+        match self {
+            Self::Even(p) => {
+                let [top_left, bottom_right] = p.neighboring_hex();
+                [
+                    (top_left + CornerHeight::BOTTOM).into(),
+                    (bottom_right + CornerHeight::TOP).into(),
+                ]
+            }
+            Self::Odd(p) => {
+                let [top_right, bottom_left] = p.neighboring_hex();
+                [
+                    (top_right + CornerHeight::BOTTOM).into(),
+                    (bottom_left + CornerHeight::TOP).into(),
+                ]
+            }
+            Self::Positive(p) => {
+                let [left, right] = p.neighboring_hex();
+                [
+                    (left + CornerHeight::TOP_RIGHT).into(),
+                    (right + CornerHeight::BOTTOM_LEFT).into(),
+                ]
+            }
+        }
+    }
+
     pub fn is_neighbor(&self, other: Self) -> bool {
-        (self.horizontal_distance(other).abs() + self.vertical_distance(other).abs()) == 2 && self.rights() != other.rights()
+        (self.horizontal_distance(other).abs() + self.vertical_distance(other).abs()) == 2
+            && self.rights() != other.rights()
     }
 
     fn distance(&self, other: Self) -> i32 {

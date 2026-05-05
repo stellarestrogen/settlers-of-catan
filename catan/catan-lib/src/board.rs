@@ -108,9 +108,29 @@ impl Board {
             .filter(|p| self.tiles.get_bounds().contains(*p))
     }
 
+    pub fn neighboring_edges_for_corner(
+        &self,
+        position: CornerPosition,
+    ) -> impl Iterator<Item = EdgePosition> + Clone {
+        position
+            .neighboring_edges()
+            .into_iter()
+            .filter(|p| self.edges.get_bounds().contains(*p))
+    }
+
     pub fn neighboring_corners(
         &self,
         position: CornerPosition,
+    ) -> impl Iterator<Item = CornerPosition> + Clone {
+        position
+            .neighboring_corners()
+            .into_iter()
+            .filter(|p| self.corners.get_bounds().contains(*p))
+    }
+
+    pub fn neighboring_corners_for_edge(
+        &self,
+        position: EdgePosition,
     ) -> impl Iterator<Item = CornerPosition> + Clone {
         position
             .neighboring_corners()

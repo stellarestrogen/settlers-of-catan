@@ -1,6 +1,10 @@
 use std::marker::PhantomData;
 
-use crate::{corner::Corner, hex::position::HexPosition};
+use crate::{
+    corner::Corner,
+    edge::position::{EdgeOrientation, EdgePosition},
+    hex::position::HexPosition,
+};
 
 pub mod op_add;
 pub mod op_mul;
@@ -55,8 +59,31 @@ impl CornerPosition {
                 .collect(),
         };
 
+        // let p: Vec<CornerPosition> = self.position().neighboring_corners().into_iter().map(Into::<CornerPosition>::into).collect();
+
         p.try_into()
             .expect("Neighboring Corners is the incorrect size!")
+    }
+
+    pub fn neighboring_edges(&self) -> [EdgePosition; 3] {
+        match self {
+            Self::High(p) => {
+                let [top_left, top_right, down] = p.neighboring_hex();
+                [
+                    (top_left + EdgeOrientation::RIGHT).into(),
+                    (top_right + EdgeOrientation::BOTTOM_LEFT).into(),
+                    (down + EdgeOrientation::TOP_LEFT).into(),
+                ]
+            }
+            Self::Low(p) => {
+                let [up, down_left, down_right] = p.neighboring_hex();
+                [
+                    (up + EdgeOrientation::BOTTOM_RIGHT).into(),
+                    (down_left + EdgeOrientation::RIGHT).into(),
+                    (down_right + EdgeOrientation::TOP_RIGHT).into(),
+                ]
+            }
+        }
     }
 
     pub fn is_neighbor(&self, other: Self) -> bool {

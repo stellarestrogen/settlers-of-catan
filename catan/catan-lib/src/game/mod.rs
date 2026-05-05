@@ -572,7 +572,6 @@ fn test() {
     );
 
     for road in roads {
-        println!("{:?}", road);
         game.play_transport(Transport::new(TransportType::Road, player1), road)
             .unwrap()
     }
