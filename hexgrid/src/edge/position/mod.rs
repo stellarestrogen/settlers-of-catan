@@ -46,9 +46,10 @@ impl EdgePosition {
         self.downs() - other.downs()
     }
 
-    pub fn find_gap(&self, other: Self) -> Option<Self> {
+    /// If `other` does not form a gap with `self`, will return Err.
+    pub fn find_gap(&self, other: Self) -> Result<Self, ()> {
         if self.distance(other) != 4 {
-            return None;
+            return Err(());
         }
 
         let rights = ((self.rights() as f32 + other.rights() as f32) / 2.).round_ties_even() as i32;
@@ -111,35 +112,49 @@ impl EdgePosition {
     }
 
     pub fn is_neighbor(&self, other: Self) -> bool {
-        (self.horizontal_distance(other).abs() + self.vertical_distance(other).abs()) == 2
-            && self.rights() != other.rights()
+        (self.distance(other)) == 2 && self.rights() != other.rights()
+    }
+
+    /// Returns Ok if first and second are both neighbors of self. Otherwise, it returns Err.
+    pub fn are_edges_same_side(&self, first: Self, second: Self) -> Result<bool, ()> {
+        if !self.is_neighbor(first) || !self.is_neighbor(second) {
+            return Err(());
+        }
+
+        if first.is_neighbor(second) {
+            return Ok(true);
+        } else if first.distance(second) == 4 {
+            return Ok(false);
+        }
+
+        Err(())
     }
 
     fn distance(&self, other: Self) -> i32 {
         self.horizontal_distance(other).abs() + self.vertical_distance(other).abs()
     }
 
-    fn from_rights_and_downs(rights: i32, downs: i32) -> Option<Self> {
+    fn from_rights_and_downs(rights: i32, downs: i32) -> Result<Self, ()> {
         if rights % 4 == 0 && downs % 2 == 0 {
-            Some(Self::Even(EdgeOrientation {
+            Ok(Self::Even(EdgeOrientation {
                 rights,
                 downs,
                 r#type: PhantomData,
             }))
         } else if rights % 4 == 1 && downs % 2 == 1 {
-            Some(Self::Positive(EdgeOrientation {
+            Ok(Self::Positive(EdgeOrientation {
                 rights,
                 downs,
                 r#type: PhantomData,
             }))
         } else if rights % 4 == 2 && downs % 2 == 0 {
-            Some(Self::Odd(EdgeOrientation {
+            Ok(Self::Odd(EdgeOrientation {
                 rights,
                 downs,
                 r#type: PhantomData,
             }))
         } else {
-            None
+            Err(())
         }
     }
 

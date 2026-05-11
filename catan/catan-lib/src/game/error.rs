@@ -1,4 +1,3 @@
-use core::fmt;
 use std::fmt::Debug;
 
 use crate::{
@@ -24,7 +23,11 @@ pub enum BuildError {
     },
     TransportMustBeContiguous,
     TransportInterruptsBuilding,
+}
 
+#[derive(Debug, Clone, Copy)]
+pub enum GameError {
+    InsufficientPlayerCount,
 }
 
 // impl fmt::Display for BuildError {

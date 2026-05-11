@@ -17,7 +17,7 @@ use crate::{
     board::Board,
     game::{
         edition::GameEdition,
-        error::BuildError,
+        error::{BuildError, GameError},
         player::{OwnershipToken, Player},
         transport_segment::TransportSegment,
     },
@@ -38,13 +38,18 @@ pub struct Game {
     board: Board,
     players: Vec<Player>,
     current_turn: OwnershipToken,
+    turn_number: usize,
     // redundant data for ease of use
     buildings: Vec<(Building, Vec<HexPosition>)>,
     transports: Vec<(OwnershipToken, Option<EdgePosition>)>,
 }
 
 impl Game {
-    pub fn new(edition: impl GameEdition, player_count: usize) -> Self {
+    pub fn new(edition: impl GameEdition, player_count: usize) -> Result<Self, GameError> {
+        if player_count == 0 {
+            return Err(GameError::InsufficientPlayerCount);
+        }
+
         let mut players = Vec::with_capacity(player_count);
         let owned_structures = edition.get_start_structures();
         for _ in 0..player_count {
@@ -59,13 +64,14 @@ impl Game {
 
         let current_turn = players.get(0).expect("Not enough players!").token();
 
-        Self {
+        Ok(Self {
             board: Board::new(edition),
             players,
             current_turn,
+            turn_number: 0,
             buildings: Vec::new(),
             transports,
-        }
+        })
     }
 
     pub fn tick(&mut self, roll: u8) {}
@@ -152,11 +158,14 @@ impl Game {
         building: Building,
         position: CornerPosition,
     ) -> Result<(), BuildError> {
-        self.can_play_building(building, position)?;
+        // Exception for the first turn, where structures are built without restrictions.
+        if self.turn_number > 0 {
+            self.can_play_building(building, position)?;
 
-        let player = self.find_player_mut(building.owner());
+            let player = self.find_player_mut(building.owner());
 
-        player.play_structure(building.into())?;
+            player.play_structure(building.into())?;
+        }
 
         self.board
             .set_building(building, position)
@@ -183,23 +192,38 @@ impl Game {
             return Err(BuildError::StructureAlreadyExists);
         }
 
-        let mut same_ownership = 0;
-        for edge in self.board.neighboring_edges(position) {
-            if let Some(t) = self.find_transport(edge) {
-                if t.owner() == transport.owner() {
-                    same_ownership += 1;
-                }
-            }
-        }
+        let neighbor_count = self
+            .neighboring_transport(transport.owner(), position)
+            .count();
 
-        if same_ownership == 0 {
+        if neighbor_count == 0 {
             return Err(BuildError::TransportMustBeContiguous);
         }
 
-        for corner in self.board.neighboring_corners_for_edge(position) {
-            if let Some(building) = self.find_building(corner) {
-                
+        let mut unowned_buildings = self
+            .board
+            .neighboring_corners_for_edge(position)
+            .filter(|c| {
+                self.find_building(*c)
+                    .is_some_and(|b| b.owner() != transport.owner())
+            });
+
+        let mut valid_edges = 0;
+        for edge in self.neighboring_transport(transport.owner(), position) {
+            for corner in self.board.neighboring_corners_for_edge(edge) {
+                match unowned_buildings.find(|c| *c == corner) {
+                    Some(_) => valid_edges += 1,
+                    None => (),
+                }
             }
+
+            if valid_edges > 0 {
+                break;
+            }
+        }
+
+        if valid_edges == 0 {
+            return Err(BuildError::TransportInterruptsBuilding);
         }
 
         Ok(())
@@ -210,11 +234,14 @@ impl Game {
         transport: Transport,
         position: EdgePosition,
     ) -> Result<(), BuildError> {
-        self.can_play_transport(transport, position)?;
+        // Exception for the first turn, where structures are built without restrictions.
+        if self.turn_number > 0 {
+            self.can_play_transport(transport, position)?;
 
-        let player = self.find_player_mut(transport.owner());
+            let player = self.find_player_mut(transport.owner());
 
-        player.play_structure(transport.into())?;
+            player.play_structure(transport.into())?;
+        }
 
         self.board
             .set_transport(transport, position)
@@ -223,6 +250,16 @@ impl Game {
         self.update_last_played_transport(transport.owner(), position);
 
         Ok(())
+    }
+
+    fn neighboring_transport(
+        &self,
+        owner: OwnershipToken,
+        position: EdgePosition,
+    ) -> impl Iterator<Item = EdgePosition> + Clone + Debug {
+        self.board
+            .neighboring_edges(position)
+            .filter(move |p| self.find_transport(*p).is_some_and(|t| t.owner() == owner))
     }
 
     pub fn distribute_resources(&mut self, roll: u8) {
@@ -321,18 +358,6 @@ impl Game {
         new_segments
     }
 
-    fn neighboring_transport(
-        &self,
-        owner: OwnershipToken,
-        position: EdgePosition,
-    ) -> impl Iterator<Item = EdgePosition> + Clone + Debug {
-        self.board.neighboring_edges(position).filter(move |p| {
-            self.board
-                .get_transport(*p)
-                .is_some_and(|t| t.owner() == owner)
-        })
-    }
-
     fn update_last_played_transport(&mut self, owner: OwnershipToken, position: EdgePosition) {
         if let Some((_, p)) = self.transports.iter_mut().find(|(o, _)| *o == owner) {
             *p = Some(position);
@@ -411,7 +436,7 @@ impl Game {
 
         first_history.reverse();
 
-        if let Some(gap) = pos1.find_gap(pos2) {
+        if let Ok(gap) = pos1.find_gap(pos2) {
             first_history.push(gap);
         }
 
@@ -448,7 +473,7 @@ fn test() {
         .with_owned_structures(OwnedStructures::new(5, 4, 30, 0))
         .build();
 
-    let mut game = Game::new(edition, 2);
+    let mut game = Game::new(edition, 2).unwrap();
 
     let start = HexPosition::ORIGIN + EdgeOrientation::RIGHT;
 
