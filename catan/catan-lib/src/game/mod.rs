@@ -105,14 +105,30 @@ impl Game {
         building: Building,
         position: CornerPosition,
     ) -> Result<(), BuildError> {
-        // todo!
-        // check if the building is connected to at least 1 road of the same ownership, and
-        // that it is not able to cut off 2 roads of different ownership (only applies to settlements)
-
-        for p in self.board.neighboring_corners(position) {
-            if self.find_building(p).is_some() {
+        for corner in self.board.neighboring_corners(position) {
+            if self.find_building(corner).is_some() {
                 return Err(BuildError::BuildingIsTooCloseToExisting);
             }
+        }
+
+        let mut same_ownership = 0;
+        let mut different_ownership = 0;
+        for edge in self.board.neighboring_edges_for_corner(position) {
+            if let Some(transport) = self.find_transport(edge) {
+                if transport.owner() == building.owner() {
+                    same_ownership += 1;
+                } else {
+                    different_ownership += 1;
+                }
+            }
+        }
+
+        if different_ownership >= 2 {
+            return Err(BuildError::BuildingCutsOffRoad);
+        }
+
+        if same_ownership == 0 && building.r#type() == BuildingType::Settlement {
+            return Err(BuildError::BuildingHasNoRoad);
         }
 
         match (building.r#type(), self.find_building(position)) {
@@ -158,16 +174,43 @@ impl Game {
         self.board.get_transport(position)
     }
 
+    pub fn can_play_transport(
+        &self,
+        transport: Transport,
+        position: EdgePosition,
+    ) -> Result<(), BuildError> {
+        if self.find_transport(position).is_some() {
+            return Err(BuildError::StructureAlreadyExists);
+        }
+
+        let mut same_ownership = 0;
+        for edge in self.board.neighboring_edges(position) {
+            if let Some(t) = self.find_transport(edge) {
+                if t.owner() == transport.owner() {
+                    same_ownership += 1;
+                }
+            }
+        }
+
+        if same_ownership == 0 {
+            return Err(BuildError::TransportMustBeContiguous);
+        }
+
+        for corner in self.board.neighboring_corners_for_edge(position) {
+            if let Some(building) = self.find_building(corner) {
+                
+            }
+        }
+
+        Ok(())
+    }
+
     pub fn play_transport(
         &mut self,
         transport: Transport,
         position: EdgePosition,
     ) -> Result<(), BuildError> {
-        // todo!
-        // figure out if the road to be built is contiguous, and account for edge cases
-        if self.find_transport(position).is_some() {
-            return Err(BuildError::StructureAlreadyExists);
-        }
+        self.can_play_transport(transport, position)?;
 
         let player = self.find_player_mut(transport.owner());
 
@@ -188,28 +231,36 @@ impl Game {
                 .buildings
                 .iter()
                 .filter(|(b, _)| b.owner() == player.token())
-                .filter_map(|(b, pos)| {
-                    Some(pos.iter().filter_map(|p| {
-                        if self.board.get_tile_roll_number(*p)? == roll.into()
-                            && !self.board.has_robber(*p)
-                        {
-                            Some((
-                                self.board.get_resource_type(*p)?,
-                                if b.r#type() == BuildingType::Settlement {
-                                    1
-                                } else {
-                                    2
-                                },
-                            ))
-                        } else {
-                            None
-                        }
-                    }))
+                .map(|(b, pos)| {
+                    pos.iter()
+                        .filter_map(|p| Self::determine_resource(&self.board, *b, *p, roll))
                 })
                 .flatten()
                 .collect();
 
             player.add_resources(resources);
+        }
+    }
+
+    fn determine_resource(
+        board: &Board,
+        building: Building,
+        resource_tile: HexPosition,
+        roll: u8,
+    ) -> Option<(ResourceType, u32)> {
+        if board.get_tile_roll_number(resource_tile)? == roll.into()
+            && !board.has_robber(resource_tile)
+        {
+            Some((
+                board.get_resource_type(resource_tile)?,
+                if building.r#type() == BuildingType::Settlement {
+                    1
+                } else {
+                    2
+                },
+            ))
+        } else {
+            None
         }
     }
 
@@ -378,7 +429,7 @@ impl Game {
         }
     }
 
-    fn all_segments_finished(segments: &Vec<TransportSegment>) -> bool {
+    fn all_segments_finished(segments: &[TransportSegment]) -> bool {
         for segment in segments {
             if segment.is_finished() {
                 continue;
