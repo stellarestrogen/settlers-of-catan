@@ -172,11 +172,13 @@ impl Game {
         // Exception for the first turn, where structures are built without restrictions.
         if self.turn_number > 0 {
             self.can_play_building(building, position)?;
-
-            let player = self.find_player_mut(building.owner());
-
-            player.play_structure(building.into())?;
         }
+
+        let turn_number = self.turn_number;
+
+        let player = self.find_player_mut(building.owner());
+
+        player.play_structure(building.into(), turn_number)?;
 
         self.board
             .set_building(building, position)
@@ -267,11 +269,13 @@ impl Game {
         // Exception for the first turn, where structures are built without restrictions.
         if self.turn_number > 0 {
             self.can_play_transport(transport, position)?;
-
-            let player = self.find_player_mut(transport.owner());
-
-            player.play_structure(transport.into())?;
         }
+
+        let turn_number = self.turn_number;
+
+        let player = self.find_player_mut(transport.owner());
+
+        player.play_structure(transport.into(), turn_number)?;
 
         self.board
             .set_transport(transport, position)

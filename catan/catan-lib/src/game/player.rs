@@ -66,8 +66,14 @@ impl Player {
         Ok(())
     }
 
-    pub fn play_structure(&mut self, structure: StructureType) -> Result<(), BuildError> {
-        self.try_play_structure(structure)?;
+    pub fn play_structure(
+        &mut self,
+        structure: StructureType,
+        turn_number: usize,
+    ) -> Result<(), BuildError> {
+        if turn_number > 0 {
+            self.try_play_structure(structure)?;
+        }
 
         if structure == StructureType::City {
             self.owned_structures
