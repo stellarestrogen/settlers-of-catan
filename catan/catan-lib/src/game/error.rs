@@ -15,14 +15,17 @@ pub enum BuildError {
     BuildingIsTooCloseToExisting,
     BuildingCutsOffRoad,
     BuildingHasNoRoad,
+    BuildingIsOnWater,
     CityRequiresSettlement,
-    CityUpgradeTokenMismatch,
+    CityUpgradeOwnerMismatch,
     NoStructures {
         token: OwnershipToken,
         structure: StructureType,
     },
     TransportMustBeContiguous,
     TransportInterruptsBuilding,
+    RoadMustNeighborLand,
+    BoatMustNeighborWater,
 }
 
 #[derive(Debug, Clone, Copy)]

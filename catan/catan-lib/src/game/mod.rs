@@ -22,6 +22,7 @@ use crate::{
         transport_segment::TransportSegment,
     },
     object::{
+        TileType,
         card::ResourceMap,
         resource::ResourceType,
         structure::{
@@ -117,6 +118,16 @@ impl Game {
             }
         }
 
+        let hexes = self.board.neighboring_hex_for_corner(position);
+
+        let land_count = hexes
+            .filter(|p| self.board.get_tile(*p).get_tile_type() != TileType::Water)
+            .count();
+
+        if land_count == 0 {
+            return Err(BuildError::BuildingIsOnWater);
+        }
+
         let mut same_ownership = 0;
         let mut different_ownership = 0;
         for edge in self.board.neighboring_edges_for_corner(position) {
@@ -143,7 +154,7 @@ impl Game {
                 if b.r#type() == BuildingType::City {
                     Err(BuildError::StructureAlreadyExists)
                 } else if building.owner() != b.owner() {
-                    Err(BuildError::CityUpgradeTokenMismatch)
+                    Err(BuildError::CityUpgradeOwnerMismatch)
                 } else {
                     Ok(())
                 }
@@ -190,6 +201,25 @@ impl Game {
     ) -> Result<(), BuildError> {
         if self.find_transport(position).is_some() {
             return Err(BuildError::StructureAlreadyExists);
+        }
+
+        let hexes = self.board.neighboring_hex_for_edge(position);
+
+        let land_count = hexes
+            .filter(|p| self.board.get_tile(*p).get_tile_type() != TileType::Water)
+            .count();
+
+        match transport.r#type() {
+            TransportType::Road => {
+                if land_count == 0 {
+                    return Err(BuildError::RoadMustNeighborLand);
+                }
+            }
+            TransportType::Boat => {
+                if land_count == 2 {
+                    return Err(BuildError::BoatMustNeighborWater);
+                }
+            }
         }
 
         let neighbor_count = self
@@ -332,6 +362,27 @@ impl Game {
         for segment in segments {
             if segment.is_finished() {
                 new_segments.push(segment);
+                continue;
+            }
+
+            let current_position = segment.current_position();
+
+            let mut is_building_blocking = false;
+
+            for corner in self.board.neighboring_corners_for_edge(current_position) {
+                if segment.is_corner_behind_current(corner) {
+                    continue;
+                }
+
+                is_building_blocking = self
+                    .find_building(corner)
+                    .is_some_and(|b| b.owner() != segment.owner());
+            }
+
+            if is_building_blocking {
+                let mut new_segment = segment.clone();
+                new_segment.finished();
+                new_segments.push(new_segment);
                 continue;
             }
 

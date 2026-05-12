@@ -128,6 +128,16 @@ impl Board {
             .filter(|p| self.corners.get_bounds().contains(*p))
     }
 
+    pub fn neighboring_hex_for_edge(
+        &self,
+        position: EdgePosition,
+    ) -> impl Iterator<Item = HexPosition> + Clone {
+        position
+            .neighboring_hex()
+            .into_iter()
+            .filter(|p| self.tiles.get_bounds().contains(*p))
+    }
+
     pub fn neighboring_corners_for_edge(
         &self,
         position: EdgePosition,

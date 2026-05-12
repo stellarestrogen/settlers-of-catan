@@ -28,6 +28,10 @@ impl Transport {
     pub fn owner(&self) -> OwnershipToken {
         self.owner
     }
+
+    pub fn r#type(&self) -> TransportType {
+        self.r#type
+    }
 }
 
 impl Into<Structure> for Transport {

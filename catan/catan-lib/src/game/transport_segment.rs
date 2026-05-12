@@ -1,6 +1,6 @@
 use std::fmt::Debug;
 
-use hexgrid::edge::position::EdgePosition;
+use hexgrid::{corner::position::CornerPosition, edge::position::EdgePosition};
 
 use crate::game::player::OwnershipToken;
 
@@ -36,9 +36,7 @@ impl TransportSegment {
         &self,
         neighbors: impl Iterator<Item = EdgePosition> + Clone + Debug,
     ) -> impl Iterator<Item = EdgePosition> + Clone + Debug {
-        neighbors.filter(|p| {
-            !self.is_in_history(*p) && !self.is_position_behind_current(*p)
-        })
+        neighbors.filter(|p| !self.is_in_history(*p) && !self.is_position_behind_current(*p))
     }
 
     pub fn update(&mut self, position: EdgePosition) {
@@ -101,6 +99,23 @@ impl TransportSegment {
             }
         }
         Some(true)
+    }
+
+    pub fn is_corner_behind_current(&self, position: CornerPosition) -> bool {
+        let last = match self.history.last() {
+            Some(p) => p,
+            None => return false,
+        };
+
+        for edge in position.neighboring_edges() {
+            if edge.is_neighbor(*last) {
+                return true;
+            } else {
+                continue;
+            }
+        }
+
+        false
     }
 
     fn is_position_behind_current(&self, position: EdgePosition) -> bool {
