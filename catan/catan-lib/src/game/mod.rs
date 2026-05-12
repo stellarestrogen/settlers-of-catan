@@ -256,7 +256,8 @@ impl Game {
             }
         }
 
-        if valid_edges == 0 {
+        // Exception for first turn, where there are no neighbors.
+        if valid_edges == 0 && self.turn_number > 0 {
             return Err(BuildError::TransportInterruptsBuilding);
         }
 
@@ -523,7 +524,7 @@ impl Game {
 
 #[test]
 fn test() {
-    let edition = edition::CustomEdition::of_size(3, 5)
+    let edition = edition::CustomEdition::of_size(4, 6)
         .with_owned_structures(OwnedStructures::new(5, 4, 30, 0))
         .build();
 
