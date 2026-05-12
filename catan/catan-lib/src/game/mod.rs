@@ -524,13 +524,13 @@ impl Game {
 
 #[test]
 fn test() {
-    let edition = edition::CustomEdition::of_size(4, 6)
+    let edition = edition::CustomEdition::of_size(3, 5)
         .with_owned_structures(OwnedStructures::new(5, 4, 30, 0))
         .build();
 
     let mut game = Game::new(edition, 2).unwrap();
 
-    let start = HexPosition::ORIGIN + EdgeOrientation::RIGHT;
+    let start = (HexPosition::ORIGIN + HexPosition::DOWN_LEFT) + EdgeOrientation::RIGHT;
 
     let roads: [EdgePosition; 21] = [
         start.into(),
