@@ -69,9 +69,9 @@ impl Player {
     pub fn play_structure(
         &mut self,
         structure: StructureType,
-        turn_number: usize,
+        is_first_turn: bool,
     ) -> Result<(), BuildError> {
-        if turn_number > 0 {
+        if is_first_turn {
             self.try_play_structure(structure)?;
         }
 
