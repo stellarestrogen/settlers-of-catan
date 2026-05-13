@@ -24,13 +24,3 @@ impl CornerHeight<Center> {
         height: PhantomData::<Center>,
     };
 }
-
-impl<H> Clone for CornerHeight<H> {
-    fn clone(&self) -> Self {
-        CornerHeight::<H> {
-            rights: self.rights,
-            downs: self.downs,
-            height: PhantomData::<H>,
-        }
-    }
-}

@@ -109,6 +109,17 @@ pub struct CornerHeight<H> {
     height: PhantomData<H>,
 }
 
+impl<H> Clone for CornerHeight<H> {
+    fn clone(&self) -> Self {
+        CornerHeight::<H> {
+            rights: self.rights,
+            downs: self.downs,
+            height: PhantomData::<H>,
+        }
+    }
+}
+
+
 impl<H> Copy for CornerHeight<H> {}
 
 impl<H> PartialEq for CornerHeight<H> {
