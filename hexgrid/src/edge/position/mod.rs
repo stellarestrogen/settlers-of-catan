@@ -2,25 +2,17 @@ use std::marker::PhantomData;
 
 use crate::{
     corner::position::{CornerHeight, CornerPosition},
-    edge::Edge,
+    edge::{Edge, position::{even::Even, odd::Odd, positive::Positive}},
     hex::position::HexPosition,
 };
 
+pub mod even;
+pub mod negative;
+pub mod odd;
 pub mod op_add;
 pub mod op_mul;
 pub mod op_sub;
-
-#[derive(Debug, Clone, Copy)]
-pub struct Even;
-
-#[derive(Debug, Clone, Copy)]
-pub struct Odd;
-
-#[derive(Debug, Clone, Copy)]
-pub struct Positive;
-
-#[derive(Debug, Clone, Copy)]
-pub struct Negative;
+pub mod positive;
 
 #[derive(Clone, Copy, PartialEq, Eq)]
 pub enum EdgePosition {
@@ -208,218 +200,6 @@ pub struct EdgeOrientation<T> {
     rights: i32,
     downs: i32,
     r#type: PhantomData<T>,
-}
-
-impl EdgeOrientation<Even> {
-    pub const TOP_LEFT: EdgeOrientation<Even> = EdgeOrientation {
-        rights: 0,
-        downs: 0,
-        r#type: PhantomData::<Even>,
-    };
-
-    pub const BOTTOM_RIGHT: EdgeOrientation<Even> = EdgeOrientation {
-        rights: 2,
-        downs: 2,
-        r#type: PhantomData::<Even>,
-    };
-
-    pub fn go_up_right(self) -> EdgeOrientation<Positive> {
-        self + EdgeOrientation::UP_RIGHT
-    }
-
-    pub fn go_right(self) -> EdgeOrientation<Odd> {
-        self + EdgeOrientation::GO_RIGHT
-    }
-
-    pub fn go_down_left(self) -> EdgeOrientation<Positive> {
-        self + EdgeOrientation::DOWN_LEFT
-    }
-
-    pub fn go_left(self) -> EdgeOrientation<Odd> {
-        self + EdgeOrientation::GO_LEFT
-    }
-
-    pub fn neighboring_edges(&self) -> [(EdgeOrientation<Odd>, EdgeOrientation<Positive>); 2] {
-        [
-            (
-                *self + EdgeOrientation::GO_LEFT,
-                *self + EdgeOrientation::UP_RIGHT,
-            ),
-            (
-                *self + EdgeOrientation::GO_RIGHT,
-                *self + EdgeOrientation::DOWN_LEFT,
-            ),
-        ]
-    }
-}
-
-impl Into<EdgePosition> for EdgeOrientation<Even> {
-    fn into(self) -> EdgePosition {
-        EdgePosition::Even(self)
-    }
-}
-
-impl Edge for EdgeOrientation<Even> {
-    fn neighboring_hex(&self) -> [HexPosition; 2] {
-        [
-            *self + EdgeOrientation::UP_LEFT,
-            *self + EdgeOrientation::DOWN_RIGHT,
-        ]
-    }
-}
-
-impl EdgeOrientation<Odd> {
-    pub const GO_RIGHT: EdgeOrientation<Odd> = EdgeOrientation {
-        rights: 2,
-        downs: 0,
-        r#type: PhantomData::<Odd>,
-    };
-
-    pub const GO_LEFT: EdgeOrientation<Odd> = EdgeOrientation {
-        rights: -2,
-        downs: 0,
-        r#type: PhantomData::<Odd>,
-    };
-
-    pub const BOTTOM_LEFT: EdgeOrientation<Odd> = EdgeOrientation {
-        rights: -1,
-        downs: 1,
-        r#type: PhantomData::<Odd>,
-    };
-
-    pub const TOP_RIGHT: EdgeOrientation<Odd> = EdgeOrientation {
-        rights: 1,
-        downs: -1,
-        r#type: PhantomData::<Odd>,
-    };
-
-    pub fn go_right(self) -> EdgeOrientation<Even> {
-        self + EdgeOrientation::GO_RIGHT
-    }
-
-    pub fn go_down_right(self) -> EdgeOrientation<Positive> {
-        self + EdgeOrientation::DOWN_RIGHT
-    }
-
-    pub fn go_left(self) -> EdgeOrientation<Even> {
-        self + EdgeOrientation::GO_LEFT
-    }
-
-    pub fn go_up_left(self) -> EdgeOrientation<Positive> {
-        self + EdgeOrientation::UP_LEFT
-    }
-
-    pub fn neighboring_edges(&self) -> [(EdgeOrientation<Even>, EdgeOrientation<Positive>); 2] {
-        [
-            (
-                *self + EdgeOrientation::GO_LEFT,
-                *self + EdgeOrientation::UP_LEFT,
-            ),
-            (
-                *self + EdgeOrientation::GO_RIGHT,
-                *self + EdgeOrientation::DOWN_RIGHT,
-            ),
-        ]
-    }
-}
-
-impl Into<EdgePosition> for EdgeOrientation<Odd> {
-    fn into(self) -> EdgePosition {
-        EdgePosition::Odd(self)
-    }
-}
-
-impl Edge for EdgeOrientation<Odd> {
-    fn neighboring_hex(&self) -> [HexPosition; 2] {
-        [
-            *self + EdgeOrientation::UP_RIGHT,
-            *self + EdgeOrientation::DOWN_LEFT,
-        ]
-    }
-}
-
-impl EdgeOrientation<Positive> {
-    pub const DOWN_LEFT: EdgeOrientation<Positive> = EdgeOrientation {
-        rights: -1,
-        downs: 1,
-        r#type: PhantomData::<Positive>,
-    };
-
-    pub const UP_RIGHT: EdgeOrientation<Positive> = EdgeOrientation {
-        rights: 1,
-        downs: -1,
-        r#type: PhantomData::<Positive>,
-    };
-
-    pub const LEFT: EdgeOrientation<Positive> = EdgeOrientation {
-        rights: -1,
-        downs: 1,
-        r#type: PhantomData::<Positive>,
-    };
-
-    pub const RIGHT: EdgeOrientation<Positive> = EdgeOrientation {
-        rights: 3,
-        downs: 1,
-        r#type: PhantomData::<Positive>,
-    };
-
-    pub fn go_up_right(self) -> EdgeOrientation<Even> {
-        self + EdgeOrientation::UP_RIGHT
-    }
-
-    pub fn go_down_right(self) -> EdgeOrientation<Odd> {
-        self + EdgeOrientation::DOWN_RIGHT
-    }
-
-    pub fn go_up_left(self) -> EdgeOrientation<Odd> {
-        self + EdgeOrientation::UP_LEFT
-    }
-
-    pub fn go_down_left(self) -> EdgeOrientation<Even> {
-        self + EdgeOrientation::DOWN_LEFT
-    }
-
-    pub fn neighboring_edges(&self) -> [(EdgeOrientation<Even>, EdgeOrientation<Odd>); 2] {
-        [
-            (
-                *self + EdgeOrientation::UP_RIGHT,
-                *self + EdgeOrientation::UP_LEFT,
-            ),
-            (
-                *self + EdgeOrientation::DOWN_LEFT,
-                *self + EdgeOrientation::DOWN_RIGHT,
-            ),
-        ]
-    }
-}
-
-impl Into<EdgePosition> for EdgeOrientation<Positive> {
-    fn into(self) -> EdgePosition {
-        EdgePosition::Positive(self)
-    }
-}
-
-impl Edge for EdgeOrientation<Positive> {
-    fn neighboring_hex(&self) -> [HexPosition; 2] {
-        [
-            *self + EdgeOrientation::GO_LEFT,
-            *self + EdgeOrientation::GO_RIGHT,
-        ]
-    }
-}
-
-impl EdgeOrientation<Negative> {
-    pub const DOWN_RIGHT: EdgeOrientation<Negative> = EdgeOrientation {
-        rights: 1,
-        downs: 1,
-        r#type: PhantomData::<Negative>,
-    };
-
-    pub const UP_LEFT: EdgeOrientation<Negative> = EdgeOrientation {
-        rights: -1,
-        downs: -1,
-        r#type: PhantomData::<Negative>,
-    };
 }
 
 impl<T> Clone for EdgeOrientation<T> {

@@ -2,7 +2,7 @@ use std::{marker::PhantomData, ops::Sub};
 
 use crate::hex::position::HexPosition;
 
-use super::{Center, CornerHeight, High, Low};
+use super::{CornerHeight, center::Center, high::High, low::Low};
 
 macro_rules! corner_sub {
     ($lhs: ty, $rhs: ty, $out: ty) => {

@@ -1,7 +1,7 @@
 use std::marker::PhantomData;
 use std::ops::{Mul, MulAssign};
 
-use super::{CornerHeight, Low};
+use super::{CornerHeight, low::Low};
 
 macro_rules! scalar_operations {
     ($scalar: ty) => {

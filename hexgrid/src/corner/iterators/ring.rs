@@ -1,5 +1,5 @@
 use crate::{
-    corner::position::{CornerHeight, High, Low},
+    corner::position::{CornerHeight, high::High, low::Low},
     hex::position::HexPosition,
 };
 

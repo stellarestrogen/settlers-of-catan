@@ -2,7 +2,7 @@ use std::iter;
 
 use hexgrid::corner::{
     iterators::ring::CornerRing,
-    position::{CornerHeight, CornerPosition, High, Low},
+    position::{CornerHeight, CornerPosition, high::High, low::Low},
     table::CornerTable,
 };
 use rand::seq::SliceRandom;

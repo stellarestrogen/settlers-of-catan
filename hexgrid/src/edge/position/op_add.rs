@@ -3,7 +3,7 @@ use std::ops::Add;
 
 use crate::hex::position::HexPosition;
 
-use super::{EdgeOrientation, Even, Negative, Odd, Positive};
+use super::{EdgeOrientation, even::Even, negative::Negative, odd::Odd, positive::Positive};
 
 macro_rules! edge_add {
     ($lhs: ty, $rhs: ty, $out: ty) => {

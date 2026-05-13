@@ -3,7 +3,7 @@ use std::ops::Sub;
 
 use crate::hex::position::HexPosition;
 
-use super::{EdgeOrientation, Even, Negative, Odd, Positive};
+use super::{EdgeOrientation, even::Even, negative::Negative, odd::Odd, positive::Positive};
 
 macro_rules! edge_sub {
     ($lhs: ty, $rhs: ty, $out: ty) => {

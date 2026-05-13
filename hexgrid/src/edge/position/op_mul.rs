@@ -2,7 +2,7 @@ use std::marker::PhantomData;
 
 use std::ops::{Mul, MulAssign};
 
-use super::{EdgeOrientation, Even};
+use super::{EdgeOrientation, even::Even};
 
 macro_rules! scalar_operations {
     ($scalar: ty) => {
