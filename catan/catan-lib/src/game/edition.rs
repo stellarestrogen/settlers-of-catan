@@ -28,7 +28,7 @@ pub trait GameEdition {
     fn get_start_structures(&self) -> OwnedStructures;
 }
 
-pub struct BaseEdition {}
+pub struct BaseEdition;
 
 impl GameEdition for BaseEdition {
     fn get_tiles(&self) -> impl Iterator<Item = (HexPosition, TileData)> + Clone {
@@ -67,7 +67,7 @@ impl GameEdition for BaseEdition {
     }
 }
 
-pub struct ExpansionEdition {}
+pub struct ExpansionEdition;
 
 impl GameEdition for ExpansionEdition {
     fn get_tiles(&self) -> impl Iterator<Item = (HexPosition, TileData)> + Clone {

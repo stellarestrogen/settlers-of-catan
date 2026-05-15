@@ -1,5 +1,7 @@
 use std::fmt::Debug;
 
+use thiserror::Error;
+
 use crate::{
     game::player::OwnershipToken,
     object::{card::ResourceCard, structure::StructureType},
@@ -28,8 +30,9 @@ pub enum BuildError {
     BoatMustNeighborWater,
 }
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Error, Debug, Clone, Copy)]
 pub enum GameError {
+    #[error("Not enough players!")]
     InsufficientPlayerCount,
 }
 

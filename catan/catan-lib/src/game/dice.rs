@@ -4,7 +4,7 @@ use rand::prelude::*;
 pub struct Dice([u8; 2]);
 
 impl Dice {
-    pub fn roll(rng: &mut (impl SeedableRng + RngCore)) -> Self {
+    pub fn roll(rng: &mut (impl SeedableRng + Rng)) -> Self {
         let first = rng.random_range(1..7);
         let second = rng.random_range(1..7);
 
