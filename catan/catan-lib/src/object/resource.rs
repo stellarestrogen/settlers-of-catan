@@ -1,4 +1,6 @@
 use rand::prelude::*;
+use serde::Deserialize;
+use tsify::Tsify;
 use std::iter;
 
 use super::{TileData, TileType};
@@ -6,7 +8,7 @@ use crate::distribution::Distribution;
 
 pub const RESOURCE_NO: usize = 5;
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Tsify, Deserialize)]
 pub enum ResourceType {
     Wood,
     Brick,

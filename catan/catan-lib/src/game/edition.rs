@@ -2,6 +2,7 @@ use std::iter;
 
 use hexgrid::hex::{iterators::spiral::HexSpiral, position::HexPosition};
 use rand::prelude::*;
+use wasm_bindgen::prelude::wasm_bindgen;
 
 use crate::object::{
     TileData,
@@ -106,10 +107,11 @@ impl GameEdition for ExpansionEdition {
     }
 }
 
+#[wasm_bindgen]
 pub struct CustomEdition {
     shortest: u32,
     longest: u32,
-    rsrc_distr: ResourceDistribution,
+    resource_distr: ResourceDistribution,
     roll_numbers: Vec<u8>,
     trade_distr: TradeDistribution,
     trade_gaps: Vec<u32>,
@@ -127,7 +129,7 @@ impl GameEdition for CustomEdition {
         let size: usize = ((self.longest - 1) * self.longest - (self.shortest - 1) * self.shortest + self.longest) as usize;
         let resource_deck = ResourceDeck::new(
             size,
-            self.rsrc_distr.clone(),
+            self.resource_distr.clone(),
             &mut self.roll_numbers.clone().into_iter(),
         );
 
@@ -148,10 +150,11 @@ impl GameEdition for CustomEdition {
     }
 }
 
+#[wasm_bindgen]
 pub struct CustomEditionBuilder {
     shortest: u32,
     longest: u32,
-    rsrc_distr: ResourceDistribution,
+    resource_distr: ResourceDistribution,
     roll_numbers: Vec<u8>,
     trade_distr: TradeDistribution,
     trade_gaps: Vec<u32>,
@@ -163,7 +166,7 @@ impl CustomEditionBuilder {
         CustomEdition {
             shortest: self.shortest,
             longest: self.longest,
-            rsrc_distr: self.rsrc_distr,
+            resource_distr: self.resource_distr,
             roll_numbers: self.roll_numbers,
             trade_distr: self.trade_distr,
             trade_gaps: self.trade_gaps,
@@ -175,7 +178,7 @@ impl CustomEditionBuilder {
         CustomEditionBuilder {
             shortest,
             longest,
-            rsrc_distr: Self::default_resource_distribution(shortest, longest),
+            resource_distr: Self::default_resource_distribution(shortest, longest),
             roll_numbers: Self::default_roll_numbers(shortest, longest),
             trade_distr: Self::default_trade_distribution(shortest, longest),
             trade_gaps: Self::default_trade_gaps(shortest, longest),
@@ -187,7 +190,7 @@ impl CustomEditionBuilder {
         mut self,
         distr: ResourceDistribution,
     ) -> CustomEditionBuilder {
-        self.rsrc_distr = distr;
+        self.resource_distr = distr;
         self
     }
 

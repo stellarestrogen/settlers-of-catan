@@ -1,6 +1,10 @@
 pub mod building;
 pub mod transport;
 
+use serde::Deserialize;
+use tsify::Tsify;
+use wasm_bindgen::prelude::wasm_bindgen;
+
 use crate::{
     game::player::OwnershipToken,
     object::{card::ResourceMap, resource::ResourceType},
@@ -62,7 +66,8 @@ impl Structure {
 }
 
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, Tsify, Deserialize)]
+#[wasm_bindgen]
 pub struct OwnedStructures {
     settlements: u32,
     cities: u32,

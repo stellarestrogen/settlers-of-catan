@@ -21,9 +21,9 @@ use crate::{
 
 #[derive(Debug)]
 pub struct Board {
+    tiles: HexTable<TileData>,
     corners: CornerTable<CornerData>,
     edges: EdgeTable<EdgeData>,
-    tiles: HexTable<TileData>,
     robber: Robber,
 }
 
@@ -35,9 +35,9 @@ impl Board {
         let edges = EdgeTable::new(EdgeBounds::new(bounds));
         let robber = Robber::place(&tiles);
         Board {
+            tiles,
             corners,
             edges,
-            tiles,
             robber,
         }
     }
@@ -158,7 +158,6 @@ impl Board {
             .filter(|p| self.edges.get_bounds().contains(*p))
     }
 
-    // TODO: Create error handler instead of expecting the position.
     fn create_tiles(edition: &impl GameEdition) -> HexTable<TileData> {
         let mut bounds = HexPerimeter::new();
         let iter = edition.get_tiles();

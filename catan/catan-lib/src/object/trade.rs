@@ -6,6 +6,8 @@ use hexgrid::corner::{
     table::CornerTable,
 };
 use rand::seq::SliceRandom;
+use serde::Deserialize;
+use tsify::Tsify;
 
 use crate::{
     distribution::Distribution,
@@ -15,7 +17,7 @@ use crate::{
 
 const TRADE_NO: usize = 6;
 
-#[derive(Debug, Clone, Copy, PartialEq)]
+#[derive(Debug, Clone, Copy, PartialEq, Tsify, Deserialize)]
 pub enum TradeType {
     Resource(ResourceType),
     Any,

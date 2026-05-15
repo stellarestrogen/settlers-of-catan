@@ -319,7 +319,7 @@ impl Game {
         resource_tile: HexPosition,
         roll: u8,
     ) -> Option<(ResourceType, u32)> {
-        if board.get_tile_roll_number(resource_tile)? == roll.into()
+        if board.get_tile_roll_number(resource_tile)? == roll as u32
             && !board.has_robber(resource_tile)
         {
             Some((
