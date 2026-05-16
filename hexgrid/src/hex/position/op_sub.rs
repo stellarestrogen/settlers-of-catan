@@ -8,13 +8,13 @@ impl Sub for HexPosition {
     fn sub(self, rhs: Self) -> Self::Output {
         HexPosition {
             rights: self
-                .horizontal_distance(HexPosition::ORIGIN)
-                .sub(rhs.horizontal_distance(HexPosition::ORIGIN))
+                .horizontal_displacement(HexPosition::ORIGIN)
+                .sub(rhs.horizontal_displacement(HexPosition::ORIGIN))
                 .ceil(),
 
             downs: self
-                .vertical_distance(HexPosition::ORIGIN)
-                .sub(rhs.vertical_distance(HexPosition::ORIGIN)),
+                .vertical_displacement(HexPosition::ORIGIN)
+                .sub(rhs.vertical_displacement(HexPosition::ORIGIN)),
         }
     }
 }
@@ -22,12 +22,12 @@ impl Sub for HexPosition {
 impl SubAssign for HexPosition {
     fn sub_assign(&mut self, rhs: Self) {
         self.rights = self
-            .horizontal_distance(HexPosition::ORIGIN)
-            .sub(rhs.horizontal_distance(HexPosition::ORIGIN))
+            .horizontal_displacement(HexPosition::ORIGIN)
+            .sub(rhs.horizontal_displacement(HexPosition::ORIGIN))
             .ceil();
 
         self.downs = self
-            .vertical_distance(HexPosition::ORIGIN)
-            .sub(rhs.vertical_distance(HexPosition::ORIGIN));
+            .vertical_displacement(HexPosition::ORIGIN)
+            .sub(rhs.vertical_displacement(HexPosition::ORIGIN));
     }
 }

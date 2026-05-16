@@ -2,7 +2,7 @@ use crate::{
     edge::position::EdgePosition,
     hex::{
         bounds::HexPerimeter,
-        position::{HexPosition, HorizontalDistance},
+        position::{HexPosition, HorizontalDisplacement},
     },
 };
 
@@ -31,13 +31,14 @@ impl EdgeBounds {
 
         let length = self.bounds.get_length();
 
-        if let HorizontalDistance::Unshifted(_) = top_left.horizontal_distance(HexPosition::ORIGIN)
+        if let HorizontalDisplacement::Unshifted(_) =
+            top_left.horizontal_displacement(HexPosition::ORIGIN)
         {
             hex1 = top_left + length * HexPosition::RIGHT;
         }
 
-        if let HorizontalDistance::Shifted(_) =
-            bottom_right.horizontal_distance(HexPosition::ORIGIN)
+        if let HorizontalDisplacement::Shifted(_) =
+            bottom_right.horizontal_displacement(HexPosition::ORIGIN)
         {
             hex2 = bottom_right + length * HexPosition::LEFT;
         }

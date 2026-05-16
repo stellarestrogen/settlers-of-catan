@@ -56,10 +56,10 @@ impl Sub<HexPosition> for CornerHeight<High> {
     type Output = CornerHeight<High>;
 
     fn sub(self, rhs: HexPosition) -> Self::Output {
-        let shift: f64 = rhs.horizontal_distance(HexPosition::ORIGIN).into();
+        let shift: f64 = rhs.horizontal_displacement(HexPosition::ORIGIN).into();
         CornerHeight {
             rights: self.rights - (shift * 2.) as i32,
-            downs: self.downs - rhs.vertical_distance(HexPosition::ORIGIN) * 3,
+            downs: self.downs - rhs.vertical_displacement(HexPosition::ORIGIN) * 3,
             height: PhantomData::<High>,
         }
     }
@@ -69,10 +69,10 @@ impl Sub<HexPosition> for CornerHeight<Low> {
     type Output = CornerHeight<Low>;
 
     fn sub(self, rhs: HexPosition) -> Self::Output {
-        let shift: f64 = rhs.horizontal_distance(HexPosition::ORIGIN).into();
+        let shift: f64 = rhs.horizontal_displacement(HexPosition::ORIGIN).into();
         CornerHeight {
             rights: self.rights - (shift * 2.) as i32,
-            downs: self.downs - rhs.vertical_distance(HexPosition::ORIGIN) * 3,
+            downs: self.downs - rhs.vertical_displacement(HexPosition::ORIGIN) * 3,
             height: PhantomData::<Low>,
         }
     }
@@ -82,10 +82,10 @@ impl Sub<CornerHeight<Low>> for HexPosition {
     type Output = CornerHeight<High>;
 
     fn sub(self, rhs: CornerHeight<Low>) -> Self::Output {
-        let shift: f64 = self.horizontal_distance(HexPosition::ORIGIN).into();
+        let shift: f64 = self.horizontal_displacement(HexPosition::ORIGIN).into();
         CornerHeight {
             rights: rhs.rights - (shift * 2.) as i32,
-            downs: rhs.downs - self.vertical_distance(HexPosition::ORIGIN) * 3,
+            downs: rhs.downs - self.vertical_displacement(HexPosition::ORIGIN) * 3,
             height: PhantomData::<High>,
         }
     }
@@ -95,10 +95,10 @@ impl Sub<CornerHeight<High>> for HexPosition {
     type Output = CornerHeight<Low>;
 
     fn sub(self, rhs: CornerHeight<High>) -> Self::Output {
-        let shift: f64 = self.horizontal_distance(HexPosition::ORIGIN).into();
+        let shift: f64 = self.horizontal_displacement(HexPosition::ORIGIN).into();
         CornerHeight {
             rights: rhs.rights - (shift * 2.) as i32,
-            downs: rhs.downs - self.vertical_distance(HexPosition::ORIGIN) * 3,
+            downs: rhs.downs - self.vertical_displacement(HexPosition::ORIGIN) * 3,
             height: PhantomData::<Low>,
         }
     }

@@ -1,6 +1,6 @@
 use core::fmt;
 
-pub use horizontal_distance::HorizontalDistance;
+pub use horizontal_distance::HorizontalDisplacement;
 
 pub mod horizontal_distance;
 pub mod op_add;
@@ -49,70 +49,70 @@ impl HexPosition {
         downs: -1,
     };
 
-    pub fn horizontal_distance(&self, other: Self) -> HorizontalDistance {
-        if self.downs % 2 == other.downs % 2 {
-            HorizontalDistance::Unshifted(self.rights - other.rights)
-        } else if other.downs % 2 == 1 {
-            HorizontalDistance::Shifted(self.rights - other.rights + 1)
+    pub fn horizontal_displacement(&self, other: Self) -> HorizontalDisplacement {
+        if self.downs.abs() % 2 == other.downs.abs() % 2 {
+            HorizontalDisplacement::Unshifted(self.rights - other.rights)
+        } else if other.downs.abs() % 2 == 1 {
+            HorizontalDisplacement::Shifted(self.rights - other.rights + 1)
         } else {
-            HorizontalDistance::Shifted(self.rights - other.rights)
+            HorizontalDisplacement::Shifted(self.rights - other.rights)
         }
     }
 
-    pub fn raw_horizontal_distance(&self, other: Self) -> i32 {
+    pub fn raw_horizontal_displacement(&self, other: Self) -> i32 {
         self.rights - other.rights
     }
 
-    pub fn vertical_distance(&self, other: Self) -> i32 {
+    pub fn vertical_displacement(&self, other: Self) -> i32 {
         self.downs - other.downs
     }
 
     pub fn is_right(&self, other: Self) -> bool {
-        self.horizontal_distance(other).ceil() > 0
+        self.horizontal_displacement(other).ceil() > 0
     }
 
     pub fn is_right_or_equal(&self, other: Self) -> bool {
-        self.horizontal_distance(other).ceil() >= 0
+        self.horizontal_displacement(other).ceil() >= 0
     }
 
     pub fn is_right_raw(&self, other: Self) -> bool {
-        self.raw_horizontal_distance(other) > 0
+        self.raw_horizontal_displacement(other) > 0
     }
 
     pub fn is_right_or_equal_raw(&self, other: Self) -> bool {
-        self.raw_horizontal_distance(other) >= 0
+        self.raw_horizontal_displacement(other) >= 0
     }
 
     pub fn is_left(&self, other: Self) -> bool {
-        self.horizontal_distance(other).ceil() < 0
+        self.horizontal_displacement(other).ceil() < 0
     }
 
     pub fn is_left_raw(&self, other: Self) -> bool {
-        self.raw_horizontal_distance(other) < 0
+        self.raw_horizontal_displacement(other) < 0
     }
 
     pub fn is_left_or_equal(&self, other: Self) -> bool {
-        self.horizontal_distance(other).ceil() <= 0
+        self.horizontal_displacement(other).ceil() <= 0
     }
 
     pub fn is_left_or_equal_raw(&self, other: Self) -> bool {
-        self.raw_horizontal_distance(other) <= 0
+        self.raw_horizontal_displacement(other) <= 0
     }
 
     pub fn is_below(&self, other: Self) -> bool {
-        self.vertical_distance(other) > 0
+        self.vertical_displacement(other) > 0
     }
 
     pub fn is_below_or_equal(&self, other: Self) -> bool {
-        self.vertical_distance(other) >= 0
+        self.vertical_displacement(other) >= 0
     }
 
     pub fn is_above(&self, other: Self) -> bool {
-        self.vertical_distance(other) < 0
+        self.vertical_displacement(other) < 0
     }
 
     pub fn is_above_or_equal(&self, other: Self) -> bool {
-        self.vertical_distance(other) <= 0
+        self.vertical_displacement(other) <= 0
     }
 }
 

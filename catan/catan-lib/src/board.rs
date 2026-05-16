@@ -42,12 +42,24 @@ impl Board {
         }
     }
 
+    pub fn get_length(&self) -> u32 {
+        self.tiles.get_bounds().get_length()
+    }
+
+    pub fn get_width(&self) -> u32 {
+        self.tiles.get_bounds().get_width()
+    }
+
     pub fn get_tile(&self, position: HexPosition) -> TileData {
         if let Some(r) = self.tiles.get(position) {
             *r
         } else {
             TileData::new(TileType::Water)
         }
+    }
+
+    pub fn get_tile_data(&self) -> impl Iterator<Item = TileData> {
+        self.tiles.positions().map(|p| self.get_tile(p))
     }
 
     pub fn get_resource_type(&self, position: HexPosition) -> Option<ResourceType> {
@@ -159,6 +171,7 @@ impl Board {
     }
 
     fn create_tiles(edition: &impl GameEdition) -> HexTable<TileData> {
+        println!("board::create_tiles");
         let mut bounds = HexPerimeter::new();
         let iter = edition.get_tiles();
 
@@ -171,7 +184,7 @@ impl Board {
         for (p, t) in iter {
             tiles.set(p, t).expect("HexPosition is out of bounds!")
         }
-
+        println!("returning tiles");
         tiles
     }
 

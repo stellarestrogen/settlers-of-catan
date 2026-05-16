@@ -8,13 +8,13 @@ impl Add for HexPosition {
     fn add(self, rhs: HexPosition) -> HexPosition {
         HexPosition {
             rights: self
-                .horizontal_distance(HexPosition::ORIGIN)
-                .add(rhs.horizontal_distance(HexPosition::ORIGIN))
+                .horizontal_displacement(HexPosition::ORIGIN)
+                .add(rhs.horizontal_displacement(HexPosition::ORIGIN))
                 .ceil(),
 
             downs: self
-                .vertical_distance(HexPosition::ORIGIN)
-                .add(rhs.vertical_distance(HexPosition::ORIGIN)),
+                .vertical_displacement(HexPosition::ORIGIN)
+                .add(rhs.vertical_displacement(HexPosition::ORIGIN)),
         }
     }
 }
@@ -22,12 +22,12 @@ impl Add for HexPosition {
 impl AddAssign for HexPosition {
     fn add_assign(&mut self, rhs: Self) {
         self.rights = self
-            .horizontal_distance(HexPosition::ORIGIN)
-            .add(rhs.horizontal_distance(HexPosition::ORIGIN))
+            .horizontal_displacement(HexPosition::ORIGIN)
+            .add(rhs.horizontal_displacement(HexPosition::ORIGIN))
             .ceil();
 
         self.downs = self
-            .vertical_distance(HexPosition::ORIGIN)
-            .add(rhs.vertical_distance(HexPosition::ORIGIN));
+            .vertical_displacement(HexPosition::ORIGIN)
+            .add(rhs.vertical_displacement(HexPosition::ORIGIN));
     }
 }

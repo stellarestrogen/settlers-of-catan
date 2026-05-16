@@ -5,7 +5,7 @@ pub mod hand;
 pub mod player;
 pub mod transport_segment;
 
-use std::{fmt::Debug, iter, usize::MAX};
+use std::{fmt::Debug, iter, num::NonZeroUsize, usize::MAX};
 
 use hexgrid::{
     corner::position::CornerPosition,
@@ -22,14 +22,11 @@ use crate::{
         transport_segment::TransportSegment,
     },
     object::{
-        TileType,
-        card::ResourceMap,
-        resource::ResourceType,
-        structure::{
+        TileData, TileType, card::ResourceMap, resource::ResourceType, structure::{
             OwnedStructures,
             building::{Building, BuildingType},
             transport::{Transport, TransportType},
-        },
+        }
     },
 };
 
@@ -46,14 +43,10 @@ pub struct Game {
 }
 
 impl Game {
-    pub fn new(edition: impl GameEdition, player_count: usize) -> Result<Self, GameError> {
-        if player_count == 0 {
-            return Err(GameError::InsufficientPlayerCount);
-        }
-
-        let mut players = Vec::with_capacity(player_count);
+    pub fn new(edition: impl GameEdition, player_count: NonZeroUsize) -> Self {
+        let mut players = Vec::with_capacity(player_count.into());
         let owned_structures = edition.get_start_structures();
-        for _ in 0..player_count {
+        for _ in 0..player_count.into() {
             players.push(Player::new(owned_structures))
         }
 
@@ -65,14 +58,22 @@ impl Game {
 
         let current_turn = players.get(0).expect("Not enough players!").token();
 
-        Ok(Self {
+        Self {
             board: Board::new(edition),
             players,
             current_turn,
             turn_number: 0,
             buildings: Vec::new(),
             transports,
-        })
+        }
+    }
+
+    pub fn get_board_length(&self) -> u32 {
+        self.board.get_length()
+    }
+
+    pub fn get_board_width(&self) -> u32 {
+        self.board.get_width()
     }
 
     pub fn tick(&mut self, roll: u8) {}
@@ -284,6 +285,10 @@ impl Game {
         self.update_last_played_transport(transport.owner(), position);
 
         Ok(())
+    }
+
+    pub fn get_tile_data(&self) -> impl Iterator<Item = TileData> {
+        self.board.get_tile_data()
     }
 
     fn neighboring_transport(
@@ -528,7 +533,7 @@ fn test() {
         .with_owned_structures(OwnedStructures::new(5, 4, 30, 0))
         .build();
 
-    let mut game = Game::new(edition, 2).unwrap();
+    let mut game = Game::new(edition, NonZeroUsize::new(2).unwrap());
 
     let start = (HexPosition::ORIGIN + HexPosition::DOWN_LEFT) + EdgeOrientation::RIGHT;
 

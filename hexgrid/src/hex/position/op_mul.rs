@@ -10,11 +10,11 @@ macro_rules! scalar_operations {
             fn mul(self, rhs: $scalar) -> HexPosition {
                 HexPosition {
                     rights: self
-                        .horizontal_distance(HexPosition::ORIGIN)
+                        .horizontal_displacement(HexPosition::ORIGIN)
                         .mul(rhs as isize)
                         .ceil(),
 
-                    downs: self.vertical_distance(HexPosition::ORIGIN).mul(rhs as i32),
+                    downs: self.vertical_displacement(HexPosition::ORIGIN).mul(rhs as i32),
                 }
             }
         }
@@ -22,11 +22,11 @@ macro_rules! scalar_operations {
         impl MulAssign<$scalar> for HexPosition {
             fn mul_assign(&mut self, rhs: $scalar) {
                 self.rights = self
-                    .horizontal_distance(HexPosition::ORIGIN)
+                    .horizontal_displacement(HexPosition::ORIGIN)
                     .mul(rhs as isize)
                     .ceil();
 
-                self.downs = self.vertical_distance(HexPosition::ORIGIN).mul(rhs as i32);
+                self.downs = self.vertical_displacement(HexPosition::ORIGIN).mul(rhs as i32);
             }
         }
 
@@ -36,11 +36,11 @@ macro_rules! scalar_operations {
             fn mul(self, rhs: HexPosition) -> HexPosition {
                 HexPosition {
                     rights: rhs
-                        .horizontal_distance(HexPosition::ORIGIN)
+                        .horizontal_displacement(HexPosition::ORIGIN)
                         .mul(self as isize)
                         .ceil(),
 
-                    downs: rhs.vertical_distance(HexPosition::ORIGIN).mul(self as i32),
+                    downs: rhs.vertical_displacement(HexPosition::ORIGIN).mul(self as i32),
                 }
             }
         }

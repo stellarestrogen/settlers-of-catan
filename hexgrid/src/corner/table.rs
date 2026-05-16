@@ -82,7 +82,7 @@ impl<T> CornerTable<T> {
     }
 
     pub fn data(&self) -> impl Iterator<Item = &T> {
-        self.data.data().flat_map(|(a, b)| [a, b]).flatten()
+        self.data.data().flat_map(|((a, b), _)| [a, b]).flatten()
     }
 }
 

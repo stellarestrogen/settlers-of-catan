@@ -88,7 +88,7 @@ impl<T> EdgeTable<T> {
     }
 
     pub fn data(&self) -> impl Iterator<Item = &T> {
-        self.data.data().flat_map(|(a, b, c)| [a, b, c]).flatten()
+        self.data.data().flat_map(|((a, b, c), _)| [a, b, c]).flatten()
     }
 }
 

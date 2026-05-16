@@ -48,11 +48,11 @@ macro_rules! hex_to_edge {
             type Output = EdgeOrientation<$t>;
 
             fn add(self, rhs: HexPosition) -> Self::Output {
-                let shift: f64 = rhs.horizontal_distance(HexPosition::ORIGIN).into();
+                let shift: f64 = rhs.horizontal_displacement(HexPosition::ORIGIN).into();
 
                 EdgeOrientation::<$t> {
                     rights: self.rights + (shift * 4.) as i32,
-                    downs: self.downs + rhs.vertical_distance(HexPosition::ORIGIN) * 2,
+                    downs: self.downs + rhs.vertical_displacement(HexPosition::ORIGIN) * 2,
                     r#type: PhantomData::<$t>,
                 }
             }
@@ -62,11 +62,11 @@ macro_rules! hex_to_edge {
             type Output = EdgeOrientation<$t>;
 
             fn add(self, rhs: EdgeOrientation<$t>) -> Self::Output {
-                let shift: f64 = self.horizontal_distance(HexPosition::ORIGIN).into();
+                let shift: f64 = self.horizontal_displacement(HexPosition::ORIGIN).into();
 
                 EdgeOrientation::<$t> {
                     rights: rhs.rights + (shift * 4.) as i32,
-                    downs: rhs.downs + self.vertical_distance(HexPosition::ORIGIN) * 2,
+                    downs: rhs.downs + self.vertical_displacement(HexPosition::ORIGIN) * 2,
                     r#type: PhantomData::<$t>,
                 }
             }

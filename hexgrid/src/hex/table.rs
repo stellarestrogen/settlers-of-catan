@@ -1,4 +1,7 @@
+use std::fmt::Debug;
 use std::ops::{Index, IndexMut};
+
+use crate::hex::bounds::HexArea;
 
 use super::{bounds::HexPerimeter, position::HexPosition};
 
@@ -32,13 +35,13 @@ impl<T> HexTable<T> {
         }
 
         let rights: isize = position
-            .horizontal_distance(self.bounds.get_top_left())
+            .horizontal_displacement(self.bounds.get_top_left())
             .ceil()
             .try_into()
             .ok()?;
 
         let downs: isize = position
-            .vertical_distance(self.bounds.get_top_left())
+            .vertical_displacement(self.bounds.get_top_left())
             .try_into()
             .ok()?;
 
@@ -69,16 +72,16 @@ impl<T> HexTable<T> {
         }
     }
 
-    pub fn positions<'a>(&'a self) -> impl Iterator<Item = HexPosition> {
-        HexData::new(self)
+    pub fn positions(&self) -> HexArea<'_> {
+        self.bounds.area()
     }
 
-    pub fn data(&self) -> impl Iterator<Item = &T> {
-        self.positions().map(|p| self.get(p)).flatten()
+    pub fn data(&self) -> HexData<'_, T> {
+        HexData::new(&self)
     }
 }
 
-impl<T> Index<HexPosition> for HexTable<T> {
+impl<T: Debug> Index<HexPosition> for HexTable<T> {
     type Output = T;
 
     fn index(&self, index: HexPosition) -> &T {
@@ -86,7 +89,7 @@ impl<T> Index<HexPosition> for HexTable<T> {
     }
 }
 
-impl<T> IndexMut<HexPosition> for HexTable<T> {
+impl<T: Debug> IndexMut<HexPosition> for HexTable<T> {
     fn index_mut(&mut self, index: HexPosition) -> &mut T {
         self.get_mut(index)
             .expect("No data at specified HexPosition!")
@@ -95,30 +98,23 @@ impl<T> IndexMut<HexPosition> for HexTable<T> {
 
 pub struct HexData<'a, T> {
     parent: &'a HexTable<T>,
-    current: HexPosition,
+    area: HexArea<'a>,
 }
 
 impl<'a, T> HexData<'a, T> {
     fn new(parent: &'a HexTable<T>) -> Self {
-        HexData {
-            parent,
-            current: parent.bounds.get_top_left(),
-        }
+        let area = parent.bounds.area();
+        HexData { parent, area }
     }
 }
 
 impl<'a, T> Iterator for HexData<'a, T> {
-    type Item = HexPosition;
+    type Item = (&'a T, HexPosition);
 
     fn next(&mut self) -> Option<Self::Item> {
-        let mut area = self.parent.get_bounds().area();
-        area.position(|p| p == self.current)?;
-
-        for p in area {
-            if self.parent.get(p).is_some() {
-                return Some(p);
-            } else {
-                continue;
+        while let Some(position) = self.area.next() {
+            if let Some(data) = self.parent.get(position) {
+                return Some((data, position));
             }
         }
 

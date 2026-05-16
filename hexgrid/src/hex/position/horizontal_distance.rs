@@ -1,14 +1,14 @@
 use std::ops::{Add, AddAssign, Mul, Sub};
 
 #[derive(Debug)]
-pub enum HorizontalDistance {
+pub enum HorizontalDisplacement {
     Unshifted(i32),
 
     // Represents an implicit -0.5 to the stored i32.
     Shifted(i32),
 }
 
-impl HorizontalDistance {
+impl HorizontalDisplacement {
     pub fn ceil(self) -> i32 {
         match self {
             Self::Unshifted(a) => a,
@@ -25,13 +25,13 @@ impl HorizontalDistance {
     }
 }
 
-impl Into<i32> for HorizontalDistance {
+impl Into<i32> for HorizontalDisplacement {
     fn into(self) -> i32 {
         self.ceil()
     }
 }
 
-impl Into<f64> for HorizontalDistance {
+impl Into<f64> for HorizontalDisplacement {
     fn into(self) -> f64 {
         match self {
             Self::Shifted(a) => a as f64 - 0.5,
@@ -40,8 +40,8 @@ impl Into<f64> for HorizontalDistance {
     }
 }
 
-impl Add for HorizontalDistance {
-    type Output = HorizontalDistance;
+impl Add for HorizontalDisplacement {
+    type Output = HorizontalDisplacement;
 
     fn add(self, rhs: Self) -> Self::Output {
         match (self, rhs) {
@@ -54,8 +54,8 @@ impl Add for HorizontalDistance {
     }
 }
 
-impl Sub for HorizontalDistance {
-    type Output = HorizontalDistance;
+impl Sub for HorizontalDisplacement {
+    type Output = HorizontalDisplacement;
 
     fn sub(self, rhs: Self) -> Self::Output {
         match (self, rhs) {
@@ -69,31 +69,31 @@ impl Sub for HorizontalDistance {
 
 macro_rules! scalar_operations {
     ($scalar: ty) => {
-        impl Add<HorizontalDistance> for $scalar {
-            type Output = HorizontalDistance;
+        impl Add<HorizontalDisplacement> for $scalar {
+            type Output = HorizontalDisplacement;
 
-            fn add(self, rhs: HorizontalDistance) -> Self::Output {
+            fn add(self, rhs: HorizontalDisplacement) -> Self::Output {
                 match rhs {
-                    HorizontalDistance::Unshifted(a) => {
-                        HorizontalDistance::Unshifted(a + self as i32)
+                    HorizontalDisplacement::Unshifted(a) => {
+                        HorizontalDisplacement::Unshifted(a + self as i32)
                     }
-                    HorizontalDistance::Shifted(a) => HorizontalDistance::Shifted(a + self as i32),
+                    HorizontalDisplacement::Shifted(a) => HorizontalDisplacement::Shifted(a + self as i32),
                 }
             }
         }
 
-        impl Add<$scalar> for HorizontalDistance {
-            type Output = HorizontalDistance;
+        impl Add<$scalar> for HorizontalDisplacement {
+            type Output = HorizontalDisplacement;
 
             fn add(self, rhs: $scalar) -> Self::Output {
                 match self {
-                    Self::Unshifted(a) => HorizontalDistance::Unshifted(a + rhs as i32),
-                    Self::Shifted(a) => HorizontalDistance::Shifted(a + rhs as i32),
+                    Self::Unshifted(a) => HorizontalDisplacement::Unshifted(a + rhs as i32),
+                    Self::Shifted(a) => HorizontalDisplacement::Shifted(a + rhs as i32),
                 }
             }
         }
 
-        impl AddAssign<$scalar> for HorizontalDistance {
+        impl AddAssign<$scalar> for HorizontalDisplacement {
             fn add_assign(&mut self, rhs: $scalar) {
                 match self {
                     Self::Unshifted(a) => *a += rhs as i32,
@@ -104,8 +104,8 @@ macro_rules! scalar_operations {
     };
 }
 
-impl Mul<isize> for HorizontalDistance {
-    type Output = HorizontalDistance;
+impl Mul<isize> for HorizontalDisplacement {
+    type Output = HorizontalDisplacement;
 
     fn mul(self, rhs: isize) -> Self::Output {
         match self {

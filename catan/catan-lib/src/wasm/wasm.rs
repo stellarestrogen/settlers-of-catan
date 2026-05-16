@@ -1,14 +1,24 @@
+use std::num::NonZeroUsize;
+
 use serde::Deserialize;
+use tracing::info;
 use tsify::Tsify;
 use wasm_bindgen::{JsError, prelude::wasm_bindgen};
 
 use crate::{
-    distribution::Distribution, game::{
+    distribution::Distribution,
+    game::{
         Game,
         edition::{BaseEdition, CustomEdition, ExpansionEdition},
-    }, object::{
-        resource::{ResourceDistribution, ResourceType}, structure::OwnedStructures, trade::{TradeDistribution, TradeType},
-    }
+        error::GameError,
+    },
+    object::{
+        TileData,
+        resource::{ResourceDistribution, ResourceType},
+        structure::OwnedStructures,
+        trade::{TradeDistribution, TradeType},
+    },
+    wasm::resource::WasmTileData,
 };
 
 #[wasm_bindgen]
@@ -19,18 +29,33 @@ pub struct WasmInterface {
 #[wasm_bindgen]
 impl WasmInterface {
     pub fn new_base(player_count: usize) -> Result<Self, JsError> {
-        Ok(Self {
-            game: Game::new(BaseEdition, player_count)?,
-        })
+        let Some(player_count) = NonZeroUsize::new(player_count) else {
+            return Err(GameError::InsufficientPlayerCount.into());
+        };
+
+        let game = Game::new(BaseEdition, player_count);
+
+        Ok(Self { game })
     }
 
     pub fn new_expansion(player_count: usize) -> Result<Self, JsError> {
+        let Some(player_count) = NonZeroUsize::new(player_count) else {
+            return Err(GameError::InsufficientPlayerCount.into());
+        };
+
         Ok(Self {
-            game: Game::new(ExpansionEdition, player_count)?,
+            game: Game::new(ExpansionEdition, player_count),
         })
     }
 
-    pub fn new_custom(edition: <WasmCustomEdition as Tsify>::JsType, player_count: usize) -> Result<Self, JsError> {
+    pub fn new_custom(
+        edition: <WasmCustomEdition as Tsify>::JsType,
+        player_count: usize,
+    ) -> Result<Self, JsError> {
+        let Some(player_count) = NonZeroUsize::new(player_count) else {
+            return Err(GameError::InsufficientPlayerCount.into());
+        };
+
         let wasm = WasmCustomEdition::from_js(edition).expect("Failed to deserialize!");
 
         let mut edition = CustomEdition::of_size(wasm.shortest, wasm.longest);
@@ -54,10 +79,28 @@ impl WasmInterface {
         if let Some(owned_structures) = wasm.owned_structures {
             edition = edition.with_owned_structures(owned_structures)
         }
-        
+
         Ok(Self {
-            game: Game::new(edition.build(), player_count)?,
+            game: Game::new(edition.build(), player_count),
         })
+    }
+
+    pub fn get_length(&self) -> u32 {
+        self.game.get_board_length()
+    }
+
+    pub fn get_width(&self) -> u32 {
+        self.game.get_board_width()
+    }
+
+    pub fn get_tile_data(&self) -> Vec<<WasmTileData as Tsify>::JsType> {
+        let thing = self
+            .game
+            .get_tile_data()
+            .map(WasmTileData::from_tile_data)
+            .map(|t| t.into_js().expect(""))
+            .collect();
+        thing
     }
 }
 
@@ -71,9 +114,3 @@ pub struct WasmCustomEdition {
     pub trade_gaps: Option<Vec<u32>>,
     pub owned_structures: Option<OwnedStructures>,
 }
-
-#[wasm_bindgen]
-impl WasmCustomEdition {
-    
-}
-

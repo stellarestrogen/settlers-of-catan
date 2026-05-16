@@ -4,6 +4,7 @@ pub mod structure;
 pub mod trade;
 
 use hexgrid::hex::{position::HexPosition, table::HexTable};
+use wasm_bindgen::prelude::wasm_bindgen;
 
 use crate::object::{
     resource::ResourceType,
@@ -50,9 +51,9 @@ pub struct Robber {
 
 impl Robber {
     pub fn place(tiles: &HexTable<TileData>) -> Self {
-        if let Some(desert_tile) = tiles
-            .positions()
-            .find(|p| tiles.get(*p).unwrap().get_tile_type() == TileType::Desert)
+        if let Some((_, desert_tile)) = tiles
+            .data()
+            .find(|(t, p)| t.get_tile_type() == TileType::Desert)
         {
             Self {
                 position: desert_tile,
@@ -128,6 +129,7 @@ impl EdgeData {
 }
 
 #[derive(Debug, Clone, Copy)]
+#[wasm_bindgen]
 pub struct TileData {
     r#type: TileType,
 }
