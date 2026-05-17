@@ -1,8 +1,8 @@
 use core::fmt;
 
-pub use horizontal_distance::HorizontalDisplacement;
+pub use horizontal_displacement::HorizontalDisplacement;
 
-pub mod horizontal_distance;
+pub mod horizontal_displacement;
 pub mod op_add;
 pub mod op_mul;
 pub mod op_sub;

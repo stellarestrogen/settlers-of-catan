@@ -3,8 +3,8 @@
     import {WasmInterface, type WasmCustomEdition} from "catan";
 
     let edition: WasmCustomEdition = {
-        shortest: 5,
-        longest: 9,
+        shortest: 1,
+        longest: 2,
         resource_distr: null,
         roll_numbers: null,
         trade_distr: null,
@@ -43,7 +43,7 @@
 
     .row:nth-child(odd) {
         position: relative;
-        left: 165px;
+        left: 167px;
         margin: 0px;
         margin-top: -105px;
         margin-bottom: -105px;

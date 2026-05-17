@@ -122,13 +122,17 @@ impl CustomEdition {
     pub fn of_size(shortest: u32, longest: u32) -> CustomEditionBuilder {
         CustomEditionBuilder::of_size(shortest, longest)
     }
+
+    fn size(&self) -> usize {
+        ((self.longest - 1) * self.longest - (self.shortest - 1) * self.shortest + self.longest)
+            as usize
+    }
 }
 
 impl GameEdition for CustomEdition {
     fn get_tiles(&self) -> impl Iterator<Item = (HexPosition, TileData)> + Clone {
-        let size: usize = ((self.longest - 1) * self.longest - (self.shortest - 1) * self.shortest + self.longest) as usize;
         let resource_deck = ResourceDeck::new(
-            size,
+            self.size(),
             self.resource_distr.clone(),
             &mut self.roll_numbers.clone().into_iter(),
         );
@@ -214,8 +218,12 @@ impl CustomEditionBuilder {
         self
     }
 
+    fn size(shortest: u32, longest: u32) -> usize {
+        ((longest - 1) * longest - (shortest - 1) * shortest + longest) as usize
+    }
+
     fn default_resource_distribution(shortest: u32, longest: u32) -> ResourceDistribution {
-        let size: f64 = ((longest - 1) * longest - (shortest - 1) * shortest + longest) as f64;
+        let size: f64 = Self::size(shortest, longest) as f64;
         ResourceDistribution::new([
             (ResourceType::Wood, (size / 5.).round() as u32),
             (ResourceType::Brick, (size / 6.).round() as u32),
@@ -226,7 +234,7 @@ impl CustomEditionBuilder {
     }
 
     fn default_roll_numbers(shortest: u32, longest: u32) -> Vec<u8> {
-        let size: usize = ((longest - 1) * longest - (shortest - 1) * shortest + longest) as usize;
+        let size = Self::size(shortest, longest);
         let mut roll_numbers: Vec<u8> =
             iter::repeat_n(ROLL_NUMBERS, (size / ROLL_NUMBERS.len()) + 1)
                 .flatten()

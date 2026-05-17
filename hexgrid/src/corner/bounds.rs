@@ -16,7 +16,6 @@ impl CornerBounds {
         let mut bounds: HexPerimeter = hex_bounds.clone();
         bounds.expand(bounds.get_top_left() + HexPosition::UP_RIGHT);
         bounds.expand(bounds.get_bottom_right() + HexPosition::RIGHT + HexPosition::DOWN_LEFT);
-
         CornerBounds { bounds }
     }
 

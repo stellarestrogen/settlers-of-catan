@@ -1,7 +1,6 @@
 use std::num::NonZeroUsize;
 
-use serde::{Deserialize, Serialize};
-use tracing::info;
+use serde::Deserialize;
 use tsify::Tsify;
 use wasm_bindgen::{JsError, prelude::wasm_bindgen};
 
@@ -12,12 +11,7 @@ use crate::{
         edition::{BaseEdition, CustomEdition, ExpansionEdition},
         error::GameError,
     },
-    object::{
-        TileData,
-        resource::{ResourceDistribution, ResourceType},
-        structure::OwnedStructures,
-        trade::{TradeDistribution, TradeType},
-    },
+    object::{resource::ResourceType, structure::OwnedStructures, trade::TradeType},
     wasm::resource::WasmTileData,
 };
 

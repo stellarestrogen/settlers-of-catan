@@ -103,7 +103,7 @@ impl TradePortDeck {
     ) -> Vec<(CornerHeight<Low>, CornerHeight<High>)> {
         let mut trades = Vec::<(CornerHeight<Low>, CornerHeight<High>)>::with_capacity(size);
         let mut offset = false;
-        let mut ring = CornerRing::new(shortest, longest).into_iter();
+        let mut ring = CornerRing::new(shortest, longest);
 
         for gap in trade_gaps {
             if gap % 2 == 1 {

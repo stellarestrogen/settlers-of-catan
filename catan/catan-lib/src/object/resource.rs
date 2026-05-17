@@ -78,6 +78,7 @@ impl ResourceDeck {
                 distribution.for_obj(resource) as usize,
             ));
         }
+
         resources.truncate(size);
 
         while resources.len() < size {

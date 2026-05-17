@@ -77,7 +77,9 @@ macro_rules! scalar_operations {
                     HorizontalDisplacement::Unshifted(a) => {
                         HorizontalDisplacement::Unshifted(a + self as i32)
                     }
-                    HorizontalDisplacement::Shifted(a) => HorizontalDisplacement::Shifted(a + self as i32),
+                    HorizontalDisplacement::Shifted(a) => {
+                        HorizontalDisplacement::Shifted(a + self as i32)
+                    }
                 }
             }
         }
@@ -113,7 +115,9 @@ impl Mul<isize> for HorizontalDisplacement {
             Self::Shifted(a) if rhs % 2 == 0 => {
                 Self::Unshifted((a * rhs as i32) - (rhs / 2) as i32)
             }
-            Self::Shifted(a) => Self::Shifted((a * rhs as i32) - (rhs / 2) as i32),
+            Self::Shifted(a) => {
+                Self::Shifted((a * rhs as i32) - ((rhs as f64) / 2.).floor() as i32)
+            }
         }
     }
 }

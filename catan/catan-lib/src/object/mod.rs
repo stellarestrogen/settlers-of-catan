@@ -53,7 +53,7 @@ impl Robber {
     pub fn place(tiles: &HexTable<TileData>) -> Self {
         if let Some((_, desert_tile)) = tiles
             .data()
-            .find(|(t, p)| t.get_tile_type() == TileType::Desert)
+            .find(|(t, _)| t.get_tile_type() == TileType::Desert)
         {
             Self {
                 position: desert_tile,

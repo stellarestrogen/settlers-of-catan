@@ -1,5 +1,3 @@
-use std::thread::current;
-
 use crate::{corner::bounds::CornerBounds, edge::bounds::EdgeBounds};
 
 use super::position::{HexPosition, HorizontalDisplacement};
@@ -115,7 +113,7 @@ impl HexPerimeter {
         EdgeBounds::new(self)
     }
 
-    pub fn area(&self) -> HexArea {
+    pub fn area(&self) -> HexArea<'_> {
         HexArea::new(self)
     }
 }
@@ -152,8 +150,8 @@ impl<'a> Iterator for HexArea<'a> {
                     .get_top_left()
                     .horizontal_displacement(self.parent.get_bottom_right())
                     .ceil()
-                    .abs() + 1);
-
+                    .abs()
+                    + 1);
         }
 
         if !current_position.is_below(self.parent.get_bottom_right()) {
