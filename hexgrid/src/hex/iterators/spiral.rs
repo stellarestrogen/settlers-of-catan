@@ -27,15 +27,18 @@ impl Iterator for HexSpiral {
     fn next(&mut self) -> Option<HexPosition> {
         if let Some(next) = self.ring.next() {
             self.position = next;
-            Some(self.position)
-        } else if self.shortest > 0 && self.longest > 1 {
-            self.shortest -= 1;
-            self.longest -= 2;
+            return Some(self.position);
+        } 
+        if self.shortest > 1 {
+            self.shortest = self.shortest.saturating_sub(1);
             self.position += HexPosition::RIGHT;
-            self.ring = HexRing::new(self.position, self.shortest, self.longest);
-            self.ring.next()
         } else {
-            None
+            self.position += HexPosition::DOWN_RIGHT;
         }
+        self.longest = self.longest.checked_sub(2)?;
+        self.ring = HexRing::new(self.position, self.shortest, self.longest);
+        self.ring.next()
+
+
     }
 }

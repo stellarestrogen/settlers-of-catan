@@ -2,24 +2,30 @@
     import Hexagon from "$lib/Hexagon.svelte";
     import {WasmInterface, type WasmCustomEdition} from "catan";
 
-    let edition: WasmCustomEdition = {
-        shortest: 1,
-        longest: 2,
+    let x = $state(3);
+    let y = $state(3);
+
+    let edition: WasmCustomEdition = $derived({
+        shortest: x,
+        longest: x + y - 1,
         resource_distr: null,
         roll_numbers: null,
         trade_distr: null,
         trade_gaps: null,
         owned_structures: null,
-    }
+    })
 
-    let game = WasmInterface.new_custom(edition, 2);
+    let game = $derived(WasmInterface.new_custom(edition, 2));
     
-    let length = game.get_length();
-    let width = game.get_width();
+    let length = $derived(game.get_length());
+    let width = $derived(game.get_width());
 
-    let tile_data = $state(game.get_tile_data());
+    let tile_data = $derived(game.get_tile_data());
     // $inspect(tile_data);
 </script>
+
+<input bind:value={x} type="number" class="shortest">
+<input bind:value={y} type="number" class="longest">
 
 <div class="board">
     {#each Array(width) as _, y}
@@ -34,11 +40,20 @@
 </div>
 
 <style>
-    .board {
+    .longest {
+        margin: 0px;
+    }
 
+    .shortest {
+        margin: 0px;
+    }
+
+    .board {
+        scale: 0.5;
         position: relative;
-        top: 200px;
-        left: 100px;
+        top: 0px;
+        left: 0px;
+        background-color: rgb(0, 106, 255);
     }
 
     .row:nth-child(odd) {
