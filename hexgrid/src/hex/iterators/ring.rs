@@ -77,7 +77,7 @@ impl Iterator for HexRing {
     type Item = HexPosition;
 
     fn next(&mut self) -> Option<HexPosition> {
-        if self.remaining == 0 {
+        while self.remaining == 0 {
             self.direction.next()?;
             self.remaining = self.get_remaining()?;
         }

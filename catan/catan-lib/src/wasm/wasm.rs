@@ -1,6 +1,6 @@
 use std::num::NonZeroUsize;
 
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 use tracing::info;
 use tsify::Tsify;
 use wasm_bindgen::{JsError, prelude::wasm_bindgen};
