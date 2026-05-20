@@ -42,7 +42,7 @@ impl GameEdition for BaseEdition {
         ]);
 
         let resource_deck =
-            ResourceDeck::new(19, resource_distribution, &mut ROLL_ORDER_BASE.into_iter());
+            ResourceDeck::new(19, resource_distribution, &mut ROLL_ORDER_BASE.into_iter().rev());
 
         HexSpiral::new(3, 5).zip(resource_deck)
     }
@@ -81,7 +81,7 @@ impl GameEdition for ExpansionEdition {
         ]);
 
         let resource_deck =
-            ResourceDeck::new(30, resource_distribution, &mut ROLL_ORDER_EXP.into_iter());
+            ResourceDeck::new(30, resource_distribution, &mut ROLL_ORDER_EXP.into_iter().rev());
 
         HexSpiral::new(3, 6).zip(resource_deck)
     }

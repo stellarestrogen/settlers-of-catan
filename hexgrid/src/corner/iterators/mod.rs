@@ -1,3 +1,4 @@
+#[allow(unused_imports)]
 use crate::corner::iterators::ring::CornerRing;
 
 pub mod ring;

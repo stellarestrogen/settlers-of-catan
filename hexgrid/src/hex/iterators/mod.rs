@@ -1,3 +1,4 @@
+#[allow(unused_imports)]
 use crate::hex::iterators::spiral::HexSpiral;
 
 pub mod ring;

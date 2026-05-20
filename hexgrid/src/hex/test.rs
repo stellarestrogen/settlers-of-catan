@@ -1,3 +1,4 @@
+#[allow(unused_imports)]
 use crate::hex::{bounds::HexPerimeter, position::HexPosition, table::HexTable};
 
 #[test]

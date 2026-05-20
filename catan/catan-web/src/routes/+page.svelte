@@ -15,7 +15,7 @@
         owned_structures: null,
     })
 
-    let game = $derived(WasmInterface.new_custom(edition, 2));
+    let game = $derived(WasmInterface.new_base(2));
     
     let length = $derived(game.get_length());
     let width = $derived(game.get_width());
@@ -24,15 +24,14 @@
     // $inspect(tile_data);
 </script>
 
-<input bind:value={x} type="number" class="shortest">
-<input bind:value={y} type="number" class="longest">
+<input bind:value={x} type="number" class="shortest" min=1>
+<input bind:value={y} type="number" class="longest" min=2>
 
 <div class="board">
     {#each Array(width) as _, y}
         <div class="row">
-
             {#each Array(length) as _, x}
-                <Hexagon {...tile_data[x + y*length]} />
+                <Hexagon {...tile_data[x + y*length]} {x} {y} />
             {/each}
             <br/>
         </div>
@@ -49,10 +48,11 @@
     }
 
     .board {
-        scale: 0.5;
+        /* scale: 0.5; */
         position: relative;
-        top: 0px;
-        left: 0px;
+        display: grid-block;
+        top: 100px;
+        left: 100px;
         background-color: rgb(0, 106, 255);
     }
 
