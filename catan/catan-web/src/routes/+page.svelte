@@ -1,6 +1,6 @@
 <script lang="ts">
-    import Hexagon from "$lib/Hexagon.svelte";
-    import {WasmInterface, type WasmCustomEdition} from "catan";
+    import Board from "$lib/Board.svelte";
+    import { WasmInterface, type WasmCustomEdition } from "catan";
 
     let x = $state(3);
     let y = $state(3);
@@ -13,10 +13,10 @@
         trade_distr: null,
         trade_gaps: null,
         owned_structures: null,
-    })
+    });
 
     let game = $derived(WasmInterface.new_base(2));
-    
+
     let length = $derived(game.get_length());
     let width = $derived(game.get_width());
 
@@ -24,43 +24,8 @@
     // $inspect(tile_data);
 </script>
 
-<input bind:value={x} type="number" class="shortest" min=1>
-<input bind:value={y} type="number" class="longest" min=2>
-
-<div class="board">
-    {#each Array(width) as _, y}
-        <div class="row">
-            {#each Array(length) as _, x}
-                <Hexagon {...tile_data[x + y*length]} {x} {y} />
-            {/each}
-            <br/>
-        </div>
-    {/each}
-</div>
+<Board tiles={tile_data} {length} {width} />
 
 <style>
-    .longest {
-        margin: 0px;
-    }
 
-    .shortest {
-        margin: 0px;
-    }
-
-    .board {
-        /* scale: 0.5; */
-        position: relative;
-        display: grid-block;
-        top: 100px;
-        left: 100px;
-        background-color: rgb(0, 106, 255);
-    }
-
-    .row:nth-child(odd) {
-        position: relative;
-        left: 167px;
-        margin: 0px;
-        margin-top: -105px;
-        margin-bottom: -105px;
-    }
 </style>
