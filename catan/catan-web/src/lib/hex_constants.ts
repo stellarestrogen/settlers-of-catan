@@ -1,0 +1,11 @@
+export const HEX_SIDE_LENGTH = 100;
+export const HEX_WIDTH = Math.sqrt(3) * HEX_SIDE_LENGTH;
+export const HEX_HEIGHT = HEX_SIDE_LENGTH * 2;
+export const HEX_CENTER_X = HEX_WIDTH / 2;
+export const HEX_CENTER_Y = HEX_HEIGHT / 2;
+export const HEX_ROW_HEIGHT = HEX_SIDE_LENGTH + HEX_SIDE_LENGTH / 2;
+
+export const ROLL_NUMBER_RADIUS = HEX_SIDE_LENGTH / 3;
+export const FONT_SIZE = HEX_SIDE_LENGTH / 4;
+export const PROBABILITY_RADIUS = ROLL_NUMBER_RADIUS / 12;
+export const PROBABILITY_MARGIN = PROBABILITY_RADIUS * 3;
