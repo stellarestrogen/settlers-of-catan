@@ -1,4 +1,4 @@
-export const HEX_SIDE_LENGTH = 50;
+export const HEX_SIDE_LENGTH = 100;
 export const HEX_WIDTH = Math.sqrt(3) * HEX_SIDE_LENGTH;
 export const HEX_HEIGHT = HEX_SIDE_LENGTH * 2;
 export const HEX_CENTER_X = HEX_WIDTH / 2;

@@ -28,30 +28,43 @@
     function rollNumber(x: number, y: number) {
         return tiles[index(x, y)].roll_number;
     }
+
+    function onTileClick(x: number, y: number) {
+        console.log(`This hexagon's position is ${x}, ${y}`);
+    }
 </script>
 
 <svg width={board_width} height={board_height}>
     {#each Array(height) as _, y}
         {#each Array(width) as _, x}
             {#if tileType(x, y) != "Water"}
+                <!-- svelte-ignore a11y_no_static_element_interactions -->
+                <!-- svelte-ignore a11y_click_events_have_key_events -->
                 <polygon
                     points={util.calculateTilePosition(x, y)}
                     fill={util.getColor(tileType(x, y))}
                     stroke="black"
                     stroke-width="0.25%"
                     onclick={() => {
-                        console.log(`This hexagon's position is ${x}, ${y}`);
+                        onTileClick(x, y);
                     }}
                 />
 
                 {#if tileType(x, y) != "Water" && tileType(x, y) != "Desert"}
+                    <!-- svelte-ignore a11y_no_static_element_interactions -->
+                    <!-- svelte-ignore a11y_click_events_have_key_events -->
                     <circle
                         cx={util.calculateRollNumberPosition(x, y).x}
                         cy={util.calculateRollNumberPosition(x, y).y}
                         r={ROLL_NUMBER_RADIUS}
                         fill="white"
                         stroke="black"
+                        onclick={() => {
+                            onTileClick(x, y);
+                        }}
                     />
+                    <!-- svelte-ignore a11y_no_static_element_interactions -->
+                    <!-- svelte-ignore a11y_click_events_have_key_events -->
                     <text
                         font-size={FONT_SIZE}
                         x={util.calculateRollNumberPosition(x, y).x}
@@ -64,8 +77,13 @@
                         font-style={util.isRollNumberCommon(rollNumber(x, y))
                             ? "italic"
                             : "normal"}
+                        onclick={() => {
+                            onTileClick(x, y);
+                        }}
                         >{rollNumber(x, y)}
                     </text>
+                    <!-- svelte-ignore a11y_no_static_element_interactions -->
+                    <!-- svelte-ignore a11y_click_events_have_key_events -->
                     {#each Array(util.rollProbabilityCircles(rollNumber(x, y))) as _, i}
                         <circle
                             cx={util.probabilityCircleStartPosition(
@@ -79,6 +97,9 @@
                             fill={util.isRollNumberCommon(rollNumber(x, y))
                                 ? "red"
                                 : "black"}
+                            onclick={() => {
+                                onTileClick(x, y);
+                            }}
                         />
                     {/each}
                 {/if}
