@@ -15,17 +15,27 @@
         owned_structures: null,
     });
 
-    let game = $derived(WasmInterface.new_base(2));
+    let game = $derived(WasmInterface.new_custom(edition, 2));
 
-    let length = $derived(game.get_length());
+    let height = $derived(game.get_height());
     let width = $derived(game.get_width());
+
+    $inspect(height, width)
 
     let tile_data = $derived(game.get_tile_data());
     // $inspect(tile_data);
 </script>
 
-<Board tiles={tile_data} {length} {width} />
+<input bind:value={x} type="number" class="shortest" min="1" />
+<input bind:value={y} type="number" class="longest" min="2" />
+
+<div class="board">
+    <Board tiles={tile_data} {height} {width} />
+</div>
 
 <style>
-
+    .board {
+        position: relative;
+        top: 100px;
+    }
 </style>

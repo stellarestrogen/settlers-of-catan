@@ -13,7 +13,7 @@ pub struct HexTable<T> {
 
 impl HexPerimeter {
     fn get_size(&self) -> usize {
-        (self.get_length() * self.get_width()) as usize
+        (self.get_width() * self.get_height()) as usize
     }
 }
 
@@ -45,7 +45,7 @@ impl<T> HexTable<T> {
             .try_into()
             .ok()?;
 
-        let length: isize = self.bounds.get_length().try_into().ok()?;
+        let length: isize = self.bounds.get_width().try_into().ok()?;
 
         downs
             .checked_mul(length)?

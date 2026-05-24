@@ -69,12 +69,12 @@ impl Game {
         }
     }
 
-    pub fn get_board_length(&self) -> u32 {
-        self.board.get_length()
-    }
-
     pub fn get_board_width(&self) -> u32 {
         self.board.get_width()
+    }
+
+    pub fn get_board_height(&self) -> u32 {
+        self.board.get_height()
     }
 
     pub fn get_player(&self, player_number: usize) -> Option<&Player> {

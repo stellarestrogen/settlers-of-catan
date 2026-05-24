@@ -29,7 +29,7 @@ impl EdgeBounds {
         let mut hex1 = top_left;
         let mut hex2 = bottom_right;
 
-        let length = self.bounds.get_length();
+        let length = self.bounds.get_width();
 
         if let HorizontalDisplacement::Unshifted(_) =
             top_left.horizontal_displacement(HexPosition::ORIGIN)

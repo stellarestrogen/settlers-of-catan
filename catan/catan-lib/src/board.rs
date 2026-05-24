@@ -42,12 +42,12 @@ impl Board {
         }
     }
 
-    pub fn get_length(&self) -> u32 {
-        self.tiles.get_bounds().get_length()
-    }
-
     pub fn get_width(&self) -> u32 {
         self.tiles.get_bounds().get_width()
+    }
+
+    pub fn get_height(&self) -> u32 {
+        self.tiles.get_bounds().get_height()
     }
 
     pub fn get_tile(&self, position: HexPosition) -> TileData {

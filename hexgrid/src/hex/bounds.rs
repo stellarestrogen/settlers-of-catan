@@ -24,7 +24,7 @@ impl HexPerimeter {
         self.bottom_right
     }
 
-    pub fn get_length(&self) -> u32 {
+    pub fn get_width(&self) -> u32 {
         self.bottom_right
             .horizontal_displacement(self.top_left)
             .ceil()
@@ -32,7 +32,7 @@ impl HexPerimeter {
             + 1
     }
 
-    pub fn get_width(&self) -> u32 {
+    pub fn get_height(&self) -> u32 {
         self.bottom_right.vertical_displacement(self.top_left).abs() as u32 + 1
     }
 

@@ -79,12 +79,12 @@ impl WasmInterface {
         })
     }
 
-    pub fn get_length(&self) -> u32 {
-        self.game.get_board_length()
-    }
-
     pub fn get_width(&self) -> u32 {
         self.game.get_board_width()
+    }
+
+    pub fn get_height(&self) -> u32 {
+        self.game.get_board_height()
     }
 
     pub fn get_tile_data(&self) -> Vec<<WasmTileData as Tsify>::JsType> {
