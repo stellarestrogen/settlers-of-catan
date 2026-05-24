@@ -1,5 +1,6 @@
 use std::num::NonZeroUsize;
 
+use hexgrid::hex::position::HexPosition;
 use serde::Deserialize;
 use tsify::Tsify;
 use wasm_bindgen::{JsError, prelude::wasm_bindgen};
@@ -12,7 +13,7 @@ use crate::{
         error::GameError,
     },
     object::{resource::ResourceType, structure::OwnedStructures, trade::TradeType},
-    wasm::resource::WasmTileData,
+    wasm::{position::WasmHexPosition, resource::WasmTileData},
 };
 
 #[wasm_bindgen]
@@ -85,6 +86,13 @@ impl WasmInterface {
 
     pub fn get_height(&self) -> u32 {
         self.game.get_board_height()
+    }
+
+    pub fn take_hex_position(&self, position: <WasmHexPosition as Tsify>::JsType) {
+        let mut position: HexPosition = position.into();
+        position += self.game.get_offset();
+        // do something with the resulting position
+
     }
 
     pub fn get_tile_data(&self) -> Vec<<WasmTileData as Tsify>::JsType> {

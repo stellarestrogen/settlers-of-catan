@@ -1,6 +1,6 @@
 <script lang="ts">
     import Board from "$lib/Board.svelte";
-    import { WasmInterface, type WasmCustomEdition } from "catan";
+    import { type WasmHexPosition, WasmInterface, type WasmCustomEdition } from "catan";
 
     let x = $state(3);
     let y = $state(3);
@@ -30,7 +30,7 @@
 <input bind:value={y} type="number" class="longest" min="2" />
 
 <div class="board">
-    <Board tiles={tile_data} {height} {width} />
+    <Board tiles={tile_data} {height} {width} {game}/>
 </div>
 
 <style>

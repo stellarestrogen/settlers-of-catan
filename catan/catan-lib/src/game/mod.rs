@@ -77,6 +77,10 @@ impl Game {
         self.board.get_height()
     }
 
+    pub fn get_offset(&self) -> HexPosition {
+        self.board.get_offset()
+    }
+
     pub fn get_player(&self, player_number: usize) -> Option<&Player> {
         self.players.get(player_number)
     }

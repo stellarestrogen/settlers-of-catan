@@ -50,6 +50,10 @@ impl Board {
         self.tiles.get_bounds().get_height()
     }
 
+    pub fn get_offset(&self) -> HexPosition {
+        self.tiles.get_bounds().get_top_left()
+    }
+
     pub fn get_tile(&self, position: HexPosition) -> TileData {
         if let Some(r) = self.tiles.get(position) {
             *r

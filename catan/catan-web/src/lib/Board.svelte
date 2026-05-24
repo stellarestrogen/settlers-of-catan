@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { nonpassive } from "svelte/legacy";
     import {
         HEX_WIDTH,
         HEX_HEIGHT,
@@ -6,14 +7,19 @@
         FONT_SIZE,
         PROBABILITY_RADIUS,
         PROBABILITY_MARGIN,
-    } from "./hex_constants";
+        CORNER_RADIUS,
+        HEX_ROW_HEIGHT,
+        BOARD_MARGIN_TOP,
+    } from "./board_constants";
 
     import * as util from "./board_util";
+    import { type WasmHexPosition } from "catan/catan_lib";
+    import { redirect } from "@sveltejs/kit";
 
-    let { tiles, height, width } = $props();
+    let { tiles, height, width, game } = $props();
 
     let board_width = $derived(HEX_WIDTH * width + HEX_WIDTH);
-    let board_height = $derived(HEX_HEIGHT * height);
+    let board_height = $derived(HEX_ROW_HEIGHT * (height - 1) + HEX_HEIGHT + BOARD_MARGIN_TOP*2);
 
     $inspect(board_width, board_height);
 
@@ -31,10 +37,24 @@
 
     function onTileClick(x: number, y: number) {
         console.log(`This hexagon's position is ${x}, ${y}`);
+        let pos: WasmHexPosition = {
+            rights: x,
+            downs: y,
+        };
+        game.take_hex_position(pos);
     }
 </script>
 
 <svg width={board_width} height={board_height}>
+    <style>
+        .corner {
+            fill: black;
+        }
+
+        .corner:hover {
+            fill: red;
+        }
+    </style>
     {#each Array(height) as _, y}
         {#each Array(width) as _, x}
             {#if tileType(x, y) != "Water"}
@@ -44,13 +64,13 @@
                     points={util.calculateTilePosition(x, y)}
                     fill={util.getColor(tileType(x, y))}
                     stroke="black"
-                    stroke-width="0.25%"
+                    stroke-width={util.strokeWidth()}
                     onclick={() => {
                         onTileClick(x, y);
                     }}
                 />
 
-                {#if tileType(x, y) != "Water" && tileType(x, y) != "Desert"}
+                {#if tileType(x, y) != "Desert"}
                     <!-- svelte-ignore a11y_no_static_element_interactions -->
                     <!-- svelte-ignore a11y_click_events_have_key_events -->
                     <circle
@@ -103,6 +123,21 @@
                         />
                     {/each}
                 {/if}
+            {/if}
+        {/each}
+    {/each}
+
+    {#each Array(height) as _, y}
+        {#each Array(width) as _, x}
+            {#if tileType(x, y) != "Water"}
+                {#each Array(6) as _, i}
+                <circle
+                    cx={util.hexVertices(x, y)[i][0]}
+                    cy={util.hexVertices(x, y)[i][1]}
+                    r={CORNER_RADIUS}
+                    class="corner"
+                />
+                {/each}
             {/if}
         {/each}
     {/each}
