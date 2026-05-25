@@ -26,3 +26,9 @@ impl Into<HexPosition> for <WasmHexPosition as Tsify>::JsType {
         new_position
     }
 }
+
+#[derive(Debug, Clone, Copy, Tsify, Deserialize)]
+pub struct WasmCornerPosition {
+    pub rights: i32,
+    pub downs: i32,
+}

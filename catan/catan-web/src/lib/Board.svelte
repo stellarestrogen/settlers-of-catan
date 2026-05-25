@@ -1,5 +1,4 @@
 <script lang="ts">
-    import { nonpassive } from "svelte/legacy";
     import {
         HEX_WIDTH,
         HEX_HEIGHT,
@@ -13,29 +12,19 @@
     } from "./board_constants";
 
     import * as util from "./board_util";
-    import { type WasmHexPosition } from "catan/catan_lib";
-    import { redirect } from "@sveltejs/kit";
+    import {
+        type WasmCornerPosition,
+        type WasmHexPosition,
+    } from "catan/catan_lib";
 
     let { tiles, height, width, game } = $props();
+
+    let data = $derived(new util.GameData(tiles, width, height));
 
     let board_width = $derived(HEX_WIDTH * width + HEX_WIDTH);
     let board_height = $derived(
         HEX_ROW_HEIGHT * (height - 1) + HEX_HEIGHT + BOARD_MARGIN_TOP * 2,
     );
-
-    $inspect(board_width, board_height);
-
-    function index(x: number, y: number) {
-        return x + y * width;
-    }
-
-    function tileType(x: number, y: number) {
-        return tiles[index(x, y)].tile_type;
-    }
-
-    function rollNumber(x: number, y: number) {
-        return tiles[index(x, y)].roll_number;
-    }
 
     function onTileClick(x: number, y: number) {
         console.log(`This hexagon's position is ${x}, ${y}`);
@@ -46,8 +35,8 @@
         game.take_hex_position(pos);
     }
 
-    function onCornerClick(i: number) {
-        console.log(`This corner's position is ${i}`);
+    function onCornerClick(position: WasmCornerPosition) {
+        console.log(`This corner's position is `, position);
     }
 </script>
 
@@ -63,12 +52,12 @@
     </style>
     {#each Array(height) as _, y}
         {#each Array(width) as _, x}
-            {#if tileType(x, y) != "Water"}
+            {#if data.tileTypeByXY(x, y) != "Water"}
                 <!-- svelte-ignore a11y_no_static_element_interactions -->
                 <!-- svelte-ignore a11y_click_events_have_key_events -->
                 <polygon
                     points={util.calculateTilePosition(x, y)}
-                    fill={util.getColor(tileType(x, y))}
+                    fill={util.getColor(data.tileTypeByXY(x, y))}
                     stroke="black"
                     stroke-width={util.strokeWidth()}
                     onclick={() => {
@@ -76,7 +65,7 @@
                     }}
                 />
 
-                {#if tileType(x, y) != "Desert"}
+                {#if data.tileTypeByXY(x, y) != "Desert"}
                     <!-- svelte-ignore a11y_no_static_element_interactions -->
                     <!-- svelte-ignore a11y_click_events_have_key_events -->
                     <circle
@@ -97,30 +86,36 @@
                         y={util.calculateRollNumberPosition(x, y).y}
                         text-anchor="middle"
                         dominant-baseline="middle"
-                        fill={util.isRollNumberCommon(rollNumber(x, y))
+                        fill={util.isRollNumberCommon(
+                            data.rollNumberByXY(x, y)!,
+                        )
                             ? "red"
                             : "black"}
-                        font-style={util.isRollNumberCommon(rollNumber(x, y))
+                        font-style={util.isRollNumberCommon(
+                            data.rollNumberByXY(x, y)!,
+                        )
                             ? "italic"
                             : "normal"}
                         onclick={() => {
                             onTileClick(x, y);
                         }}
-                        >{rollNumber(x, y)}
+                        >{data.rollNumberByXY(x, y)!}
                     </text>
                     <!-- svelte-ignore a11y_no_static_element_interactions -->
                     <!-- svelte-ignore a11y_click_events_have_key_events -->
-                    {#each Array(util.rollProbabilityCircles(rollNumber(x, y))) as _, i}
+                    {#each Array(util.rollProbabilityCircles(data.rollNumberByXY(x, y)!)) as _, i}
                         <circle
                             cx={util.probabilityCircleStartPosition(
                                 x,
                                 y,
-                                rollNumber(x, y),
+                                data.rollNumberByXY(x, y)!,
                             ).x +
                                 PROBABILITY_MARGIN * i}
                             cy={util.calculateProbabilityCirclePosition(x, y).y}
                             r={PROBABILITY_RADIUS}
-                            fill={util.isRollNumberCommon(rollNumber(x, y))
+                            fill={util.isRollNumberCommon(
+                                data.rollNumberByXY(x, y)!,
+                            )
                                 ? "red"
                                 : "black"}
                             onclick={() => {
@@ -135,15 +130,15 @@
 
     <!-- svelte-ignore a11y_no_static_element_interactions -->
     <!-- svelte-ignore a11y_click_events_have_key_events -->
-    {#each util.cornerPositions(width, height, tiles) as positions, i}
+    {#each util.cornerPositions(data) as positions}
         <circle
-            cx={positions[0]}
-            cy={positions[1]}
+            cx={positions.positions[0]}
+            cy={positions.positions[1]}
             r={CORNER_RADIUS}
             class="corner"
-            data-position={i}
+            data-position={positions.nextPosition}
             onclick={() => {
-                onCornerClick(i);
+                onCornerClick(positions.nextPosition);
             }}
         />
     {/each}
