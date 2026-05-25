@@ -19,7 +19,9 @@
     let { tiles, height, width, game } = $props();
 
     let board_width = $derived(HEX_WIDTH * width + HEX_WIDTH);
-    let board_height = $derived(HEX_ROW_HEIGHT * (height - 1) + HEX_HEIGHT + BOARD_MARGIN_TOP*2);
+    let board_height = $derived(
+        HEX_ROW_HEIGHT * (height - 1) + HEX_HEIGHT + BOARD_MARGIN_TOP * 2,
+    );
 
     $inspect(board_width, board_height);
 
@@ -42,6 +44,10 @@
             downs: y,
         };
         game.take_hex_position(pos);
+    }
+
+    function onCornerClick(i: number) {
+        console.log(`This corner's position is ${i}`);
     }
 </script>
 
@@ -127,19 +133,19 @@
         {/each}
     {/each}
 
-    {#each Array(height) as _, y}
-        {#each Array(width) as _, x}
-            {#if tileType(x, y) != "Water"}
-                {#each Array(6) as _, i}
-                <circle
-                    cx={util.hexVertices(x, y)[i][0]}
-                    cy={util.hexVertices(x, y)[i][1]}
-                    r={CORNER_RADIUS}
-                    class="corner"
-                />
-                {/each}
-            {/if}
-        {/each}
+    <!-- svelte-ignore a11y_no_static_element_interactions -->
+    <!-- svelte-ignore a11y_click_events_have_key_events -->
+    {#each util.cornerPositions(width, height, tiles) as positions, i}
+        <circle
+            cx={positions[0]}
+            cy={positions[1]}
+            r={CORNER_RADIUS}
+            class="corner"
+            data-position={i}
+            onclick={() => {
+                onCornerClick(i);
+            }}
+        />
     {/each}
 </svg>
 

@@ -1,4 +1,5 @@
-import { HEX_SIDE_LENGTH, HEX_ROW_HEIGHT, HEX_WIDTH, HEX_CENTER_X, HEX_CENTER_Y, PROBABILITY_MARGIN, HEX_HEIGHT, BOARD_MARGIN_TOP } from "./board_constants";
+import type { WasmTileData } from "catan/catan_lib";
+import { HEX_SIDE_LENGTH, HEX_ROW_HEIGHT, HEX_WIDTH, HEX_CENTER_X, HEX_CENTER_Y, PROBABILITY_MARGIN, HEX_HEIGHT, BOARD_MARGIN_TOP, CORNER_DELTA_HEIGHT } from "./board_constants";
 
 export function strokeWidth() {
     return HEX_SIDE_LENGTH * 0.03;
@@ -28,7 +29,7 @@ export function hexVertices(x: number, y: number) {
     let br = [tr[0], tr[1] + HEX_SIDE_LENGTH];
     let bottom = [br[0] - HEX_WIDTH / 2, br[1] + HEX_SIDE_LENGTH / 2];
 
-    return [ bl, tl, top, tr, br, bottom ];
+    return [bl, tl, top, tr, br, bottom];
 }
 
 export function calculateTilePosition(x: number, y: number) {
@@ -36,6 +37,39 @@ export function calculateTilePosition(x: number, y: number) {
 
     let positions = array.map(positionToSVG).join(" ");
 
+    return positions;
+}
+
+export function startingCorner() {
+    return hexVertices(0, 0)[1];
+}
+
+export function nextCorner(position: number[], width: number, height: number) {
+    let nextPosition = position;
+    if ((position[1] / CORNER_DELTA_HEIGHT) % 4 == 3) {
+        nextPosition[1] -= CORNER_DELTA_HEIGHT;
+    }
+    
+}
+
+export function cornerPositions(width: number, height: number, tiles: WasmTileData[]) {
+    let positions: number[][] = [];
+    for (let y = 0; y < height; y++) {
+        for (let x = 0; x < width; x++) {
+            if (tiles[x + y * width].tile_type == "Water") {
+                
+            }
+            let vertices = hexVertices(x, y);
+            for (let vertex of vertices) {
+                vertex[0] = +vertex[0].toFixed(5);
+                vertex[1] = +vertex[1].toFixed(5);
+                if (positions.map(p => `${p[0]}-${p[1]}`).indexOf(`${vertex[0]}-${vertex[1]}`) === -1) {
+                    positions.push(vertex);
+                }
+            }
+        }
+    }
+    console.log(positions);
     return positions;
 }
 
