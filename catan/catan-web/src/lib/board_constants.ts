@@ -5,6 +5,7 @@ export const HEX_CENTER_X = HEX_WIDTH / 2;
 export const HEX_CENTER_Y = HEX_HEIGHT / 2;
 export const HEX_ROW_HEIGHT = HEX_SIDE_LENGTH + HEX_SIDE_LENGTH / 2;
 export const BOARD_MARGIN_TOP = HEX_SIDE_LENGTH / 4;
+export const BOARD_MARGIN_SIDE = HEX_SIDE_LENGTH / 4;
 
 export const ROLL_NUMBER_RADIUS = HEX_SIDE_LENGTH / 3;
 export const FONT_SIZE = HEX_SIDE_LENGTH / 4;

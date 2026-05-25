@@ -1,5 +1,5 @@
 import type { WasmCornerPosition, WasmHexPosition, WasmTileData } from "catan/catan_lib";
-import { HEX_SIDE_LENGTH, HEX_ROW_HEIGHT, HEX_WIDTH, HEX_CENTER_X, HEX_CENTER_Y, PROBABILITY_MARGIN, HEX_HEIGHT, BOARD_MARGIN_TOP, CORNER_DELTA_HEIGHT } from "./board_constants";
+import { HEX_SIDE_LENGTH, HEX_ROW_HEIGHT, HEX_WIDTH, HEX_CENTER_X, HEX_CENTER_Y, PROBABILITY_MARGIN, HEX_HEIGHT, BOARD_MARGIN_TOP, CORNER_DELTA_HEIGHT, BOARD_MARGIN_SIDE } from "./board_constants";
 
 export class GameData {
     constructor(public tileData: WasmTileData[], public width: number, public height: number) { }
@@ -24,7 +24,11 @@ export class GameData {
     }
 
     tileTypeByXY(x: number, y: number) {
-        return this.tileData[x + y * this.width]?.tile_type ?? "Water";
+        if (this.isPositionInvalid({ rights: x, downs: y })) {
+            return "Water";
+        }
+
+        return this.tileTypeByPosition({ rights: x, downs: y });
     }
 
     rollNumberByPosition(position: WasmHexPosition) {
@@ -32,7 +36,7 @@ export class GameData {
     }
 
     rollNumberByXY(x: number, y: number) {
-        return this.tileData[x + y * this.width].roll_number;
+        return this.rollNumberByPosition({ rights: x, downs: y });
     }
 }
 
@@ -92,7 +96,7 @@ function calculateXOffset(y: number) {
 
 export function hexVertices(x: number, y: number) {
     let bl = [
-        calculateXOffset(y) + HEX_WIDTH * x,
+        calculateXOffset(y) + BOARD_MARGIN_SIDE + HEX_WIDTH * x,
         BOARD_MARGIN_TOP + HEX_ROW_HEIGHT + HEX_ROW_HEIGHT * y,
     ];
 
@@ -142,7 +146,7 @@ export function nextCorner(position: WasmCornerPosition, width: number, height: 
 }
 
 export function cornerToCoordinates(position: WasmCornerPosition) {
-    return [HEX_CENTER_X + position.rights * HEX_CENTER_X, BOARD_MARGIN_TOP * 3 + position.downs * HEX_CENTER_Y / 2]
+    return [BOARD_MARGIN_SIDE + HEX_CENTER_X + position.rights * HEX_CENTER_X, BOARD_MARGIN_TOP * 3 + position.downs * HEX_CENTER_Y / 2]
 }
 
 export function cornerPositions(data: GameData) {
@@ -173,7 +177,7 @@ export function cornerPositions(data: GameData) {
 }
 
 export function calculateRollNumberPosition(x: number, y: number) {
-    let x_pos = calculateXOffset(y) + HEX_CENTER_X + HEX_WIDTH * x;
+    let x_pos = calculateXOffset(y) + BOARD_MARGIN_SIDE + HEX_CENTER_X + HEX_WIDTH * x;
     let y_pos = BOARD_MARGIN_TOP + HEX_CENTER_Y + HEX_ROW_HEIGHT * y;
 
     return { x: x_pos, y: y_pos };

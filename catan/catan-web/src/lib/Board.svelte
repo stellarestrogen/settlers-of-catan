@@ -9,6 +9,8 @@
         CORNER_RADIUS,
         HEX_ROW_HEIGHT,
         BOARD_MARGIN_TOP,
+        BOARD_MARGIN_SIDE,
+        HEX_SIDE_LENGTH,
     } from "./board_constants";
 
     import * as util from "./board_util";
@@ -21,7 +23,7 @@
 
     let data = $derived(new util.GameData(tiles, width, height));
 
-    let board_width = $derived(HEX_WIDTH * width + HEX_WIDTH);
+    let board_width = $derived(HEX_WIDTH * width + BOARD_MARGIN_SIDE * 2 + HEX_SIDE_LENGTH);
     let board_height = $derived(
         HEX_ROW_HEIGHT * (height - 1) + HEX_HEIGHT + BOARD_MARGIN_TOP * 2,
     );
