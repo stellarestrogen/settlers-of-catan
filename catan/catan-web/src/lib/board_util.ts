@@ -156,7 +156,6 @@ export function cornerPositions(data: GameData) {
     while ((nextPosition = nextCorner(currentPosition, data.width, data.height)) != null) {
         let isWater = true;
         for (let hex of neighboringHexForCorner(nextPosition)) {
-            console.log(nextPosition, hex, data.tileTypeByPosition(hex));
             if (data.tileTypeByPosition(hex) == "Water") {
                 continue;
             } else {
@@ -172,7 +171,6 @@ export function cornerPositions(data: GameData) {
         currentPosition = nextPosition;
     }
 
-    console.log("balls ", positions);
     return positions;
 }
 
