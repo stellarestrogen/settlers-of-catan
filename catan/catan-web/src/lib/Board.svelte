@@ -11,11 +11,17 @@
         BOARD_MARGIN_TOP,
         BOARD_MARGIN_SIDE,
         HEX_SIDE_LENGTH,
+        EDGE_WIDTH,
+        EDGE_LENGTH,
     } from "./board_constants";
 
     import * as util from "./board_util";
+    import * as corner from "./corner";
+    import * as edge from "./edge";
+
     import {
         type WasmCornerPosition,
+        type WasmEdgePosition,
         type WasmHexPosition,
     } from "catan/catan_lib";
 
@@ -42,6 +48,10 @@
     function onCornerClick(position: WasmCornerPosition) {
         console.log(`This corner's position is `, position);
     }
+
+    function onEdgeClick(position: WasmEdgePosition) {
+        console.log(`This edge's position is `, position);
+    }
 </script>
 
 <svg width={board_width} height={board_height}>
@@ -52,7 +62,15 @@
 
         .corner:hover {
             fill: red;
-            stroke: red;
+            stroke: black;
+        }
+        .edge {
+            fill: black;
+        }
+
+        .edge:hover {
+            fill: lime;
+            stroke: black;
         }
     </style>
     {#each Array(height) as _, y}
@@ -135,7 +153,7 @@
 
     <!-- svelte-ignore a11y_no_static_element_interactions -->
     <!-- svelte-ignore a11y_click_events_have_key_events -->
-    {#each util.cornerPositions(data) as positions}
+    {#each corner.cornerPositions(data) as positions}
         <circle
             cx={positions.positions[0]}
             cy={positions.positions[1]}
@@ -144,6 +162,25 @@
             data-position={positions.nextPosition}
             onclick={() => {
                 onCornerClick(positions.nextPosition);
+            }}
+        />
+    {/each}
+
+    <!-- svelte-ignore a11y_click_events_have_key_events -->
+    <!-- svelte-ignore a11y_no_static_element_interactions -->
+    {#each edge.edgePositions(data) as positions}
+        <rect
+            x={positions.positions[0] - EDGE_WIDTH / 2}
+            y={positions.positions[1] - EDGE_LENGTH / 2}
+            width={EDGE_WIDTH}
+            height={EDGE_LENGTH}
+            transform="rotate({edge.rotateAngle(
+                positions.nextPosition,
+            )}, {positions.positions[0]}, {positions.positions[1]})"
+            class="edge"
+            data-position={positions.nextPosition}
+            onclick={() => {
+                onEdgeClick(positions.nextPosition);
             }}
         />
     {/each}
