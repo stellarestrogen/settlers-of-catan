@@ -23,7 +23,9 @@
 
     let data = $derived(new util.GameData(tiles, width, height));
 
-    let board_width = $derived(HEX_WIDTH * width + BOARD_MARGIN_SIDE * 2 + HEX_SIDE_LENGTH);
+    let board_width = $derived(
+        HEX_WIDTH * width + BOARD_MARGIN_SIDE * 2 + HEX_SIDE_LENGTH,
+    );
     let board_height = $derived(
         HEX_ROW_HEIGHT * (height - 1) + HEX_HEIGHT + BOARD_MARGIN_TOP * 2,
     );
@@ -50,6 +52,7 @@
 
         .corner:hover {
             fill: red;
+            stroke: red;
         }
     </style>
     {#each Array(height) as _, y}
