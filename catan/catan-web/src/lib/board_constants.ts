@@ -18,12 +18,6 @@ export const CORNER_START_X = BOARD_MARGIN_SIDE + HEX_CENTER_X;
 export const CORNER_START_Y = BOARD_MARGIN_TOP * 3;
 
 export const EDGE_WIDTH = CORNER_RADIUS;
-export const EDGE_LENGTH = 0.75 * HEX_SIDE_LENGTH;
-
-export const EDGE_EVEN_TR = [EDGE_LENGTH * Math.sqrt(3) / 4 + EDGE_WIDTH / 4, -EDGE_LENGTH / 4 + EDGE_WIDTH * Math.sqrt(3) / 4];
-export const EDGE_EVEN_TL = [EDGE_LENGTH * Math.sqrt(3) / 4 - EDGE_WIDTH / 4, -EDGE_LENGTH / 4 - EDGE_WIDTH * Math.sqrt(3) / 4];
-export const EDGE_EVEN_BR = [-(EDGE_LENGTH * Math.sqrt(3) / 4) + EDGE_WIDTH / 4, EDGE_LENGTH / 4 + EDGE_WIDTH * Math.sqrt(3) / 4];
-export const EDGE_EVEN_BL = [-EDGE_LENGTH * Math.sqrt(3) / 4 - EDGE_WIDTH / 4, EDGE_LENGTH / 4 - EDGE_WIDTH * Math.sqrt(3) / 4]
-
+export const EDGE_LENGTH = 0.65 * HEX_SIDE_LENGTH;
 export const EDGE_START_X = BOARD_MARGIN_SIDE + HEX_CENTER_X + HEX_WIDTH / 4;
 export const EDGE_START_Y = BOARD_MARGIN_TOP + HEX_SIDE_LENGTH / 4;
