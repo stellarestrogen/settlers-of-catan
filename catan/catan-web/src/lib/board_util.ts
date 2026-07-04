@@ -1,9 +1,22 @@
-import type { WasmCornerPosition, WasmHexPosition, WasmTileData } from "catan/catan_lib";
-import { HEX_SIDE_LENGTH, HEX_ROW_HEIGHT, HEX_WIDTH, HEX_CENTER_X, HEX_CENTER_Y, PROBABILITY_MARGIN, HEX_HEIGHT, BOARD_MARGIN_TOP, CORNER_DELTA_HEIGHT, BOARD_MARGIN_SIDE } from "./board_constants";
-import { neighboringHexForCorner } from "./corner";
+import type { WasmHexPosition, WasmTileData } from "catan/catan_lib";
+
+import {
+    HEX_SIDE_LENGTH,
+    HEX_ROW_HEIGHT,
+    HEX_WIDTH,
+    HEX_CENTER_X,
+    HEX_CENTER_Y,
+    PROBABILITY_MARGIN,
+    BOARD_MARGIN_TOP,
+    BOARD_MARGIN_SIDE,
+} from "./board_constants";
 
 export class GameData {
-    constructor(public tileData: WasmTileData[], public width: number, public height: number) { }
+    constructor(
+        public tileData: WasmTileData[],
+        public width: number,
+        public height: number,
+    ) {}
     isPositionInvalid(position: WasmHexPosition) {
         if (position.rights >= this.width || position.rights < 0) {
             return true;
@@ -40,7 +53,6 @@ export class GameData {
         return this.rollNumberByPosition({ rights: x, downs: y });
     }
 }
-
 
 export function strokeWidth() {
     return HEX_SIDE_LENGTH * 0.03;
@@ -115,12 +127,11 @@ export function calculateProbabilityCirclePosition(x: number, y: number) {
     y_pos += HEX_SIDE_LENGTH / 6;
 
     return { x: x_pos, y: y_pos };
-
 }
 
 export function probabilityCircleStartPosition(x: number, y: number, roll: number) {
     let { x: x_pos, y: y_pos } = calculateProbabilityCirclePosition(x, y);
-    x_pos -= PROBABILITY_MARGIN / 2 * (rollProbabilityCircles(roll) - 1);
+    x_pos -= (PROBABILITY_MARGIN / 2) * (rollProbabilityCircles(roll) - 1);
 
     return { x: x_pos, y: y_pos };
 }
@@ -142,6 +153,6 @@ export function getColor(tile_type: String) {
         case "Ore":
             return "#7a7a7a";
         default:
-            return "#000000";
+            return "#00000000";
     }
 }

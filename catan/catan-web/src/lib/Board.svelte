@@ -63,6 +63,7 @@
         .corner:hover {
             fill: red;
             stroke: black;
+            stroke-width: 0.2%;
         }
         .edge {
             fill: black;
@@ -71,6 +72,7 @@
         .edge:hover {
             fill: lime;
             stroke: black;
+            stroke-width: 0.2%;
         }
     </style>
     {#each Array(height) as _, y}
