@@ -63,7 +63,7 @@
         .corner:hover {
             fill: red;
             stroke: black;
-            stroke-width: 0.2%;
+            stroke-width: 2px;
         }
         .edge {
             fill: black;
@@ -72,12 +72,12 @@
         .edge:hover {
             fill: lime;
             stroke: black;
-            stroke-width: 0.2%;
+            stroke-width: 2px;
         }
     </style>
     {#each Array(height) as _, y}
         {#each Array(width) as _, x}
-            {#if data.tileTypeByXY(x, y) != "Water"}
+            {#if data.tileTypeByXY(x, y)}
                 <!-- svelte-ignore a11y_no_static_element_interactions -->
                 <!-- svelte-ignore a11y_click_events_have_key_events -->
                 <polygon

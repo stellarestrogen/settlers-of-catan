@@ -20,17 +20,14 @@
     let height = $derived(game.get_height());
     let width = $derived(game.get_width());
 
-    $inspect(height, width)
-
     let tile_data = $derived(game.get_tile_data());
-    // $inspect(tile_data);
 </script>
 
 <input bind:value={x} type="number" class="shortest" min="1" />
 <input bind:value={y} type="number" class="longest" min="2" />
 
 <div class="board">
-    <Board tiles={tile_data} {height} {width} {game}/>
+    <Board tiles={tile_data} {height} {width} {game} />
 </div>
 
 <style>

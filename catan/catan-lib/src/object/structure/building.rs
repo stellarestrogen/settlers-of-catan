@@ -3,7 +3,7 @@ use hexgrid::corner::{position::CornerPosition, table::CornerTable};
 use crate::{
     game::player::OwnershipToken,
     object::{
-        CornerData,
+        CornerInfo,
         structure::{Structure, StructureType},
     },
 };
@@ -58,13 +58,13 @@ pub trait BuildingStore {
     fn buildings(&self) -> impl Iterator<Item = Building>;
 }
 
-impl BuildingStore for CornerTable<CornerData> {
+impl BuildingStore for CornerTable<CornerInfo> {
     fn set_building(&mut self, position: CornerPosition, building: Building) -> Result<(), ()> {
         if let Some(data) = self.get_mut(position) {
             data.set_building(building);
             Ok(())
         } else {
-            let mut data = CornerData::new();
+            let mut data = CornerInfo::new();
             data.set_building(building);
             self.set(position, data)
         }
@@ -75,6 +75,6 @@ impl BuildingStore for CornerTable<CornerData> {
     }
 
     fn buildings(&self) -> impl Iterator<Item = Building> {
-        self.data().flat_map(|d| d.get_building())
+        self.data().flat_map(|(d, _)| d.get_building())
     }
 }

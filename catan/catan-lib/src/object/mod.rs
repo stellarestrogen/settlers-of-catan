@@ -75,14 +75,14 @@ impl Robber {
 }
 
 #[derive(Debug, Clone, Copy)]
-pub struct CornerData {
+pub struct CornerInfo {
     building: Option<Building>,
     trade_type: Option<TradeType>,
 }
 
-impl CornerData {
+impl CornerInfo {
     pub fn new() -> Self {
-        CornerData {
+        CornerInfo {
             building: None,
             trade_type: None,
         }
@@ -114,13 +114,13 @@ impl CornerData {
 }
 
 #[derive(Debug, Clone, Copy)]
-pub struct EdgeData {
+pub struct EdgeInfo {
     transport: Transport,
 }
 
-impl EdgeData {
+impl EdgeInfo {
     pub fn new(transport: Transport) -> Self {
-        EdgeData { transport }
+        EdgeInfo { transport }
     }
 
     pub fn get_transport(&self) -> Transport {

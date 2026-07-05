@@ -12,18 +12,18 @@ use tsify::Tsify;
 use crate::{
     distribution::Distribution,
     game::edition::GameEdition,
-    object::{CornerData, resource::ResourceType},
+    object::{CornerInfo, resource::ResourceType},
 };
 
 const TRADE_NO: usize = 6;
 
-#[derive(Debug, Clone, Copy, PartialEq, Tsify, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Tsify, Deserialize)]
 pub enum TradeType {
     Resource(ResourceType),
     Any,
 }
 
-#[derive(Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct TradePort {
     positions: (CornerHeight<Low>, CornerHeight<High>),
     r#type: TradeType,
@@ -61,6 +61,7 @@ static TRADES: [TradeType; TRADE_NO] = [
 
 pub type TradeDistribution = Distribution<TradeType, TRADE_NO>;
 
+#[derive(Debug, Clone)]
 pub struct TradePortDeck {
     trades: Vec<TradePort>,
 }
@@ -134,17 +135,25 @@ impl Iterator for TradePortDeck {
     }
 }
 
+impl FromIterator<TradePort> for TradePortDeck {
+    fn from_iter<T: IntoIterator<Item = TradePort>>(iter: T) -> Self {
+        let trades: Vec<TradePort> = iter.into_iter().collect();
+        Self { trades }
+    }
+}
+
 pub trait TradeStore {
     fn with_trades(self, edition: &impl GameEdition) -> Self;
     fn set_trades(&mut self, trade_port: TradePort) -> Result<(), ()>;
     fn set_trade(&mut self, position: CornerPosition, trade: TradeType) -> Result<(), ()>;
     fn get_trade(&self, position: CornerPosition) -> Option<TradeType>;
+    fn get_trades(&self) -> impl Iterator<Item = TradeType>;
 }
 
-impl TradeStore for CornerTable<CornerData> {
+impl TradeStore for CornerTable<CornerInfo> {
     fn with_trades(mut self, edition: &impl GameEdition) -> Self {
         let trades = edition.get_trades();
-        for trade in trades.into_iter() {
+        for trade in trades {
             self.set_trades(trade)
                 .expect("CornerPosition is out of bounds!");
         }
@@ -165,7 +174,7 @@ impl TradeStore for CornerTable<CornerData> {
             data.set_trade(trade);
             Ok(())
         } else {
-            let mut data = CornerData::new();
+            let mut data = CornerInfo::new();
             data.set_trade(trade);
             self.set(position, data)
         }
@@ -173,5 +182,9 @@ impl TradeStore for CornerTable<CornerData> {
 
     fn get_trade(&self, position: CornerPosition) -> Option<TradeType> {
         self.get(position)?.get_trade()
+    }
+
+    fn get_trades(&self) -> impl Iterator<Item = TradeType> {
+        self.data().map(|(d, _)| d.get_trade()).flatten()
     }
 }

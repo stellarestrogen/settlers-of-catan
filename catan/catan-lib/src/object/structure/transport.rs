@@ -3,7 +3,7 @@ use hexgrid::edge::{position::EdgePosition, table::EdgeTable};
 use crate::{
     game::player::OwnershipToken,
     object::{
-        EdgeData,
+        EdgeInfo,
         structure::{Structure, StructureType},
     },
 };
@@ -58,9 +58,9 @@ pub trait TransportStore {
     fn transports(&self) -> impl Iterator<Item = Transport>;
 }
 
-impl TransportStore for EdgeTable<EdgeData> {
+impl TransportStore for EdgeTable<EdgeInfo> {
     fn set_transport(&mut self, position: EdgePosition, transport: Transport) -> Result<(), ()> {
-        self.set(position, EdgeData::new(transport))
+        self.set(position, EdgeInfo::new(transport))
     }
     fn get_transport(&self, position: EdgePosition) -> Option<Transport> {
         Some(self.get(position)?.get_transport())

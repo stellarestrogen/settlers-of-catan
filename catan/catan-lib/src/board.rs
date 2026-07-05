@@ -3,28 +3,29 @@ use std::fmt::Debug;
 use hexgrid::{
     corner::{bounds::CornerBounds, position::CornerPosition, table::CornerTable},
     edge::{bounds::EdgeBounds, position::EdgePosition, table::EdgeTable},
-    hex::{bounds::HexPerimeter, position::HexPosition, table::HexTable},
+    hex::{bounds::HexBounds, position::HexPosition, table::HexTable},
 };
 
 use crate::{
     game::edition::GameEdition,
     object::{
-        CornerData, EdgeData, Robber, TileData, TileType,
+        CornerInfo, EdgeInfo, Robber, TileData, TileType,
         resource::ResourceType,
         structure::{
             building::{Building, BuildingStore},
             transport::{Transport, TransportStore},
         },
-        trade::{TradeStore, TradeType},
+        trade::{TradePort, TradePortDeck, TradeStore, TradeType},
     },
 };
 
 #[derive(Debug)]
 pub struct Board {
     tiles: HexTable<TileData>,
-    corners: CornerTable<CornerData>,
-    edges: EdgeTable<EdgeData>,
+    corners: CornerTable<CornerInfo>,
+    edges: EdgeTable<EdgeInfo>,
     robber: Robber,
+    trade_ports: TradePortDeck,
 }
 
 impl Board {
@@ -34,11 +35,13 @@ impl Board {
         let corners = Self::create_trades(bounds, &edition);
         let edges = EdgeTable::new(EdgeBounds::new(bounds));
         let robber = Robber::place(&tiles);
+        let trade_ports = edition.get_trades().collect();
         Board {
             tiles,
             corners,
             edges,
             robber,
+            trade_ports,
         }
     }
 
@@ -76,6 +79,14 @@ impl Board {
 
     pub fn get_trade(&self, position: CornerPosition) -> Option<TradeType> {
         self.corners.get_trade(position)
+    }
+
+    pub fn trades(&self) -> impl Iterator<Item = TradeType> {
+        self.corners.get_trades()
+    }
+
+    pub fn trade_ports(&self) -> impl Iterator<Item = TradePort> {
+        self.trade_ports.clone()
     }
 
     pub fn get_building(&self, position: CornerPosition) -> Option<Building> {
@@ -176,7 +187,7 @@ impl Board {
 
     fn create_tiles(edition: &impl GameEdition) -> HexTable<TileData> {
         println!("board::create_tiles");
-        let mut bounds = HexPerimeter::new();
+        let mut bounds = HexBounds::new();
         let iter = edition.get_tiles();
 
         for (b, _) in iter.clone() {
@@ -192,7 +203,7 @@ impl Board {
         tiles
     }
 
-    fn create_trades(bounds: &HexPerimeter, edition: &impl GameEdition) -> CornerTable<CornerData> {
+    fn create_trades(bounds: &HexBounds, edition: &impl GameEdition) -> CornerTable<CornerInfo> {
         CornerTable::new(CornerBounds::new(bounds)).with_trades(edition)
     }
 }

@@ -13,21 +13,16 @@ use hexgrid::{
 };
 
 use crate::{
-    board::Board,
-    game::{
+    board::Board, game::{
         edition::GameEdition,
         error::BuildError,
         player::{OwnershipToken, Player},
         transport_segment::TransportSegment,
-    },
-    object::{
-        TileData, TileType,
-        card::ResourceMap,
-        resource::ResourceType,
-        structure::{
+    }, object::{
+        TileData, TileType, card::ResourceMap, resource::ResourceType, structure::{
             building::{Building, BuildingType},
             transport::{Transport, TransportType},
-        },
+        }, trade::{TradePort, TradeType},
     },
 };
 
@@ -79,6 +74,18 @@ impl Game {
 
     pub fn get_offset(&self) -> HexPosition {
         self.board.get_offset()
+    }
+
+    pub fn get_tile_data(&self) -> impl Iterator<Item = TileData> {
+        self.board.get_tile_data()
+    }
+
+    fn get_trades(&self) -> impl Iterator<Item = TradeType> {
+        self.board.trades()
+    }
+
+    pub fn get_trade_ports(&self) -> impl Iterator<Item = TradePort> {
+        self.board.trade_ports()
     }
 
     pub fn get_player(&self, player_number: usize) -> Option<&Player> {
@@ -288,10 +295,6 @@ impl Game {
         self.update_last_played_transport(transport.owner(), position);
 
         Ok(())
-    }
-
-    pub fn get_tile_data(&self) -> impl Iterator<Item = TileData> {
-        self.board.get_tile_data()
     }
 
     fn neighboring_transport(
