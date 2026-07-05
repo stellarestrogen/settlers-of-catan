@@ -3,14 +3,14 @@ use crate::{corner::bounds::CornerBounds, edge::bounds::EdgeBounds};
 use super::position::{HexPosition, HorizontalDisplacement};
 
 #[derive(Debug, Clone)]
-pub struct HexPerimeter {
+pub struct HexBounds {
     top_left: HexPosition,
     bottom_right: HexPosition,
 }
 
-impl HexPerimeter {
+impl HexBounds {
     pub fn new() -> Self {
-        HexPerimeter {
+        HexBounds {
             top_left: HexPosition::ORIGIN,
             bottom_right: HexPosition::ORIGIN,
         }
@@ -49,9 +49,9 @@ impl HexPerimeter {
             return;
         }
 
-        let vertical_distance_top_left = position.vertical_displacement(self.top_left).abs();
+        let vertical_displacement_top_left = position.vertical_displacement(self.top_left).abs();
 
-        let vertical_distance_bottom_right =
+        let vertical_displacement_bottom_right =
             position.vertical_displacement(self.bottom_right).abs();
 
         if position.is_left_raw(self.top_left) {
@@ -65,7 +65,7 @@ impl HexPerimeter {
         }
 
         if position.is_above(self.top_left) {
-            let vertical_distance = vertical_distance_top_left;
+            let vertical_distance = vertical_displacement_top_left;
 
             let shift = self
                 .bottom_right
@@ -84,7 +84,7 @@ impl HexPerimeter {
                 + HexPosition::UP_RIGHT * (vertical_distance / 2)
                 + adjustment;
         } else if position.is_below(self.bottom_right) {
-            let vertical_distance = vertical_distance_bottom_right;
+            let vertical_distance = vertical_displacement_bottom_right;
 
             let shift = self
                 .bottom_right
@@ -119,12 +119,12 @@ impl HexPerimeter {
 }
 
 pub struct HexArea<'a> {
-    parent: &'a HexPerimeter,
+    parent: &'a HexBounds,
     position: HexPosition,
 }
 
 impl<'a> HexArea<'a> {
-    fn new(parent: &'a HexPerimeter) -> Self {
+    fn new(parent: &'a HexBounds) -> Self {
         let position = parent.get_top_left();
         HexArea { parent, position }
     }

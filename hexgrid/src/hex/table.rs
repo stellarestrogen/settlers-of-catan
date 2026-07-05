@@ -3,29 +3,29 @@ use std::ops::{Index, IndexMut};
 
 use crate::hex::bounds::HexArea;
 
-use super::{bounds::HexPerimeter, position::HexPosition};
+use super::{bounds::HexBounds, position::HexPosition};
 
 #[derive(Debug)]
 pub struct HexTable<T> {
     data: Vec<Option<T>>,
-    bounds: HexPerimeter,
+    bounds: HexBounds,
 }
 
-impl HexPerimeter {
+impl HexBounds {
     fn get_size(&self) -> usize {
         (self.get_width() * self.get_height()) as usize
     }
 }
 
 impl<T> HexTable<T> {
-    pub fn new(bounds: HexPerimeter) -> Self {
+    pub fn new(bounds: HexBounds) -> Self {
         let mut data = Vec::with_capacity(bounds.get_size());
         data.resize_with(bounds.get_size(), Default::default);
 
         HexTable { data, bounds }
     }
 
-    pub fn get_bounds(&self) -> &HexPerimeter {
+    pub fn get_bounds(&self) -> &HexBounds {
         &self.bounds
     }
 
@@ -81,7 +81,7 @@ impl<T> HexTable<T> {
     }
 }
 
-impl<T: Debug> Index<HexPosition> for HexTable<T> {
+impl<T> Index<HexPosition> for HexTable<T> {
     type Output = T;
 
     fn index(&self, index: HexPosition) -> &T {
@@ -89,7 +89,7 @@ impl<T: Debug> Index<HexPosition> for HexTable<T> {
     }
 }
 
-impl<T: Debug> IndexMut<HexPosition> for HexTable<T> {
+impl<T> IndexMut<HexPosition> for HexTable<T> {
     fn index_mut(&mut self, index: HexPosition) -> &mut T {
         self.get_mut(index)
             .expect("No data at specified HexPosition!")

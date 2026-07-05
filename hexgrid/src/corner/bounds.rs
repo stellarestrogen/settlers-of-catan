@@ -1,26 +1,48 @@
 use crate::{
     corner::position::{CornerHeight, CornerPosition},
     hex::{
-        bounds::HexPerimeter,
+        bounds::HexBounds,
         position::{HexPosition, HorizontalDisplacement},
     },
 };
 
 #[derive(Debug, Clone)]
 pub struct CornerBounds {
-    bounds: HexPerimeter,
+    bounds: HexBounds,
 }
 
 impl CornerBounds {
-    pub fn new(hex_bounds: &HexPerimeter) -> Self {
-        let mut bounds: HexPerimeter = hex_bounds.clone();
+    pub fn new(hex_bounds: &HexBounds) -> Self {
+        let mut bounds: HexBounds = hex_bounds.clone();
         bounds.expand(bounds.get_top_left() + HexPosition::UP_RIGHT);
-        bounds.expand(bounds.get_bottom_right() + HexPosition::RIGHT + HexPosition::DOWN_LEFT);
+        bounds.expand(bounds.get_bottom_right() + HexPosition::RIGHT);
+        bounds.expand(bounds.get_bottom_right() + HexPosition::DOWN_LEFT);
         CornerBounds { bounds }
     }
 
-    pub fn get_hex_bounds(&self) -> HexPerimeter {
+    pub fn get_hex_bounds(&self) -> HexBounds {
         self.bounds.clone()
+    }
+
+    pub fn get_top_left(&self) -> CornerPosition {
+        let hex_top_left = self.bounds.get_top_left();
+        match hex_top_left.horizontal_displacement(HexPosition::ORIGIN) {
+            HorizontalDisplacement::Shifted(_) => (hex_top_left + CornerHeight::BOTTOM).into(),
+            HorizontalDisplacement::Unshifted(_) => {
+                ((hex_top_left + HexPosition::LEFT) + CornerHeight::BOTTOM).into()
+            }
+        }
+    }
+
+    pub fn get_bottom_right(&self) -> CornerPosition {
+        let hex_bottom_right = self.bounds.get_bottom_right();
+
+        match hex_bottom_right.horizontal_displacement(HexPosition::ORIGIN) {
+            HorizontalDisplacement::Shifted(_) => (hex_bottom_right + CornerHeight::TOP).into(),
+            HorizontalDisplacement::Unshifted(_) => {
+                ((hex_bottom_right + HexPosition::LEFT) + CornerHeight::TOP).into()
+            }
+        }
     }
 
     fn is_invalid_hex(&self, position: HexPosition) -> bool {
@@ -53,7 +75,7 @@ impl CornerBounds {
         let bottom_row: CornerPosition =
             (self.bounds.get_bottom_right() + CornerHeight::TOP_LEFT).into();
 
-        if position.vertical_distance(top_row) < 0 || position.vertical_distance(bottom_row) > 0 {
+        if position.is_above(top_row) || position.is_below(bottom_row) {
             return false;
         }
 
@@ -67,5 +89,49 @@ impl CornerBounds {
         }
 
         self.bounds.contains(hex)
+    }
+
+    pub fn area(&self) -> CornerArea<'_> {
+        CornerArea::new(self)
+    }
+}
+
+pub struct CornerArea<'a> {
+    parent: &'a CornerBounds,
+    position: CornerPosition,
+}
+
+impl<'a> CornerArea<'a> {
+    fn new(parent: &'a CornerBounds) -> Self {
+        let position = parent.get_top_left();
+        CornerArea { parent, position }
+    }
+}
+
+impl<'a> Iterator for CornerArea<'a> {
+    type Item = CornerPosition;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        let mut current_position = self.position;
+
+        if !self.parent.contains(current_position) {
+            current_position = match current_position {
+                CornerPosition::High(p) => p.go_left().go_down().into(),
+                CornerPosition::Low(p) => p.go_down().go_left().into(),
+            };
+
+            while self.parent.contains(current_position) {
+                current_position = current_position.go_left();
+            }
+
+            current_position = current_position.go_right();
+        }
+
+        if !current_position.is_below(self.parent.get_bottom_right().go_left()) {
+            self.position = current_position.go_right();
+            Some(current_position)
+        } else {
+            None
+        }
     }
 }

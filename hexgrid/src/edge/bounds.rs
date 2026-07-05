@@ -1,7 +1,7 @@
 use crate::{
     edge::position::EdgePosition,
     hex::{
-        bounds::HexPerimeter,
+        bounds::HexBounds,
         position::{HexPosition, HorizontalDisplacement},
     },
 };
@@ -10,12 +10,12 @@ use super::position::EdgeOrientation;
 
 #[derive(Debug, Clone)]
 pub struct EdgeBounds {
-    bounds: HexPerimeter,
+    bounds: HexBounds,
 }
 
 impl EdgeBounds {
-    pub fn new(hex_bounds: &HexPerimeter) -> Self {
-        let mut bounds: HexPerimeter = hex_bounds.clone();
+    pub fn new(hex_bounds: &HexBounds) -> Self {
+        let mut bounds: HexBounds = hex_bounds.clone();
         bounds.expand(bounds.get_top_left() + HexPosition::UP_RIGHT);
         bounds.expand(bounds.get_bottom_right() + HexPosition::RIGHT + HexPosition::DOWN_LEFT);
 
@@ -69,7 +69,7 @@ impl EdgeBounds {
         self.bounds.contains(hex)
     }
 
-    pub fn get_hex_bounds(&self) -> HexPerimeter {
+    pub fn get_hex_bounds(&self) -> HexBounds {
         self.bounds.clone()
     }
 }

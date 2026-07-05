@@ -38,6 +38,70 @@ impl CornerPosition {
         self.downs() - other.downs()
     }
 
+    pub fn is_right(&self, other: Self) -> bool {
+        self.horizontal_distance(other) > 0
+    }
+
+    pub fn is_right_or_equal(&self, other: Self) -> bool {
+        self.horizontal_distance(other) >= 0
+    }
+
+    pub fn is_left(&self, other: Self) -> bool {
+        self.horizontal_distance(other) < 0
+    }
+
+    pub fn is_left_or_equal(&self, other: Self) -> bool {
+        self.horizontal_distance(other) <= 0
+    }
+
+    pub fn is_above(&self, other: Self) -> bool {
+        self.vertical_distance(other) < 0
+    }
+
+    pub fn is_above_or_equal(&self, other: Self) -> bool {
+        self.vertical_distance(other) <= 0
+    }
+
+    pub fn is_below(&self, other: Self) -> bool {
+        self.vertical_distance(other) > 0
+    }
+
+    pub fn is_below_or_equal(&self, other: Self) -> bool {
+        self.vertical_distance(other) >= 0
+    }
+
+    pub fn go_right(self) -> Self {
+        match self {
+            Self::High(p) => p.go_right().into(),
+            Self::Low(p) => p.go_right().into(),
+        }
+    }
+
+    pub fn right_for(self, count: usize) -> Self {
+        let mut position = self;
+        for _ in 0..count {
+            position = position.go_right();
+        }
+
+        position
+    }
+
+    pub fn go_left(self) -> Self {
+        match self {
+            Self::High(p) => p.go_left().into(),
+            Self::Low(p) => p.go_left().into(),
+        }
+    }
+
+    pub fn left_for(self, count: usize) -> Self {
+        let mut position = self;
+        for _ in 0..count {
+            position = position.go_left();
+        }
+
+        position
+    }
+
     pub fn neighboring_hex(&self) -> [HexPosition; 3] {
         self.position().neighboring_hex()
     }
@@ -118,7 +182,6 @@ impl<H> Clone for CornerHeight<H> {
         }
     }
 }
-
 
 impl<H> Copy for CornerHeight<H> {}
 

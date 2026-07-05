@@ -1,7 +1,7 @@
 use std::ops::{Index, IndexMut};
 
 use crate::{
-    corner::position::CornerPosition,
+    corner::{bounds::CornerArea, position::CornerPosition},
     hex::{position::HexPosition, table::HexTable},
 };
 
@@ -81,8 +81,12 @@ impl<T> CornerTable<T> {
         Ok(())
     }
 
-    pub fn data(&self) -> impl Iterator<Item = &T> {
-        self.data.data().flat_map(|((a, b), _)| [a, b]).flatten()
+    pub fn positions(&self) -> CornerArea<'_> {
+        self.bounds.area()
+    }
+
+    pub fn data(&self) -> CornerData<'_, T> {
+        CornerData::new(&self)
     }
 }
 
@@ -99,5 +103,31 @@ impl<T> IndexMut<CornerPosition> for CornerTable<T> {
     fn index_mut(&mut self, index: CornerPosition) -> &mut Self::Output {
         self.get_mut(index)
             .expect("No data at specified CornerPosition!")
+    }
+}
+
+pub struct CornerData<'a, T> {
+    parent: &'a CornerTable<T>,
+    area: CornerArea<'a>,
+}
+
+impl<'a, T> CornerData<'a, T> {
+    fn new(parent: &'a CornerTable<T>) -> Self {
+        let area = parent.bounds.area();
+        CornerData { parent, area }
+    }
+}
+
+impl<'a, T> Iterator for CornerData<'a, T> {
+    type Item = (&'a T, CornerPosition);
+
+    fn next(&mut self) -> Option<Self::Item> {
+        while let Some(position) = self.area.next() {
+            if let Some(data) = self.parent.get(position) {
+                return Some((data, position));
+            }
+        }
+
+        None
     }
 }
