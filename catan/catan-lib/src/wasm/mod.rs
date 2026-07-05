@@ -2,6 +2,7 @@ use wasm_bindgen::{JsValue, prelude::wasm_bindgen};
 
 pub mod position;
 pub mod resource;
+pub mod trade;
 pub mod wasm;
 
 #[wasm_bindgen(start)]

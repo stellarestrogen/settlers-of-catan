@@ -1,6 +1,9 @@
 use std::num::NonZeroUsize;
 
-use hexgrid::hex::position::HexPosition;
+use hexgrid::{
+    corner::position::{CornerHeight, CornerPosition},
+    hex::position::HexPosition,
+};
 use serde::Deserialize;
 use tsify::Tsify;
 use wasm_bindgen::{JsError, prelude::wasm_bindgen};
@@ -13,7 +16,11 @@ use crate::{
         error::GameError,
     },
     object::{resource::ResourceType, structure::OwnedStructures, trade::TradeType},
-    wasm::{position::WasmHexPosition, resource::WasmTileData},
+    wasm::{
+        position::{WasmCornerPosition, WasmHexPosition},
+        resource::WasmTileData,
+        trade::WasmTradePort,
+    },
 };
 
 #[wasm_bindgen]
@@ -92,17 +99,57 @@ impl WasmInterface {
         let mut position: HexPosition = position.into();
         position += self.game.get_offset();
         // do something with the resulting position
-
     }
 
     pub fn get_tile_data(&self) -> Vec<<WasmTileData as Tsify>::JsType> {
-        let thing = self
+        let tiles = self
             .game
             .get_tile_data()
             .map(WasmTileData::from_tile_data)
             .map(|t| t.into_js().expect(""))
             .collect();
-        thing
+        tiles
+    }
+
+    pub fn get_trade_ports(&self) -> Vec<<WasmTradePort as Tsify>::JsType> {
+        let trades = self
+            .game
+            .get_trade_ports()
+            .map(WasmTradePort::from_trade_port)
+            .map(|t| t.into_js().expect(""))
+            .collect();
+        trades
+    }
+
+    pub fn hex_offset(&self) -> <WasmHexPosition as Tsify>::JsType {
+        let position: WasmHexPosition = self.game.get_offset().into();
+
+        position.into_js().expect("")
+    }
+
+    pub fn corner_offset(&self) -> <WasmCornerPosition as Tsify>::JsType {
+        let position: WasmCornerPosition =
+            Into::<CornerPosition>::into(self.game.get_offset() + CornerHeight::TOP_LEFT).into();
+
+        position.into_js().expect("")
+    }
+
+    pub fn query_trade(&self, position: <WasmCornerPosition as Tsify>::JsType) {
+        let offset = WasmCornerPosition::from_js(self.corner_offset()).expect("");
+        let position = WasmCornerPosition::from_js(position).expect("");
+
+        let position = WasmCornerPosition {
+            rights: offset.rights + position.rights,
+            downs: offset.downs + position.downs,
+        };
+
+        let real_position: CornerPosition = position.into();
+
+        if let Some(trade) = self.game.get_trade(real_position) {
+            tracing::trace!("The trade here is {:?}\n", trade);
+        } else {
+            tracing::trace!("There is no trade here.\n")
+        }
     }
 }
 

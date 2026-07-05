@@ -3,11 +3,11 @@ use hexgrid::{
     edge::position::{EdgeOrientation, EdgePosition},
     hex::position::HexPosition,
 };
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 use tsify::Tsify;
 use wasm_bindgen::prelude::wasm_bindgen;
 
-#[derive(Debug, Clone, Copy, Tsify, Deserialize)]
+#[derive(Debug, Clone, Copy, Tsify, Serialize, Deserialize)]
 pub struct WasmHexPosition {
     pub rights: i32,
     pub downs: i32,
@@ -28,7 +28,13 @@ impl Into<HexPosition> for WasmHexPosition {
         new_position += HexPosition::DOWN_LEFT * (self.downs / 2);
         new_position += HexPosition::DOWN_RIGHT * (self.downs / 2);
         if self.downs.abs() % 2 == 1 {
-            new_position += HexPosition::DOWN_LEFT;
+            new_position += if self.downs.signum() == 1 {
+                HexPosition::DOWN_LEFT
+            } else if self.downs.signum() == -1 {
+                HexPosition::UP_LEFT
+            } else {
+                HexPosition::ORIGIN
+            };
         }
 
         new_position += HexPosition::RIGHT * self.rights;
@@ -37,7 +43,16 @@ impl Into<HexPosition> for WasmHexPosition {
     }
 }
 
-#[derive(Debug, Clone, Copy, Tsify, Deserialize)]
+impl Into<WasmHexPosition> for HexPosition {
+    fn into(self) -> WasmHexPosition {
+        let rights = self.horizontal_displacement(HexPosition::ORIGIN).ceil();
+        let downs = self.vertical_displacement(HexPosition::ORIGIN);
+
+        WasmHexPosition { rights, downs }
+    }
+}
+
+#[derive(Debug, Clone, Copy, Tsify, Serialize, Deserialize)]
 pub struct WasmCornerPosition {
     pub rights: i32,
     pub downs: i32,
@@ -45,37 +60,56 @@ pub struct WasmCornerPosition {
 
 impl WasmCornerPosition {
     fn structural_owner(&self) -> WasmHexPosition {
-        let rights = self.rights + 1;
-        let downs = if (self.downs % 3).abs() == 0 {
+        let rights = ((self.rights as f64 + 1.) / 2.).floor() as i32;
+        let downs = (if (self.downs % 3).abs() == 0 {
             self.downs + 1
         } else {
             self.downs - 1
-        };
+        } as f64
+            / 3.)
+            .floor() as i32;
 
         WasmHexPosition { rights, downs }
+    }
+}
+
+impl Into<CornerPosition> for WasmCornerPosition {
+    fn into(self) -> CornerPosition {
+        let is_low = (self.downs % 3).abs() == 0;
+
+        let hex: HexPosition = self.structural_owner().into();
+
+        let position = if is_low {
+            (hex + CornerHeight::TOP_LEFT).into()
+        } else {
+            (hex + CornerHeight::BOTTOM_LEFT).into()
+        };
+
+        position
     }
 }
 
 impl Into<CornerPosition> for <WasmCornerPosition as Tsify>::JsType {
     fn into(self) -> CornerPosition {
         let position = WasmCornerPosition::from_js(self).expect("");
-
-        let is_low = (position.downs % 3).abs() == 0;
-
-        let hex: HexPosition = position.structural_owner().into();
-
-        if is_low {
-            (hex + CornerHeight::TOP_LEFT).into()
-        } else {
-            (hex + CornerHeight::BOTTOM_LEFT).into()
-        }
+        position.into()
     }
 }
 
-#[derive(Debug, Clone, Copy, Tsify, Deserialize)]
+impl Into<WasmCornerPosition> for CornerPosition {
+    fn into(self) -> WasmCornerPosition {
+        let origin_corner = (HexPosition::ORIGIN + CornerHeight::TOP_LEFT).into();
+        let rights = self.horizontal_distance(origin_corner);
+        let downs = self.vertical_distance(origin_corner);
+
+        WasmCornerPosition { rights, downs }
+    }
+}
+
+#[derive(Debug, Clone, Copy, Tsify, Serialize, Deserialize)]
 pub struct WasmEdgePosition {
-    rights: i32,
-    downs: i32,
+    pub rights: i32,
+    pub downs: i32,
 }
 
 impl WasmEdgePosition {

@@ -1,4 +1,4 @@
-import type { WasmHexPosition, WasmTileData } from "catan/catan_lib";
+import type { WasmHexPosition, WasmTileData, WasmTradePort } from "catan/catan_lib";
 
 import {
     HEX_SIDE_LENGTH,
@@ -14,6 +14,7 @@ import {
 export class GameData {
     constructor(
         public tileData: WasmTileData[],
+        public tradePorts: WasmTradePort[],
         public width: number,
         public height: number,
     ) {}

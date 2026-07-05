@@ -25,28 +25,31 @@
         type WasmHexPosition,
     } from "catan/catan_lib";
 
-    let { tiles, height, width, game } = $props();
+    let { tiles, trade_ports, height, width, game } = $props();
 
-    let data = $derived(new util.GameData(tiles, width, height));
+    let data = $derived(new util.GameData(tiles, trade_ports, width, height));
 
-    let board_width = $derived(
-        HEX_WIDTH * width + BOARD_MARGIN_SIDE * 2 + HEX_SIDE_LENGTH,
-    );
-    let board_height = $derived(
-        HEX_ROW_HEIGHT * (height - 1) + HEX_HEIGHT + BOARD_MARGIN_TOP * 2,
-    );
+    let board_width = $derived(HEX_WIDTH * width + BOARD_MARGIN_SIDE * 2 + HEX_SIDE_LENGTH);
+    let board_height = $derived(HEX_ROW_HEIGHT * (height - 1) + HEX_HEIGHT + BOARD_MARGIN_TOP * 2);
 
     function onTileClick(x: number, y: number) {
-        console.log(`This hexagon's position is ${x}, ${y}`);
         let pos: WasmHexPosition = {
             rights: x,
             downs: y,
         };
+        console.log(`This hexagon's position is `, pos);
         game.take_hex_position(pos);
     }
 
     function onCornerClick(position: WasmCornerPosition) {
         console.log(`This corner's position is `, position);
+        let offset: WasmCornerPosition = game.corner_offset();
+        let offset_position: WasmCornerPosition = {
+            rights: offset.rights + position.rights,
+            downs: offset.downs + position.downs,
+        };
+        console.log(`With offset, this corner's position is `, offset_position);
+        game.query_trade(position);
     }
 
     function onEdgeClick(position: WasmEdgePosition) {
@@ -77,7 +80,7 @@
     </style>
     {#each Array(height) as _, y}
         {#each Array(width) as _, x}
-            {#if data.tileTypeByXY(x, y)}
+            {#if data.tileTypeByXY(x, y) != "Water"}
                 <!-- svelte-ignore a11y_no_static_element_interactions -->
                 <!-- svelte-ignore a11y_click_events_have_key_events -->
                 <polygon
@@ -111,14 +114,8 @@
                         y={util.calculateRollNumberPosition(x, y).y}
                         text-anchor="middle"
                         dominant-baseline="middle"
-                        fill={util.isRollNumberCommon(
-                            data.rollNumberByXY(x, y)!,
-                        )
-                            ? "red"
-                            : "black"}
-                        font-style={util.isRollNumberCommon(
-                            data.rollNumberByXY(x, y)!,
-                        )
+                        fill={util.isRollNumberCommon(data.rollNumberByXY(x, y)!) ? "red" : "black"}
+                        font-style={util.isRollNumberCommon(data.rollNumberByXY(x, y)!)
                             ? "italic"
                             : "normal"}
                         onclick={() => {
@@ -138,9 +135,7 @@
                                 PROBABILITY_MARGIN * i}
                             cy={util.calculateProbabilityCirclePosition(x, y).y}
                             r={PROBABILITY_RADIUS}
-                            fill={util.isRollNumberCommon(
-                                data.rollNumberByXY(x, y)!,
-                            )
+                            fill={util.isRollNumberCommon(data.rollNumberByXY(x, y)!)
                                 ? "red"
                                 : "black"}
                             onclick={() => {
@@ -176,9 +171,8 @@
             y={positions.positions[1] - EDGE_LENGTH / 2}
             width={EDGE_WIDTH}
             height={EDGE_LENGTH}
-            transform="rotate({edge.rotateAngle(
-                positions.nextPosition,
-            )}, {positions.positions[0]}, {positions.positions[1]})"
+            transform="rotate({edge.rotateAngle(positions.nextPosition)}, {positions
+                .positions[0]}, {positions.positions[1]})"
             class="edge"
             data-position={positions.nextPosition}
             onclick={() => {

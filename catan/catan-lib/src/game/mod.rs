@@ -80,7 +80,11 @@ impl Game {
         self.board.get_tile_data()
     }
 
-    fn get_trades(&self) -> impl Iterator<Item = TradeType> {
+    pub fn get_trade(&self, position: CornerPosition) -> Option<TradeType> {
+        self.board.get_trade(position)
+    }
+
+    pub fn get_trades(&self) -> impl Iterator<Item = TradeType> {
         self.board.trades()
     }
 
