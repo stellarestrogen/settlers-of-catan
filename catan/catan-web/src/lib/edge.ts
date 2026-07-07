@@ -1,33 +1,6 @@
-import type { WasmEdgePosition, WasmHexPosition } from "catan/catan_lib";
+import { WasmEdgePosition, type WasmHexPosition } from "catan/catan_lib";
 import type { GameData } from "./board_util";
-import {
-    EDGE_START_X,
-    EDGE_START_Y,
-    HEX_SIDE_LENGTH,
-    HEX_WIDTH,
-} from "./board_constants";
-
-function isEdgeEven(position: WasmEdgePosition) {
-    return (
-        Math.abs((position.rights + position.downs) % 4) == 0 && Math.abs(position.downs % 2) == 0
-    );
-}
-
-function isEdgeOdd(position: WasmEdgePosition) {
-    return (
-        Math.abs((position.rights + position.downs) % 4) == 2 && Math.abs(position.downs % 2) == 0
-    );
-}
-
-function isEdgePositive(position: WasmEdgePosition) {
-    return (
-        Math.abs(position.downs % 2) == 1 && Math.abs((position.rights + position.downs) % 4) == 0
-    );
-}
-
-function isEdgeInvalid(position: WasmEdgePosition) {
-    return !isEdgeEven(position) && !isEdgeOdd(position) && !isEdgePositive(position);
-}
+import { EDGE_START_X, EDGE_START_Y, HEX_SIDE_LENGTH, HEX_WIDTH } from "./board_constants";
 
 function furthestRightEdge(width: number) {
     return width * 4;
@@ -38,11 +11,11 @@ function furthestDownEdge(height: number) {
 }
 
 function nextEdge(position: WasmEdgePosition, width: number, height: number) {
-    let nextPosition = Object.assign({}, position);
+    let nextPosition = new WasmEdgePosition(position.rights, position.downs);
 
-    if (isEdgeEven(position) || isEdgeOdd(position)) {
+    if (position.is_even() || position.is_odd()) {
         nextPosition.rights += 2;
-    } else if (isEdgePositive(position)) {
+    } else if (position.is_positive()) {
         nextPosition.rights += 4;
     }
 
@@ -51,7 +24,7 @@ function nextEdge(position: WasmEdgePosition, width: number, height: number) {
         nextPosition.downs += 1;
     }
 
-    while (isEdgeInvalid(nextPosition)) {
+    while (nextPosition.is_invalid()) {
         nextPosition.rights += 1;
     }
 
@@ -60,45 +33,6 @@ function nextEdge(position: WasmEdgePosition, width: number, height: number) {
     }
 
     return nextPosition;
-}
-
-function neighboringHexForEdge(position: WasmEdgePosition) {
-    let hexes: WasmHexPosition[] = [];
-    if (isEdgeEven(position)) {
-        hexes = [
-            {
-                rights: Math.floor(position.rights / 4),
-                downs: (position.downs - 2) / 2,
-            },
-            {
-                rights: Math.ceil(position.rights / 4),
-                downs: position.downs / 2,
-            },
-        ];
-    } else if (isEdgeOdd(position)) {
-        hexes = [
-            {
-                rights: Math.ceil(position.rights / 4),
-                downs: (position.downs - 2) / 2,
-            },
-            {
-                rights: Math.floor(position.rights / 4),
-                downs: position.downs / 2,
-            },
-        ];
-    } else if (isEdgePositive(position)) {
-        hexes = [
-            {
-                rights: Math.ceil((position.rights + 1) / 4),
-                downs: (position.downs - 1) / 2,
-            },
-            {
-                rights: Math.ceil((position.rights - 3) / 4),
-                downs: (position.downs - 1) / 2,
-            },
-        ];
-    }
-    return hexes;
 }
 
 function edgeToCoordinates(position: WasmEdgePosition) {
@@ -110,11 +44,11 @@ function edgeToCoordinates(position: WasmEdgePosition) {
 
 export function edgePositions(data: GameData) {
     let positions: { positions: number[]; nextPosition: WasmEdgePosition }[] = [];
-    let currentPosition: WasmEdgePosition = { rights: -2, downs: 0 };
+    let currentPosition = new WasmEdgePosition(-2, 0);
     let nextPosition;
     while ((nextPosition = nextEdge(currentPosition, data.width, data.height)) != null) {
         let isWater = true;
-        for (let hex of neighboringHexForEdge(nextPosition)) {
+        for (let hex of nextPosition.neighboring_hex()) {
             if (data.tileTypeByPosition(hex) == "Water") {
                 continue;
             } else {
@@ -134,9 +68,9 @@ export function edgePositions(data: GameData) {
 }
 
 export function rotateAngle(position: WasmEdgePosition) {
-    if (isEdgeEven(position)) {
+    if (position.is_even()) {
         return 60;
-    } else if (isEdgeOdd(position)) {
+    } else if (position.is_odd()) {
         return -60;
     } else {
         return 0;

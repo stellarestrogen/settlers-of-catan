@@ -1,13 +1,6 @@
-import type { WasmCornerPosition, WasmHexPosition } from "catan/catan_lib";
-import {
-    BOARD_MARGIN_SIDE,
-    HEX_CENTER_X,
-    BOARD_MARGIN_TOP,
-    HEX_CENTER_Y,
-    CORNER_START_X,
-    CORNER_START_Y,
-} from "./board_constants";
+import { HEX_CENTER_X, HEX_CENTER_Y, CORNER_START_X, CORNER_START_Y } from "./board_constants";
 import { GameData } from "./board_util";
+import { WasmCornerPosition } from "catan";
 
 function furthestRightCorner(width: number) {
     return width * 2;
@@ -18,7 +11,7 @@ function furthestDownCorner(height: number) {
 }
 
 function nextCorner(position: WasmCornerPosition, width: number, height: number) {
-    let nextPosition = Object.assign({}, position);
+    let nextPosition = new WasmCornerPosition(position.rights, position.downs);
     if (Math.abs(position.downs) % 3 == 0) {
         nextPosition.downs -= 1;
     } else if (Math.abs(position.downs) % 3 == 1 || Math.abs(position.downs) % 3 == 2) {
@@ -34,44 +27,8 @@ function nextCorner(position: WasmCornerPosition, width: number, height: number)
     if (nextPosition.downs > furthestDownCorner(height)) {
         return null;
     }
+
     return nextPosition;
-}
-
-function neighboringHexForCorner(position: WasmCornerPosition) {
-    let hexes: WasmHexPosition[] = [];
-    if (Math.abs(position.downs) % 3 == 0) {
-        hexes = [
-            {
-                rights: Math.ceil(position.rights / 2),
-                downs: position.downs / 3,
-            },
-            {
-                rights: Math.floor((position.rights - 1) / 2),
-                downs: position.downs / 3,
-            },
-            {
-                rights: Math.floor(position.rights / 2),
-                downs: position.downs / 3 - 1,
-            },
-        ];
-    } else {
-        hexes = [
-            {
-                rights: Math.ceil(position.rights / 2),
-                downs: (position.downs - 2) / 3,
-            },
-            {
-                rights: Math.floor((position.rights - 1) / 2),
-                downs: (position.downs - 2) / 3,
-            },
-            {
-                rights: Math.floor(position.rights / 2),
-                downs: (position.downs + 1) / 3,
-            },
-        ];
-    }
-
-    return hexes;
 }
 
 function cornerToCoordinates(position: WasmCornerPosition) {
@@ -83,11 +40,11 @@ function cornerToCoordinates(position: WasmCornerPosition) {
 
 export function cornerPositions(data: GameData) {
     let positions: { positions: number[]; nextPosition: WasmCornerPosition }[] = [];
-    let currentPosition: WasmCornerPosition = { rights: -1, downs: -1 };
+    let currentPosition = new WasmCornerPosition(-1, -1);
     let nextPosition;
-    while ((nextPosition = nextCorner(currentPosition, data.width, data.height)) != null) {
+    while ((nextPosition = nextCorner(currentPosition, data.width, data.height)) !== null) {
         let isWater = true;
-        for (let hex of neighboringHexForCorner(nextPosition)) {
+        for (let hex of nextPosition.neighboring_hex()) {
             if (data.tileTypeByPosition(hex) == "Water") {
                 continue;
             } else {

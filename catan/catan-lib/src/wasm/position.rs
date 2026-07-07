@@ -5,12 +5,21 @@ use hexgrid::{
 };
 use serde::{Deserialize, Serialize};
 use tsify::Tsify;
-use wasm_bindgen::prelude::wasm_bindgen;
+use wasm_bindgen::prelude::*;
 
 #[derive(Debug, Clone, Copy, Tsify, Serialize, Deserialize)]
+#[wasm_bindgen]
 pub struct WasmHexPosition {
     pub rights: i32,
     pub downs: i32,
+}
+
+#[wasm_bindgen]
+impl WasmHexPosition {
+    #[wasm_bindgen(constructor)]
+    pub fn new(rights: i32, downs: i32) -> Self {
+        Self { rights, downs }
+    }
 }
 
 impl Into<HexPosition> for <WasmHexPosition as Tsify>::JsType {
@@ -53,6 +62,7 @@ impl Into<WasmHexPosition> for HexPosition {
 }
 
 #[derive(Debug, Clone, Copy, Tsify, Serialize, Deserialize)]
+#[wasm_bindgen]
 pub struct WasmCornerPosition {
     pub rights: i32,
     pub downs: i32,
@@ -70,6 +80,25 @@ impl WasmCornerPosition {
             .floor() as i32;
 
         WasmHexPosition { rights, downs }
+    }
+}
+
+#[wasm_bindgen]
+impl WasmCornerPosition {
+    #[wasm_bindgen(constructor)]
+    pub fn new(rights: i32, downs: i32) -> Self {
+        Self { rights, downs }
+    }
+
+    pub fn neighboring_hex(&self) -> Vec<<WasmHexPosition as Tsify>::JsType> {
+        let corner: CornerPosition = self.clone().into();
+
+        let hexes = corner
+            .neighboring_hex()
+            .map(Into::<WasmHexPosition>::into)
+            .map(|h| h.into_js().expect(""));
+
+        hexes.into()
     }
 }
 
@@ -107,24 +136,13 @@ impl Into<WasmCornerPosition> for CornerPosition {
 }
 
 #[derive(Debug, Clone, Copy, Tsify, Serialize, Deserialize)]
+#[wasm_bindgen]
 pub struct WasmEdgePosition {
     pub rights: i32,
     pub downs: i32,
 }
 
 impl WasmEdgePosition {
-    fn is_even(&self) -> bool {
-        (self.downs % 4).abs() == 0
-    }
-
-    fn is_odd(&self) -> bool {
-        (self.downs % 4).abs() == 2
-    }
-
-    fn is_positive(&self) -> bool {
-        !self.is_even() && !self.is_odd()
-    }
-
     fn structural_owner(&self) -> WasmHexPosition {
         let (rights, downs) = if self.is_even() {
             (self.rights + 1, self.downs + 1)
@@ -134,25 +152,77 @@ impl WasmEdgePosition {
             (self.rights + 2, self.downs)
         };
 
-        WasmHexPosition {
-            rights: (rights - 1) / 4,
+        let rights = if rights % 4 == 1 && rights % 4 == -3 {
+            (rights - 1) / 4
+        } else {
+            (rights + 1) / 4
+        };
+
+        let hex = WasmHexPosition {
+            rights,
             downs: (downs - 1) / 2,
-        }
+        };
+
+        hex
+    }
+}
+
+#[wasm_bindgen]
+impl WasmEdgePosition {
+    #[wasm_bindgen(constructor)]
+    pub fn new(rights: i32, downs: i32) -> Self {
+        Self { rights, downs }
+    }
+
+    pub fn neighboring_hex(&self) -> Vec<<WasmHexPosition as Tsify>::JsType> {
+        let edge: EdgePosition = self.clone().into();
+
+        let hexes = edge.neighboring_hex().map(Into::<WasmHexPosition>::into);
+
+        // tracing::trace!("self: {:?} edge: {:?} hexes: {:?}", self, edge, hexes);
+
+        edge.neighboring_hex()
+            .map(Into::<WasmHexPosition>::into)
+            .map(|h| h.into_js().expect(""))
+            .into()
+    }
+
+    pub fn is_even(&self) -> bool {
+        ((self.rights + self.downs) % 4).abs() == 0 && (self.downs % 2).abs() == 0
+    }
+
+    pub fn is_odd(&self) -> bool {
+        ((self.rights + self.downs) % 4).abs() == 2 && (self.downs % 2).abs() == 0
+    }
+
+    pub fn is_positive(&self) -> bool {
+        (self.downs % 2).abs() == 1 && ((self.rights + self.downs) % 4).abs() == 0
+    }
+
+    pub fn is_invalid(&self) -> bool {
+        !self.is_even() && !self.is_odd() && !self.is_positive()
     }
 }
 
 impl Into<EdgePosition> for <WasmEdgePosition as Tsify>::JsType {
     fn into(self) -> EdgePosition {
         let position = WasmEdgePosition::from_js(self).expect("");
+        position.into()
+    }
+}
 
-        let hex: HexPosition = position.structural_owner().into();
-
-        if position.is_even() {
+impl Into<EdgePosition> for WasmEdgePosition {
+    fn into(self) -> EdgePosition {
+        let hex: HexPosition = self.structural_owner().into();
+        if self.is_even() {
             (hex + EdgeOrientation::TOP_LEFT).into()
-        } else if position.is_odd() {
+        } else if self.is_odd() {
+            tracing::trace!("{:?} is odd", self);
             (hex + EdgeOrientation::BOTTOM_LEFT).into()
-        } else {
+        } else if self.is_positive() {
             (hex + EdgeOrientation::LEFT).into()
+        } else {
+            unreachable!()
         }
     }
 }

@@ -1,6 +1,6 @@
 <script lang="ts">
     import Board from "$lib/Board.svelte";
-    import { type WasmHexPosition, WasmInterface, type WasmCustomEdition } from "catan";
+    import { WasmCornerPosition, WasmInterface, type WasmCustomEdition } from "catan";
 
     let x = $state(3);
     let y = $state(3);

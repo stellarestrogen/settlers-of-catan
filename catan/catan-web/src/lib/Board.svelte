@@ -19,11 +19,7 @@
     import * as corner from "./corner";
     import * as edge from "./edge";
 
-    import {
-        type WasmCornerPosition,
-        type WasmEdgePosition,
-        type WasmHexPosition,
-    } from "catan/catan_lib";
+    import { WasmCornerPosition, WasmHexPosition, type WasmEdgePosition } from "catan/catan_lib";
 
     let { tiles, trade_ports, height, width, game } = $props();
 
@@ -33,22 +29,13 @@
     let board_height = $derived(HEX_ROW_HEIGHT * (height - 1) + HEX_HEIGHT + BOARD_MARGIN_TOP * 2);
 
     function onTileClick(x: number, y: number) {
-        let pos: WasmHexPosition = {
-            rights: x,
-            downs: y,
-        };
+        let pos = new WasmHexPosition(x, y);
         console.log(`This hexagon's position is `, pos);
         game.take_hex_position(pos);
     }
 
     function onCornerClick(position: WasmCornerPosition) {
         console.log(`This corner's position is `, position);
-        let offset: WasmCornerPosition = game.corner_offset();
-        let offset_position: WasmCornerPosition = {
-            rights: offset.rights + position.rights,
-            downs: offset.downs + position.downs,
-        };
-        console.log(`With offset, this corner's position is `, offset_position);
         game.query_trade(position);
     }
 
