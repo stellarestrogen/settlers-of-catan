@@ -6,7 +6,9 @@ use hexgrid::{
     edge::position::{EdgeOrientation, EdgePosition},
     hex::position::HexPosition,
 };
+use rand::SeedableRng;
 
+use crate::game::GameRng;
 #[allow(unused_imports)]
 use crate::{
     game::{Game, edition},
@@ -22,11 +24,12 @@ use crate::{
 
 #[test]
 fn longest_road_test() {
-    let edition = edition::CustomEdition::of_size(3, 5)
+    let mut rng = GameRng::seed_from_u64(1);
+    let edition = edition::CustomEdition::of_size(3, 5, &mut rng)
         .with_owned_structures(OwnedStructures::new(5, 4, 30, 0))
         .build();
 
-    let mut game = Game::new(edition, NonZeroUsize::new(2).unwrap());
+    let mut game = Game::new(edition, NonZeroUsize::new(2).unwrap(), &mut rng);
 
     let start = (HexPosition::ORIGIN + HexPosition::DOWN_LEFT) + EdgeOrientation::RIGHT;
 

@@ -4,11 +4,14 @@ use hexgrid::hex::{iterators::spiral::HexSpiral, position::HexPosition};
 use rand::prelude::*;
 use wasm_bindgen::prelude::wasm_bindgen;
 
-use crate::object::{
-    TileData,
-    resource::{ResourceDeck, ResourceDistribution, ResourceType},
-    structure::OwnedStructures,
-    trade::{TradeDistribution, TradePort, TradePortDeck, TradeType},
+use crate::{
+    game::GameRng,
+    object::{
+        TileData,
+        resource::{ResourceDeck, ResourceDistribution, ResourceType},
+        structure::OwnedStructures,
+        trade::{TradeDistribution, TradePort, TradePortDeck, TradeType},
+    },
 };
 
 const ROLL_ORDER_BASE: [u8; 18] = [11, 3, 6, 5, 4, 9, 10, 8, 4, 11, 12, 9, 10, 8, 3, 6, 2, 5];
@@ -24,15 +27,19 @@ const TRADE_GAP_BASE: [u32; 9] = [0, 1, 2, 1, 1, 2, 1, 1, 2];
 const TRADE_GAP_EXP: [u32; 11] = [0, 1, 1, 1, 1, 1, 1, 1, 3, 1, 2];
 
 pub trait GameEdition {
-    fn get_tiles(&self) -> impl Iterator<Item = (HexPosition, TileData)> + Clone;
-    fn get_trades(&self) -> impl Iterator<Item = TradePort>;
+    fn get_tiles(&self, rng: &mut GameRng)
+    -> impl Iterator<Item = (HexPosition, TileData)> + Clone;
+    fn get_trades(&self, rng: &mut GameRng) -> impl Iterator<Item = TradePort>;
     fn get_start_structures(&self) -> OwnedStructures;
 }
 
 pub struct BaseEdition;
 
 impl GameEdition for BaseEdition {
-    fn get_tiles(&self) -> impl Iterator<Item = (HexPosition, TileData)> + Clone {
+    fn get_tiles(
+        &self,
+        rng: &mut GameRng,
+    ) -> impl Iterator<Item = (HexPosition, TileData)> + Clone {
         let resource_distribution = ResourceDistribution::new([
             (ResourceType::Wood, 4),
             (ResourceType::Brick, 3),
@@ -41,13 +48,17 @@ impl GameEdition for BaseEdition {
             (ResourceType::Ore, 3),
         ]);
 
-        let resource_deck =
-            ResourceDeck::new(19, resource_distribution, &mut ROLL_ORDER_BASE.into_iter().rev());
+        let resource_deck = ResourceDeck::new(
+            19,
+            resource_distribution,
+            &mut ROLL_ORDER_BASE.into_iter().rev(),
+            rng,
+        );
 
         HexSpiral::new(3, 5).zip(resource_deck)
     }
 
-    fn get_trades(&self) -> impl Iterator<Item = TradePort> {
+    fn get_trades(&self, rng: &mut GameRng) -> impl Iterator<Item = TradePort> {
         TradePortDeck::new(
             3,
             5,
@@ -60,6 +71,7 @@ impl GameEdition for BaseEdition {
                 (TradeType::Any, 4),
             ]),
             &mut TRADE_GAP_BASE.into_iter(),
+            rng,
         )
     }
 
@@ -71,7 +83,10 @@ impl GameEdition for BaseEdition {
 pub struct ExpansionEdition;
 
 impl GameEdition for ExpansionEdition {
-    fn get_tiles(&self) -> impl Iterator<Item = (HexPosition, TileData)> + Clone {
+    fn get_tiles(
+        &self,
+        rng: &mut GameRng,
+    ) -> impl Iterator<Item = (HexPosition, TileData)> + Clone {
         let resource_distribution = ResourceDistribution::new([
             (ResourceType::Wood, 6),
             (ResourceType::Brick, 5),
@@ -80,13 +95,17 @@ impl GameEdition for ExpansionEdition {
             (ResourceType::Ore, 5),
         ]);
 
-        let resource_deck =
-            ResourceDeck::new(30, resource_distribution, &mut ROLL_ORDER_EXP.into_iter().rev());
+        let resource_deck = ResourceDeck::new(
+            30,
+            resource_distribution,
+            &mut ROLL_ORDER_EXP.into_iter().rev(),
+            rng,
+        );
 
         HexSpiral::new(3, 6).zip(resource_deck)
     }
 
-    fn get_trades(&self) -> impl Iterator<Item = TradePort> {
+    fn get_trades(&self, rng: &mut GameRng) -> impl Iterator<Item = TradePort> {
         TradePortDeck::new(
             3,
             6,
@@ -99,6 +118,7 @@ impl GameEdition for ExpansionEdition {
                 (TradeType::Any, 5),
             ]),
             &mut TRADE_GAP_EXP.into_iter(),
+            rng,
         )
     }
 
@@ -119,8 +139,8 @@ pub struct CustomEdition {
 }
 
 impl CustomEdition {
-    pub fn of_size(shortest: u32, longest: u32) -> CustomEditionBuilder {
-        CustomEditionBuilder::of_size(shortest, longest)
+    pub fn of_size(shortest: u32, longest: u32, rng: &mut GameRng) -> CustomEditionBuilder {
+        CustomEditionBuilder::of_size(shortest, longest, rng)
     }
 
     fn size(&self) -> usize {
@@ -130,22 +150,27 @@ impl CustomEdition {
 }
 
 impl GameEdition for CustomEdition {
-    fn get_tiles(&self) -> impl Iterator<Item = (HexPosition, TileData)> + Clone {
+    fn get_tiles(
+        &self,
+        rng: &mut GameRng,
+    ) -> impl Iterator<Item = (HexPosition, TileData)> + Clone {
         let resource_deck = ResourceDeck::new(
             self.size(),
             self.resource_distr.clone(),
             &mut self.roll_numbers.clone().into_iter(),
+            rng,
         );
 
         HexSpiral::new(self.shortest, self.longest).zip(resource_deck)
     }
 
-    fn get_trades(&self) -> impl Iterator<Item = TradePort> {
+    fn get_trades(&self, rng: &mut GameRng) -> impl Iterator<Item = TradePort> {
         TradePortDeck::new(
             self.shortest,
             self.longest,
             self.trade_distr.clone(),
             &mut self.trade_gaps.clone().into_iter(),
+            rng,
         )
     }
 
@@ -178,12 +203,12 @@ impl CustomEditionBuilder {
         }
     }
 
-    pub fn of_size(shortest: u32, longest: u32) -> CustomEditionBuilder {
+    pub fn of_size(shortest: u32, longest: u32, rng: &mut GameRng) -> CustomEditionBuilder {
         CustomEditionBuilder {
             shortest,
             longest,
             resource_distr: Self::default_resource_distribution(shortest, longest),
-            roll_numbers: Self::default_roll_numbers(shortest, longest),
+            roll_numbers: Self::default_roll_numbers(shortest, longest, rng),
             trade_distr: Self::default_trade_distribution(shortest, longest),
             trade_gaps: Self::default_trade_gaps(shortest, longest),
             owned_structures: Self::default_owned_structures(),
@@ -233,14 +258,14 @@ impl CustomEditionBuilder {
         ])
     }
 
-    fn default_roll_numbers(shortest: u32, longest: u32) -> Vec<u8> {
+    fn default_roll_numbers(shortest: u32, longest: u32, rng: &mut GameRng) -> Vec<u8> {
         let size = Self::size(shortest, longest);
         let mut roll_numbers: Vec<u8> =
             iter::repeat_n(ROLL_NUMBERS, (size / ROLL_NUMBERS.len()) + 1)
                 .flatten()
                 .collect();
         roll_numbers.truncate(size);
-        roll_numbers.shuffle(&mut rand::rng());
+        roll_numbers.shuffle(rng);
 
         roll_numbers
     }

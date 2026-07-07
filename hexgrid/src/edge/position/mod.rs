@@ -1,8 +1,12 @@
+use core::fmt;
 use std::marker::PhantomData;
 
 use crate::{
     corner::position::{CornerHeight, CornerPosition},
-    edge::{Edge, position::{even::Even, odd::Odd, positive::Positive}},
+    edge::{
+        Edge,
+        position::{even::Even, odd::Odd, positive::Positive},
+    },
     hex::position::HexPosition,
 };
 
@@ -55,26 +59,15 @@ impl EdgePosition {
     }
 
     pub fn neighboring_edges(&self) -> [EdgePosition; 4] {
-        let p: Vec<EdgePosition> = match self {
-            Self::Even(p) => p
-                .neighboring_edges()
-                .into_iter()
-                .flat_map(|(a, b)| [a.into(), b.into()])
-                .collect(),
-            Self::Odd(p) => p
-                .neighboring_edges()
-                .into_iter()
-                .flat_map(|(a, b)| [a.into(), b.into()])
-                .collect(),
-            Self::Positive(p) => p
-                .neighboring_edges()
-                .into_iter()
-                .flat_map(|(a, b)| [a.into(), b.into()])
-                .collect(),
-        };
-
-        p.try_into()
-            .expect("Neighboring Edges is the incorrect size!")
+        match self {
+            Self::Even(p) => {
+                flatten_array(p.neighboring_edges().map(|(a, b)| [a.into(), b.into()]))
+            }
+            Self::Odd(p) => flatten_array(p.neighboring_edges().map(|(a, b)| [a.into(), b.into()])),
+            Self::Positive(p) => {
+                flatten_array(p.neighboring_edges().map(|(a, b)| [a.into(), b.into()]))
+            }
+        }
     }
 
     pub fn neighboring_corners(&self) -> [CornerPosition; 2] {
@@ -195,6 +188,28 @@ impl std::fmt::Debug for EdgePosition {
     }
 }
 
+impl fmt::Display for EdgePosition {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::Even(p) => write!(
+                f,
+                "EdgePosition (Even) [rights: {}, downs: {}]",
+                p.rights, p.downs
+            ),
+            Self::Odd(p) => write!(
+                f,
+                "EdgePosition (Odd) [rights: {}, downs: {}",
+                p.rights, p.downs
+            ),
+            Self::Positive(p) => write!(
+                f,
+                "EdgePosition (Positive) [rights: {}, downs: {}",
+                p.rights, p.downs
+            ),
+        }
+    }
+}
+
 #[derive(Debug)]
 pub struct EdgeOrientation<T> {
     rights: i32,
@@ -221,3 +236,9 @@ impl<T> PartialEq for EdgeOrientation<T> {
 }
 
 impl<T> Eq for EdgeOrientation<T> {}
+
+fn flatten_array<T>(input: [[T; 2]; 2]) -> [T; 4] {
+    let [[a, b], [c, d]] = input;
+
+    [a, b, c, d]
+}

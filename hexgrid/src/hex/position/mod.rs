@@ -118,6 +118,6 @@ impl HexPosition {
 
 impl fmt::Display for HexPosition {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        writeln!(f, "HexPosition ({}, {})", self.rights, self.downs)
+        writeln!(f, "HexPosition [rights: {}, downs: {}]", self.rights, self.downs)
     }
 }

@@ -35,6 +35,7 @@
     }
 
     function onCornerClick(position: WasmCornerPosition) {
+        // let a = new WasmCornerPosition(position.rights, position.downs);
         console.log(`This corner's position is `, position);
         game.query_trade(position);
     }

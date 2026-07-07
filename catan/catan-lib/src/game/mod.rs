@@ -11,6 +11,7 @@ use std::{fmt::Debug, iter, num::NonZeroUsize, usize::MAX};
 use hexgrid::{
     corner::position::CornerPosition, edge::position::EdgePosition, hex::position::HexPosition,
 };
+use rand::rngs::ChaCha8Rng;
 
 use crate::{
     board::Board, game::{
@@ -26,6 +27,8 @@ use crate::{
     },
 };
 
+pub type GameRng = ChaCha8Rng;
+
 #[derive(Debug)]
 pub struct Game {
     // main members
@@ -39,7 +42,7 @@ pub struct Game {
 }
 
 impl Game {
-    pub fn new(edition: impl GameEdition, player_count: NonZeroUsize) -> Self {
+    pub fn new(edition: impl GameEdition, player_count: NonZeroUsize, rng: &mut GameRng) -> Self {
         let mut players = Vec::with_capacity(player_count.into());
         let owned_structures = edition.get_start_structures();
         for _ in 0..player_count.into() {
@@ -55,7 +58,7 @@ impl Game {
         let current_turn = players.get(0).expect("Not enough players!").token();
 
         Self {
-            board: Board::new(edition),
+            board: Board::new(edition, rng),
             players,
             current_turn,
             turn_number: 0,

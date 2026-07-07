@@ -1,10 +1,12 @@
 use rand::prelude::*;
 
+use crate::game::GameRng;
+
 #[derive(Debug, Clone, Copy)]
 pub struct Dice([u8; 2]);
 
 impl Dice {
-    pub fn roll(rng: &mut (impl SeedableRng + Rng)) -> Self {
+    pub fn roll(rng: &mut GameRng) -> Self {
         let first = rng.random_range(1..7);
         let second = rng.random_range(1..7);
 

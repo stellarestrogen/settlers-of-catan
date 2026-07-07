@@ -1,3 +1,4 @@
+use core::fmt;
 use std::marker::PhantomData;
 
 use crate::{
@@ -107,23 +108,10 @@ impl CornerPosition {
     }
 
     pub fn neighboring_corners(&self) -> [CornerPosition; 3] {
-        let p: Vec<CornerPosition> = match self {
-            Self::High(p) => p
-                .neighboring_corners()
-                .into_iter()
-                .map(Into::<CornerPosition>::into)
-                .collect(),
-            Self::Low(p) => p
-                .neighboring_corners()
-                .into_iter()
-                .map(Into::<CornerPosition>::into)
-                .collect(),
-        };
-
-        // let p: Vec<CornerPosition> = self.position().neighboring_corners().into_iter().map(Into::<CornerPosition>::into).collect();
-
-        p.try_into()
-            .expect("Neighboring Corners is the incorrect size!")
+        match self {
+            Self::High(p) => p.neighboring_corners().map(Into::<CornerPosition>::into),
+            Self::Low(p) => p.neighboring_corners().map(Into::<CornerPosition>::into),
+        }
     }
 
     pub fn neighboring_edges(&self) -> [EdgePosition; 3] {
@@ -162,6 +150,23 @@ impl CornerPosition {
         match self {
             Self::High(p) => p.downs,
             Self::Low(p) => p.downs,
+        }
+    }
+}
+
+impl fmt::Display for CornerPosition {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::High(p) => write!(
+                f,
+                "CornerPosition (High) [rights: {}, downs: {}]",
+                p.rights, p.downs
+            ),
+            Self::Low(p) => write!(
+                f,
+                "CornerPosition (Low) [rights: {}, downs: {}]",
+                p.rights, p.downs
+            ),
         }
     }
 }

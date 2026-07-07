@@ -4,6 +4,7 @@ use hexgrid::{
     corner::position::{CornerHeight, CornerPosition},
     hex::position::HexPosition,
 };
+use rand::SeedableRng;
 use serde::Deserialize;
 use tsify::Tsify;
 use wasm_bindgen::{JsError, prelude::wasm_bindgen};
@@ -11,7 +12,7 @@ use wasm_bindgen::{JsError, prelude::wasm_bindgen};
 use crate::{
     distribution::Distribution,
     game::{
-        Game,
+        Game, GameRng,
         edition::{BaseEdition, CustomEdition, ExpansionEdition},
         error::GameError,
     },
@@ -30,29 +31,34 @@ pub struct WasmInterface {
 
 #[wasm_bindgen]
 impl WasmInterface {
-    pub fn new_base(player_count: usize) -> Result<Self, JsError> {
+    pub fn new_base(player_count: usize, seed: u64) -> Result<Self, JsError> {
         let Some(player_count) = NonZeroUsize::new(player_count) else {
             return Err(GameError::InsufficientPlayerCount.into());
         };
 
-        let game = Game::new(BaseEdition, player_count);
+        let mut rng = GameRng::seed_from_u64(seed);
+
+        let game = Game::new(BaseEdition, player_count, &mut rng);
 
         Ok(Self { game })
     }
 
-    pub fn new_expansion(player_count: usize) -> Result<Self, JsError> {
+    pub fn new_expansion(player_count: usize, seed: u64) -> Result<Self, JsError> {
         let Some(player_count) = NonZeroUsize::new(player_count) else {
             return Err(GameError::InsufficientPlayerCount.into());
         };
 
+        let mut rng = GameRng::seed_from_u64(seed);
+
         Ok(Self {
-            game: Game::new(ExpansionEdition, player_count),
+            game: Game::new(ExpansionEdition, player_count, &mut rng),
         })
     }
 
     pub fn new_custom(
         edition: <WasmCustomEdition as Tsify>::JsType,
         player_count: usize,
+        seed: u64,
     ) -> Result<Self, JsError> {
         let Some(player_count) = NonZeroUsize::new(player_count) else {
             return Err(GameError::InsufficientPlayerCount.into());
@@ -60,7 +66,9 @@ impl WasmInterface {
 
         let wasm = WasmCustomEdition::from_js(edition).expect("Failed to deserialize!");
 
-        let mut edition = CustomEdition::of_size(wasm.shortest, wasm.longest);
+        let mut rng = GameRng::seed_from_u64(seed);
+
+        let mut edition = CustomEdition::of_size(wasm.shortest, wasm.longest, &mut rng);
 
         if let Some(resource_distribution) = wasm.resource_distr {
             edition = edition.with_resource_distribution(Distribution::new(resource_distribution));
@@ -83,7 +91,7 @@ impl WasmInterface {
         }
 
         Ok(Self {
-            game: Game::new(edition.build(), player_count),
+            game: Game::new(edition.build(), player_count, &mut rng),
         })
     }
 
@@ -95,8 +103,8 @@ impl WasmInterface {
         self.game.get_board_height()
     }
 
-    pub fn take_hex_position(&self, position: WasmHexPosition) {
-        let mut position: HexPosition = position.into();
+    pub fn take_hex_position(&self, position: &WasmHexPosition) {
+        let mut position: HexPosition = Into::<HexPosition>::into(*position);
         position += self.game.get_offset();
         tracing::trace!(
             "This tile's type is {:?}",
@@ -133,18 +141,19 @@ impl WasmInterface {
         Into::<CornerPosition>::into(self.game.get_offset() + CornerHeight::TOP_LEFT).into()
     }
 
-    pub fn query_trade(&self, position: WasmCornerPosition) {
+    pub fn query_trade(&self, position: &WasmCornerPosition) {
         let offset = self.corner_offset();
 
-        let position = WasmCornerPosition {
-            rights: offset.rights + position.rights,
-            downs: offset.downs + position.downs,
-        };
+        let real_position: CornerPosition = WasmCornerPosition::new(
+            offset.rights + position.rights,
+            offset.downs + position.downs,
+        )
+        .into();
 
-        let real_position: CornerPosition = position.into();
+        tracing::trace!("{}", real_position);
 
         if let Some(trade) = self.game.get_trade(real_position) {
-            tracing::trace!("The trade here is {:?}\n", trade);
+            tracing::trace!("The trade here is {}\n", trade);
         }
     }
 }

@@ -1,10 +1,10 @@
-use rand::prelude::*;
+use rand::{prelude::*, rngs::ChaCha8Rng};
 use serde::{Deserialize, Serialize};
 use std::iter;
 use tsify::Tsify;
 
 use super::{TileData, TileType};
-use crate::distribution::Distribution;
+use crate::{distribution::Distribution, game::GameRng};
 
 pub const RESOURCE_NO: usize = 5;
 
@@ -60,9 +60,10 @@ impl ResourceDeck {
         size: usize,
         distribution: ResourceDistribution,
         roll_numbers: &mut impl Iterator<Item = u8>,
+        rng: &mut GameRng,
     ) -> Self {
         ResourceDeck {
-            resources: Self::create_tiles(size, distribution, roll_numbers),
+            resources: Self::create_tiles(size, distribution, roll_numbers, rng),
         }
     }
 
@@ -70,6 +71,7 @@ impl ResourceDeck {
         size: usize,
         distribution: ResourceDistribution,
         roll_numbers: &mut impl Iterator<Item = u8>,
+        rng: &mut GameRng,
     ) -> Vec<TileData> {
         let mut resources = Vec::<Option<ResourceType>>::with_capacity(size);
         for resource in RESOURCES {
@@ -85,7 +87,7 @@ impl ResourceDeck {
             resources.push(None);
         }
 
-        resources.shuffle(&mut rand::rng());
+        resources.shuffle(rng);
 
         resources
             .into_iter()

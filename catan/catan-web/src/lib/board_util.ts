@@ -1,4 +1,4 @@
-import type { WasmHexPosition, WasmTileData, WasmTradePort } from "catan/catan_lib";
+import { WasmHexPosition, type WasmTileData, type WasmTradePort } from "catan/catan_lib";
 
 import {
     HEX_SIDE_LENGTH,
@@ -39,11 +39,11 @@ export class GameData {
     }
 
     tileTypeByXY(x: number, y: number) {
-        if (this.isPositionInvalid({ rights: x, downs: y })) {
+        if (this.isPositionInvalid(new WasmHexPosition(x, y))) {
             return "Water";
         }
 
-        return this.tileTypeByPosition({ rights: x, downs: y });
+        return this.tileTypeByPosition(new WasmHexPosition(x, y));
     }
 
     rollNumberByPosition(position: WasmHexPosition) {
@@ -51,7 +51,7 @@ export class GameData {
     }
 
     rollNumberByXY(x: number, y: number) {
-        return this.rollNumberByPosition({ rights: x, downs: y });
+        return this.rollNumberByPosition(new WasmHexPosition(x, y));
     }
 }
 

@@ -7,8 +7,8 @@ use serde::{Deserialize, Serialize};
 use tsify::Tsify;
 use wasm_bindgen::prelude::*;
 
-#[derive(Debug, Clone, Copy, Tsify, Serialize, Deserialize)]
 #[wasm_bindgen]
+#[derive(Debug, Clone, Copy, Tsify, Serialize, Deserialize)]
 pub struct WasmHexPosition {
     pub rights: i32,
     pub downs: i32,
@@ -53,8 +53,8 @@ impl Into<WasmHexPosition> for HexPosition {
     }
 }
 
-#[derive(Debug, Clone, Copy, Tsify, Serialize, Deserialize)]
 #[wasm_bindgen]
+#[derive(Debug, Clone, Copy, Tsify, Serialize, Deserialize)]
 pub struct WasmCornerPosition {
     pub rights: i32,
     pub downs: i32,
@@ -118,8 +118,8 @@ impl Into<WasmCornerPosition> for CornerPosition {
     }
 }
 
-#[derive(Debug, Clone, Copy, Tsify, Serialize, Deserialize)]
 #[wasm_bindgen]
+#[derive(Debug, Clone, Copy, Tsify, Serialize, Deserialize)]
 pub struct WasmEdgePosition {
     pub rights: i32,
     pub downs: i32,

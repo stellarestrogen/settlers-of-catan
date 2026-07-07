@@ -1,9 +1,10 @@
 <script lang="ts">
     import Board from "$lib/Board.svelte";
-    import { WasmCornerPosition, WasmInterface, type WasmCustomEdition } from "catan";
+    import { WasmInterface, type WasmCustomEdition } from "catan";
 
     let x = $state(3);
     let y = $state(3);
+    let seed = $state(239472398);
 
     let custom_edition: WasmCustomEdition = $derived({
         shortest: x,
@@ -15,7 +16,7 @@
         owned_structures: null,
     });
 
-    let game = $derived(WasmInterface.new_custom(custom_edition, 2));
+    let game = $derived(WasmInterface.new_custom(custom_edition, 2, BigInt(seed)));
 
     // let game = $derived(WasmInterface.new_base(2));
 
@@ -25,10 +26,18 @@
     let tile_data = $derived(game.get_tile_data());
 
     let trade_ports = $derived(game.get_trade_ports());
+
+    function generateSeed() {
+        seed = Math.floor(Math.random() * Number.MAX_SAFE_INTEGER);
+    }
 </script>
 
 <input bind:value={x} type="number" class="shortest" min="1" />
 <input bind:value={y} type="number" class="longest" min="2" />
+<input bind:value={seed} type="number" class="seed" min="0" />
+<!-- svelte-ignore a11y_consider_explicit_label -->
+<!-- svelte-ignore element_invalid_self_closing_tag -->
+<button onclick={generateSeed}>Randomize seed</button>
 
 <div class="board">
     <Board tiles={tile_data} {trade_ports} {height} {width} {game} />

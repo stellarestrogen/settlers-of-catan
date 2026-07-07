@@ -1,3 +1,4 @@
+use core::fmt;
 use std::iter;
 
 use hexgrid::corner::{
@@ -11,7 +12,7 @@ use tsify::Tsify;
 
 use crate::{
     distribution::Distribution,
-    game::edition::GameEdition,
+    game::{GameRng, edition::GameEdition},
     object::{CornerInfo, resource::ResourceType},
 };
 
@@ -21,6 +22,15 @@ const TRADE_NO: usize = 6;
 pub enum TradeType {
     Resource(ResourceType),
     Any,
+}
+
+impl fmt::Display for TradeType {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::Resource(r) => write!(f, "TradeType {:?}", r),
+            Self::Any => write!(f, "TradeType Any"),
+        }
+    }
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -72,11 +82,12 @@ impl TradePortDeck {
         hex_longest: u32,
         distribution: TradeDistribution,
         trade_gaps: &mut impl Iterator<Item = u32>,
+        rng: &mut GameRng,
     ) -> Self {
         let trade_positions =
             Self::trade_positions(distribution.size(), hex_shortest, hex_longest, trade_gaps);
         Self {
-            trades: Self::create_trades(distribution.clone())
+            trades: Self::create_trades(distribution.clone(), rng)
                 .into_iter()
                 .zip(trade_positions.into_iter())
                 .map(|(t, (p1, p2))| TradePort::new(t, p1, p2))
@@ -84,14 +95,14 @@ impl TradePortDeck {
         }
     }
 
-    fn create_trades(distribution: TradeDistribution) -> Vec<TradeType> {
+    fn create_trades(distribution: TradeDistribution, rng: &mut GameRng) -> Vec<TradeType> {
         let mut trades = Vec::<TradeType>::with_capacity(distribution.size());
         for trade in TRADES {
             trades.extend(iter::repeat_n(trade, distribution.for_obj(trade) as usize));
         }
         trades.truncate(distribution.size());
 
-        trades.shuffle(&mut rand::rng());
+        trades.shuffle(rng);
 
         trades
     }
@@ -143,7 +154,7 @@ impl FromIterator<TradePort> for TradePortDeck {
 }
 
 pub trait TradeStore {
-    fn with_trades(self, edition: &impl GameEdition) -> Self;
+    fn with_trades(self, edition: &impl GameEdition, rng: &mut GameRng) -> Self;
     fn set_trades(&mut self, trade_port: TradePort) -> Result<(), ()>;
     fn set_trade(&mut self, position: CornerPosition, trade: TradeType) -> Result<(), ()>;
     fn get_trade(&self, position: CornerPosition) -> Option<TradeType>;
@@ -151,8 +162,8 @@ pub trait TradeStore {
 }
 
 impl TradeStore for CornerTable<CornerInfo> {
-    fn with_trades(mut self, edition: &impl GameEdition) -> Self {
-        let trades = edition.get_trades();
+    fn with_trades(mut self, edition: &impl GameEdition, rng: &mut GameRng) -> Self {
+        let trades = edition.get_trades(rng);
         for trade in trades {
             self.set_trades(trade)
                 .expect("CornerPosition is out of bounds!");

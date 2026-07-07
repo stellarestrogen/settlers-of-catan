@@ -7,7 +7,7 @@ use hexgrid::{
 };
 
 use crate::{
-    game::edition::GameEdition,
+    game::{GameRng, edition::GameEdition},
     object::{
         CornerInfo, EdgeInfo, Robber, TileData, TileType,
         resource::ResourceType,
@@ -29,13 +29,13 @@ pub struct Board {
 }
 
 impl Board {
-    pub fn new(edition: impl GameEdition) -> Self {
-        let tiles = Self::create_tiles(&edition);
+    pub fn new(edition: impl GameEdition, rng: &mut GameRng) -> Self {
+        let tiles = Self::create_tiles(&edition, rng);
         let bounds = tiles.get_bounds();
-        let corners = Self::create_trades(bounds, &edition);
+        let corners = Self::create_trades(bounds, &edition, rng);
         let edges = EdgeTable::new(EdgeBounds::new(bounds));
         let robber = Robber::place(&tiles);
-        let trade_ports = edition.get_trades().collect();
+        let trade_ports = edition.get_trades(rng).collect();
         Board {
             tiles,
             corners,
@@ -185,10 +185,9 @@ impl Board {
             .filter(|p| self.edges.get_bounds().contains(*p))
     }
 
-    fn create_tiles(edition: &impl GameEdition) -> HexTable<TileData> {
-        println!("board::create_tiles");
+    fn create_tiles(edition: &impl GameEdition, rng: &mut GameRng) -> HexTable<TileData> {
         let mut bounds = HexBounds::new();
-        let iter = edition.get_tiles();
+        let iter = edition.get_tiles(rng);
 
         for (b, _) in iter.clone() {
             bounds.expand(b);
@@ -199,11 +198,14 @@ impl Board {
         for (p, t) in iter {
             tiles.set(p, t).expect("HexPosition is out of bounds!")
         }
-        println!("returning tiles");
         tiles
     }
 
-    fn create_trades(bounds: &HexBounds, edition: &impl GameEdition) -> CornerTable<CornerInfo> {
-        CornerTable::new(CornerBounds::new(bounds)).with_trades(edition)
+    fn create_trades(
+        bounds: &HexBounds,
+        edition: &impl GameEdition,
+        rng: &mut GameRng,
+    ) -> CornerTable<CornerInfo> {
+        CornerTable::new(CornerBounds::new(bounds)).with_trades(edition, rng)
     }
 }
