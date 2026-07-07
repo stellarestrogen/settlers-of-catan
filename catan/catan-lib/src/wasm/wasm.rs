@@ -95,9 +95,13 @@ impl WasmInterface {
         self.game.get_board_height()
     }
 
-    pub fn take_hex_position(&self, position: <WasmHexPosition as Tsify>::JsType) {
+    pub fn take_hex_position(&self, position: WasmHexPosition) {
         let mut position: HexPosition = position.into();
         position += self.game.get_offset();
+        tracing::trace!(
+            "This tile's type is {:?}",
+            self.game.get_tile_type(position)
+        );
         // do something with the resulting position
     }
 
@@ -121,22 +125,16 @@ impl WasmInterface {
         trades
     }
 
-    pub fn hex_offset(&self) -> <WasmHexPosition as Tsify>::JsType {
-        let position: WasmHexPosition = self.game.get_offset().into();
-
-        position.into_js().expect("")
+    pub fn hex_offset(&self) -> WasmHexPosition {
+        self.game.get_offset().into()
     }
 
-    pub fn corner_offset(&self) -> <WasmCornerPosition as Tsify>::JsType {
-        let position: WasmCornerPosition =
-            Into::<CornerPosition>::into(self.game.get_offset() + CornerHeight::TOP_LEFT).into();
-
-        position.into_js().expect("")
+    pub fn corner_offset(&self) -> WasmCornerPosition {
+        Into::<CornerPosition>::into(self.game.get_offset() + CornerHeight::TOP_LEFT).into()
     }
 
-    pub fn query_trade(&self, position: <WasmCornerPosition as Tsify>::JsType) {
-        let offset = WasmCornerPosition::from_js(self.corner_offset()).expect("");
-        let position = WasmCornerPosition::from_js(position).expect("");
+    pub fn query_trade(&self, position: WasmCornerPosition) {
+        let offset = self.corner_offset();
 
         let position = WasmCornerPosition {
             rights: offset.rights + position.rights,
@@ -147,8 +145,6 @@ impl WasmInterface {
 
         if let Some(trade) = self.game.get_trade(real_position) {
             tracing::trace!("The trade here is {:?}\n", trade);
-        } else {
-            tracing::trace!("There is no trade here.\n")
         }
     }
 }

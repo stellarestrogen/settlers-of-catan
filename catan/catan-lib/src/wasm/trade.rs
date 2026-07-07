@@ -9,8 +9,8 @@ use crate::{
 
 #[derive(Debug, Clone, Copy, Tsify, Serialize)]
 pub struct WasmTradePort {
-    positions: [WasmCornerPosition; 2],
-    trade: TradeType,
+    pub positions: [WasmCornerPosition; 2],
+    pub trade: TradeType,
 }
 
 impl WasmTradePort {

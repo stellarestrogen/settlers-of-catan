@@ -22,14 +22,6 @@ impl WasmHexPosition {
     }
 }
 
-impl Into<HexPosition> for <WasmHexPosition as Tsify>::JsType {
-    fn into(self) -> HexPosition {
-        let position = WasmHexPosition::from_js(self).expect("");
-
-        position.into()
-    }
-}
-
 impl Into<HexPosition> for WasmHexPosition {
     fn into(self) -> HexPosition {
         let mut new_position = HexPosition::ORIGIN;
@@ -90,15 +82,13 @@ impl WasmCornerPosition {
         Self { rights, downs }
     }
 
-    pub fn neighboring_hex(&self) -> Vec<<WasmHexPosition as Tsify>::JsType> {
+    pub fn neighboring_hex(&self) -> Vec<WasmHexPosition> {
         let corner: CornerPosition = self.clone().into();
 
-        let hexes = corner
+        corner
             .neighboring_hex()
             .map(Into::<WasmHexPosition>::into)
-            .map(|h| h.into_js().expect(""));
-
-        hexes.into()
+            .into()
     }
 }
 
@@ -115,13 +105,6 @@ impl Into<CornerPosition> for WasmCornerPosition {
         };
 
         position
-    }
-}
-
-impl Into<CornerPosition> for <WasmCornerPosition as Tsify>::JsType {
-    fn into(self) -> CornerPosition {
-        let position = WasmCornerPosition::from_js(self).expect("");
-        position.into()
     }
 }
 
@@ -174,16 +157,10 @@ impl WasmEdgePosition {
         Self { rights, downs }
     }
 
-    pub fn neighboring_hex(&self) -> Vec<<WasmHexPosition as Tsify>::JsType> {
+    pub fn neighboring_hex(&self) -> Vec<WasmHexPosition> {
         let edge: EdgePosition = self.clone().into();
-
-        let hexes = edge.neighboring_hex().map(Into::<WasmHexPosition>::into);
-
-        // tracing::trace!("self: {:?} edge: {:?} hexes: {:?}", self, edge, hexes);
-
         edge.neighboring_hex()
             .map(Into::<WasmHexPosition>::into)
-            .map(|h| h.into_js().expect(""))
             .into()
     }
 
@@ -204,20 +181,12 @@ impl WasmEdgePosition {
     }
 }
 
-impl Into<EdgePosition> for <WasmEdgePosition as Tsify>::JsType {
-    fn into(self) -> EdgePosition {
-        let position = WasmEdgePosition::from_js(self).expect("");
-        position.into()
-    }
-}
-
 impl Into<EdgePosition> for WasmEdgePosition {
     fn into(self) -> EdgePosition {
         let hex: HexPosition = self.structural_owner().into();
         if self.is_even() {
             (hex + EdgeOrientation::TOP_LEFT).into()
         } else if self.is_odd() {
-            tracing::trace!("{:?} is odd", self);
             (hex + EdgeOrientation::BOTTOM_LEFT).into()
         } else if self.is_positive() {
             (hex + EdgeOrientation::LEFT).into()

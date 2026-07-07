@@ -80,6 +80,10 @@ impl Game {
         self.board.get_tile_data()
     }
 
+    pub fn get_tile_type(&self, position: HexPosition) -> TileType {
+        self.board.get_tile(position).get_tile_type()
+    }
+
     pub fn get_trade(&self, position: CornerPosition) -> Option<TradeType> {
         self.board.get_trade(position)
     }
