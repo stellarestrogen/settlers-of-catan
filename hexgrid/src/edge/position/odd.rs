@@ -25,14 +25,14 @@ impl EdgeOrientation<Odd> {
     };
 
     pub const BOTTOM_LEFT: EdgeOrientation<Odd> = EdgeOrientation {
-        rights: -1,
-        downs: 1,
+        rights: 0,
+        downs: 2,
         r#type: PhantomData::<Odd>,
     };
 
     pub const TOP_RIGHT: EdgeOrientation<Odd> = EdgeOrientation {
-        rights: 1,
-        downs: -1,
+        rights: 2,
+        downs: 0,
         r#type: PhantomData::<Odd>,
     };
 
