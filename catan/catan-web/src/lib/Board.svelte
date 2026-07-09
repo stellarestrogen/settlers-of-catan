@@ -13,13 +13,20 @@
         HEX_SIDE_LENGTH,
         EDGE_WIDTH,
         EDGE_LENGTH,
+        TRADE_RADIUS,
     } from "./board_constants";
 
     import * as util from "./board_util";
     import * as corner from "./corner";
     import * as edge from "./edge";
 
-    import { WasmCornerPosition, WasmHexPosition, type WasmEdgePosition } from "catan/catan_lib";
+    import {
+        WasmCornerPosition,
+        WasmHexPosition,
+        type WasmEdgePosition,
+        type WasmTradePort,
+    } from "catan/catan_lib";
+    import { findTradePosition, offsetTrades, tradeToCoordinates } from "./trade";
 
     let { tiles, trade_ports, height, width, game } = $props();
 
@@ -166,6 +173,14 @@
             onclick={() => {
                 onEdgeClick(positions.nextPosition);
             }}
+        />
+    {/each}
+
+    {#each offsetTrades(trade_ports, game.corner_offset()) as port}
+        <circle
+            cx={tradeToCoordinates(findTradePosition(port.positions, data))[0]}
+            cy={tradeToCoordinates(findTradePosition(port.positions, data))[1]}
+            r={TRADE_RADIUS}
         />
     {/each}
 </svg>

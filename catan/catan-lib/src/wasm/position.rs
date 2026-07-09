@@ -90,6 +90,10 @@ impl WasmCornerPosition {
             .map(Into::<WasmHexPosition>::into)
             .into()
     }
+
+    pub fn is_low(&self) -> bool {
+        (self.downs % 3).abs() == 0
+    }
 }
 
 impl Into<CornerPosition> for WasmCornerPosition {

@@ -16,9 +16,9 @@
         owned_structures: null,
     });
 
-    let game = $derived(WasmInterface.new_custom(custom_edition, 2, BigInt(seed)));
+    // let game = $derived(WasmInterface.new_custom(custom_edition, 2, BigInt(seed)));
 
-    // let game = $derived(WasmInterface.new_base(2));
+    let game = $derived(WasmInterface.new_base(2, BigInt(seed)));
 
     let height = $derived(game.get_height());
     let width = $derived(game.get_width());

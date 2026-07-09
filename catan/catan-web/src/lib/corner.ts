@@ -1,6 +1,6 @@
 import { HEX_CENTER_X, HEX_CENTER_Y, CORNER_START_X, CORNER_START_Y } from "./board_constants";
 import { GameData } from "./board_util";
-import { WasmCornerPosition } from "catan";
+import { WasmCornerPosition, WasmHexPosition } from "catan";
 
 function furthestRightCorner(width: number) {
     return width * 2;
@@ -31,7 +31,11 @@ function nextCorner(position: WasmCornerPosition, width: number, height: number)
     return nextPosition;
 }
 
-function cornerToCoordinates(position: WasmCornerPosition) {
+export function cornerToHex(position: WasmCornerPosition) {
+    return new WasmHexPosition(Math.floor(position.rights / 2), (position.downs - 1) / 3);
+}
+
+export function cornerToCoordinates(position: WasmCornerPosition) {
     return [
         CORNER_START_X + position.rights * HEX_CENTER_X,
         CORNER_START_Y + (position.downs * HEX_CENTER_Y) / 2,
