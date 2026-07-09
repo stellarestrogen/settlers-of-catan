@@ -1,4 +1,4 @@
-use rand::{prelude::*, rngs::ChaCha8Rng};
+use rand::prelude::*;
 use serde::{Deserialize, Serialize};
 use std::iter;
 use tsify::Tsify;

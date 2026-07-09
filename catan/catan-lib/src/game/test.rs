@@ -1,7 +1,5 @@
-#[allow(unused_imports)]
 use std::num::NonZeroUsize;
 
-#[allow(unused_imports)]
 use hexgrid::{
     edge::position::{EdgeOrientation, EdgePosition},
     hex::position::HexPosition,
@@ -9,7 +7,7 @@ use hexgrid::{
 use rand::SeedableRng;
 
 use crate::game::GameRng;
-#[allow(unused_imports)]
+
 use crate::{
     game::{Game, edition},
     object::{

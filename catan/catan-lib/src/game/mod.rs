@@ -3,8 +3,10 @@ pub mod edition;
 pub mod error;
 pub mod hand;
 pub mod player;
-pub mod test;
 pub mod transport_segment;
+
+#[cfg(test)]
+pub mod test;
 
 use std::{fmt::Debug, iter, num::NonZeroUsize, usize::MAX};
 
@@ -14,16 +16,22 @@ use hexgrid::{
 use rand::rngs::ChaCha8Rng;
 
 use crate::{
-    board::Board, game::{
+    board::Board,
+    game::{
         edition::GameEdition,
         error::BuildError,
         player::{OwnershipToken, Player},
         transport_segment::TransportSegment,
-    }, object::{
-        TileData, TileType, card::ResourceMap, resource::ResourceType, structure::{
+    },
+    object::{
+        TileData, TileType,
+        card::ResourceMap,
+        resource::ResourceType,
+        structure::{
             building::{Building, BuildingType},
             transport::{Transport, TransportType},
-        }, trade::{TradePort, TradeType},
+        },
+        trade::{TradePort, TradeType},
     },
 };
 
