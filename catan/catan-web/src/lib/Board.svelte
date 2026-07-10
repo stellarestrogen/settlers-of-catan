@@ -37,18 +37,16 @@
 
     function onTileClick(x: number, y: number) {
         let pos = new WasmHexPosition(x, y);
-        console.log(`This hexagon's position is `, pos);
         game.take_hex_position(pos);
     }
 
     function onCornerClick(position: WasmCornerPosition) {
         // let a = new WasmCornerPosition(position.rights, position.downs);
-        console.log(`This corner's position is `, position);
-        game.query_trade(position);
+        game.take_corner_position(position);
     }
 
     function onEdgeClick(position: WasmEdgePosition) {
-        console.log(`This edge's position is `, position);
+        game.take_edge_position(position);
     }
 </script>
 
@@ -69,6 +67,16 @@
 
         .edge:hover {
             fill: lime;
+            stroke: black;
+            stroke-width: 2px;
+        }
+
+        .trade {
+            fill: black;
+        }
+
+        .trade:hover {
+            fill: magenta;
             stroke: black;
             stroke-width: 2px;
         }
@@ -181,6 +189,7 @@
             cx={tradeToCoordinates(findTradePosition(port.positions, data))[0]}
             cy={tradeToCoordinates(findTradePosition(port.positions, data))[1]}
             r={TRADE_RADIUS}
+            class="trade"
         />
     {/each}
 </svg>

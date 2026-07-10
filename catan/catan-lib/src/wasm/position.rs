@@ -20,6 +20,10 @@ impl WasmHexPosition {
     pub fn new(rights: i32, downs: i32) -> Self {
         Self { rights, downs }
     }
+
+    pub fn clone(&self) -> Self {
+        Self::new(self.rights, self.downs)
+    }
 }
 
 impl Into<HexPosition> for WasmHexPosition {
@@ -49,7 +53,7 @@ impl Into<WasmHexPosition> for HexPosition {
         let rights = self.horizontal_displacement(HexPosition::ORIGIN).ceil();
         let downs = self.vertical_displacement(HexPosition::ORIGIN);
 
-        WasmHexPosition { rights, downs }
+        WasmHexPosition::new(rights, downs)
     }
 }
 
@@ -80,6 +84,10 @@ impl WasmCornerPosition {
     #[wasm_bindgen(constructor)]
     pub fn new(rights: i32, downs: i32) -> Self {
         Self { rights, downs }
+    }
+
+    pub fn clone(&self) -> Self {
+        Self::new(self.rights, self.downs)
     }
 
     pub fn neighboring_hex(&self) -> Vec<WasmHexPosition> {
@@ -118,7 +126,7 @@ impl Into<WasmCornerPosition> for CornerPosition {
         let rights = self.horizontal_distance(origin_corner);
         let downs = self.vertical_distance(origin_corner);
 
-        WasmCornerPosition { rights, downs }
+        WasmCornerPosition::new(rights, downs)
     }
 }
 
@@ -161,6 +169,10 @@ impl WasmEdgePosition {
         Self { rights, downs }
     }
 
+    pub fn clone(&self) -> Self {
+        Self::new(self.rights, self.downs)
+    }
+
     pub fn neighboring_hex(&self) -> Vec<WasmHexPosition> {
         let edge: EdgePosition = self.clone().into();
         edge.neighboring_hex()
@@ -197,5 +209,16 @@ impl Into<EdgePosition> for WasmEdgePosition {
         } else {
             unreachable!()
         }
+    }
+}
+
+impl Into<WasmEdgePosition> for EdgePosition {
+    fn into(self) -> WasmEdgePosition {
+        let rights =
+            self.horizontal_distance((HexPosition::ORIGIN + EdgeOrientation::TOP_LEFT).into());
+        let downs =
+            self.vertical_distance((HexPosition::ORIGIN + EdgeOrientation::TOP_LEFT).into());
+
+        WasmEdgePosition::new(rights, downs)
     }
 }

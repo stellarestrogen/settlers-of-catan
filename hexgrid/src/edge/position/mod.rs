@@ -18,7 +18,7 @@ pub mod op_mul;
 pub mod op_sub;
 pub mod positive;
 
-#[derive(Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum EdgePosition {
     Even(EdgeOrientation<Even>),
     Odd(EdgeOrientation<Odd>),
@@ -160,34 +160,6 @@ impl EdgePosition {
     }
 }
 
-impl std::fmt::Debug for EdgePosition {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match self {
-            EdgePosition::Even(p) => {
-                write!(
-                    f,
-                    "EdgePosition::Even ( rights: {:?}, downs: {:?} )",
-                    p.rights, p.downs
-                )
-            }
-            EdgePosition::Odd(p) => {
-                write!(
-                    f,
-                    "EdgePosition::Odd ( rights: {:?}, downs: {:?} )",
-                    p.rights, p.downs
-                )
-            }
-            EdgePosition::Positive(p) => {
-                write!(
-                    f,
-                    "EdgePosition::Positive ( rights: {:?}, downs: {:?} )",
-                    p.rights, p.downs
-                )
-            }
-        }
-    }
-}
-
 impl fmt::Display for EdgePosition {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
@@ -198,12 +170,12 @@ impl fmt::Display for EdgePosition {
             ),
             Self::Odd(p) => write!(
                 f,
-                "EdgePosition (Odd) [rights: {}, downs: {}",
+                "EdgePosition (Odd) [rights: {}, downs: {}]",
                 p.rights, p.downs
             ),
             Self::Positive(p) => write!(
                 f,
-                "EdgePosition (Positive) [rights: {}, downs: {}",
+                "EdgePosition (Positive) [rights: {}, downs: {}]",
                 p.rights, p.downs
             ),
         }

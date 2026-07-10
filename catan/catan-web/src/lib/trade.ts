@@ -11,7 +11,7 @@ export function tradeToCoordinates(position: WasmCornerPosition) {
 }
 
 export function findTradePosition(positions: WasmCornerPosition[], data: GameData) {
-    let p1 = new WasmCornerPosition(positions[0].rights, positions[0].downs);
+    let p1 = positions[0].clone();
 
     let [low, high] = p1.is_low() ? [positions[0], positions[1]] : [positions[1], positions[0]];
 

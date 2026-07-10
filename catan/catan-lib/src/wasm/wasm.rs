@@ -2,6 +2,7 @@ use std::num::NonZeroUsize;
 
 use hexgrid::{
     corner::position::{CornerHeight, CornerPosition},
+    edge::position::{EdgeOrientation, EdgePosition},
     hex::position::HexPosition,
 };
 use rand::SeedableRng;
@@ -18,7 +19,7 @@ use crate::{
     },
     object::{resource::ResourceType, structure::OwnedStructures, trade::TradeType},
     wasm::{
-        position::{WasmCornerPosition, WasmHexPosition},
+        position::{WasmCornerPosition, WasmEdgePosition, WasmHexPosition},
         resource::WasmTileData,
         trade::WasmTradePort,
     },
@@ -104,13 +105,36 @@ impl WasmInterface {
     }
 
     pub fn take_hex_position(&self, position: &WasmHexPosition) {
-        let mut position: HexPosition = Into::<HexPosition>::into(*position);
-        position += self.game.get_offset();
+        let position: HexPosition = Into::<HexPosition>::into(*position) + self.game.get_offset();
+
+        tracing::trace!("This hex's position is {}", position,);
         tracing::trace!(
             "This tile's type is {:?}",
             self.game.get_tile_type(position)
         );
         // do something with the resulting position
+    }
+
+    pub fn take_corner_position(&self, position: &WasmCornerPosition) {
+        let offset = self.corner_offset();
+
+        let real_position: CornerPosition = WasmCornerPosition::new(
+            offset.rights + position.rights,
+            offset.downs + position.downs,
+        )
+        .into();
+
+        tracing::trace!("This corner's position is {}", real_position);
+
+        if let Some(trade) = self.game.get_trade(real_position) {
+            tracing::trace!("The trade here is {}", trade);
+        }
+    }
+
+    pub fn take_edge_position(&self, position: &WasmEdgePosition) {
+        let position: EdgePosition = (*position).into();
+
+        tracing::trace!("This edge's position is {}", position);
     }
 
     pub fn get_tile_data(&self) -> Vec<<WasmTileData as Tsify>::JsType> {
@@ -141,20 +165,8 @@ impl WasmInterface {
         Into::<CornerPosition>::into(self.game.get_offset() + CornerHeight::TOP_LEFT).into()
     }
 
-    pub fn query_trade(&self, position: &WasmCornerPosition) {
-        let offset = self.corner_offset();
-
-        let real_position: CornerPosition = WasmCornerPosition::new(
-            offset.rights + position.rights,
-            offset.downs + position.downs,
-        )
-        .into();
-
-        tracing::trace!("{}", real_position);
-
-        if let Some(trade) = self.game.get_trade(real_position) {
-            tracing::trace!("The trade here is {}\n", trade);
-        }
+    pub fn edge_offset(&self) -> WasmEdgePosition {
+        Into::<EdgePosition>::into(self.game.get_offset() + EdgeOrientation::TOP_LEFT).into()
     }
 }
 

@@ -3,6 +3,8 @@ pub mod resource;
 pub mod structure;
 pub mod trade;
 
+use core::fmt;
+
 use hexgrid::hex::{position::HexPosition, table::HexTable};
 use wasm_bindgen::prelude::wasm_bindgen;
 
