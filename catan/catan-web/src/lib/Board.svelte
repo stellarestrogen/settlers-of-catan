@@ -12,7 +12,7 @@
         BOARD_MARGIN_SIDE,
         HEX_SIDE_LENGTH,
         EDGE_WIDTH,
-        EDGE_LENGTH,
+        EDGE_HEIGHT,
         TRADE_RADIUS,
     } from "./board_constants";
 
@@ -26,7 +26,8 @@
         type WasmEdgePosition,
         type WasmTradePort,
     } from "catan/catan_lib";
-    import { findTradePosition, offsetTrades, tradeToCoordinates } from "./trade";
+    import { displayTrades, findTradePosition, offsetTrades, tradeToCoordinates } from "./trade";
+    import { cornerToCoordinates } from "./corner";
 
     let { tiles, trade_ports, height, width, game } = $props();
 
@@ -53,32 +54,28 @@
 <svg width={board_width} height={board_height}>
     <style>
         .corner {
-            fill: black;
+            fill: burlywood;
+            stroke: black;
+            stroke-width: 1px;
         }
 
         .corner:hover {
-            fill: red;
             stroke: black;
             stroke-width: 2px;
         }
         .edge {
-            fill: black;
+            fill: burlywood;
+            stroke: black;
+            stroke-width: 1px;
         }
 
         .edge:hover {
-            fill: lime;
             stroke: black;
             stroke-width: 2px;
         }
 
         .trade {
-            fill: black;
-        }
-
-        .trade:hover {
-            fill: magenta;
-            stroke: black;
-            stroke-width: 2px;
+            fill: white;
         }
     </style>
     {#each Array(height) as _, y}
@@ -89,7 +86,7 @@
                 <polygon
                     points={util.calculateTilePosition(x, y)}
                     fill={util.getColor(data.tileTypeByXY(x, y))}
-                    stroke="black"
+                    stroke="none"
                     stroke-width={util.strokeWidth()}
                     onclick={() => {
                         onTileClick(x, y);
@@ -170,26 +167,44 @@
     <!-- svelte-ignore a11y_no_static_element_interactions -->
     {#each edge.edgePositions(data) as positions}
         <rect
-            x={positions.positions[0] - EDGE_WIDTH / 2}
-            y={positions.positions[1] - EDGE_LENGTH / 2}
+            x={positions.rectangle.calculateTopLeft().x}
+            y={positions.rectangle.calculateTopLeft().y}
             width={EDGE_WIDTH}
-            height={EDGE_LENGTH}
-            transform="rotate({edge.rotateAngle(positions.nextPosition)}, {positions
-                .positions[0]}, {positions.positions[1]})"
+            height={EDGE_HEIGHT}
+            transform="rotate({positions.rectangle.angle}, {positions.rectangle.center
+                .x}, {positions.rectangle.center.y})"
             class="edge"
-            data-position={positions.nextPosition}
+            data-position={positions.position}
             onclick={() => {
-                onEdgeClick(positions.nextPosition);
+                onEdgeClick(positions.position);
             }}
         />
     {/each}
 
-    {#each offsetTrades(trade_ports, game.corner_offset()) as port}
+    {#each displayTrades(trade_ports, game.corner_offset(), data) as trade}
         <circle
-            cx={tradeToCoordinates(findTradePosition(port.positions, data))[0]}
-            cy={tradeToCoordinates(findTradePosition(port.positions, data))[1]}
+            cx={trade.iconPosition.x}
+            cy={trade.iconPosition.y}
             r={TRADE_RADIUS}
             class="trade"
+        />
+
+        <rect
+            x={trade.line1.calculateTopLeft().x}
+            y={trade.line1.calculateTopLeft().y}
+            width={trade.line1.width}
+            height={trade.line1.height}
+            transform="rotate({trade.line1.angle}, {trade.line1.center.x}, {trade.line1.center.y})"
+            fill="white"
+        />
+
+        <rect
+            x={trade.line2.calculateTopLeft().x}
+            y={trade.line2.calculateTopLeft().y}
+            width={trade.line2.width}
+            height={trade.line2.height}
+            transform="rotate({trade.line2.angle}, {trade.line2.center.x}, {trade.line2.center.y})"
+            fill="white"
         />
     {/each}
 </svg>

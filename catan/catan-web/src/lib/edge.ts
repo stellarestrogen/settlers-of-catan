@@ -1,6 +1,13 @@
 import { WasmEdgePosition, type WasmHexPosition } from "catan/catan_lib";
-import type { GameData } from "./board_util";
-import { EDGE_START_X, EDGE_START_Y, HEX_SIDE_LENGTH, HEX_WIDTH } from "./board_constants";
+import { Rectangle, type GameData } from "./board_util";
+import {
+    EDGE_HEIGHT,
+    EDGE_START_X,
+    EDGE_START_Y,
+    EDGE_WIDTH,
+    HEX_SIDE_LENGTH,
+    HEX_WIDTH,
+} from "./board_constants";
 
 function furthestRightEdge(width: number) {
     return width * 4;
@@ -43,7 +50,7 @@ function edgeToCoordinates(position: WasmEdgePosition) {
 }
 
 export function edgePositions(data: GameData) {
-    let positions: { positions: number[]; nextPosition: WasmEdgePosition }[] = [];
+    let positions: { rectangle: Rectangle; position: WasmEdgePosition }[] = [];
     let currentPosition = new WasmEdgePosition(-2, 0);
     let nextPosition;
     while ((nextPosition = nextEdge(currentPosition, data.width, data.height)) != null) {
@@ -60,7 +67,17 @@ export function edgePositions(data: GameData) {
             currentPosition = nextPosition;
             continue;
         }
-        positions.push({ positions: edgeToCoordinates(nextPosition), nextPosition });
+
+        let coordinates = edgeToCoordinates(nextPosition);
+
+        let rectangle = new Rectangle(
+            EDGE_WIDTH,
+            EDGE_HEIGHT,
+            { x: coordinates[0], y: coordinates[1] },
+            rotateAngle(nextPosition),
+        );
+
+        positions.push({ rectangle, position: nextPosition });
         currentPosition = nextPosition;
     }
 

@@ -55,6 +55,19 @@ export class GameData {
     }
 }
 
+export class Rectangle {
+    constructor(
+        public width: number,
+        public height: number,
+        public center: { x: number; y: number },
+        public angle: number,
+    ) {}
+
+    calculateTopLeft() {
+        return { x: this.center.x - this.width / 2, y: this.center.y - this.height / 2 };
+    }
+}
+
 export function strokeWidth() {
     return HEX_SIDE_LENGTH * 0.03;
 }
