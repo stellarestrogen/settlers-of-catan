@@ -1,3 +1,5 @@
+use std::unreachable;
+
 use hexgrid::{
     corner::position::{CornerHeight, CornerPosition},
     edge::position::{EdgeOrientation, EdgePosition},
