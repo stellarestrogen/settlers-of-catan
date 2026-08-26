@@ -86,10 +86,8 @@ function calculateRectangleCenter(corner: WasmCornerPosition, trade: WasmCornerP
     if (trade.downs < corner.downs) angle = Math.PI * 2 - angle;
 
     let center = [
-        0.5 * (realTrade[0] + realCorner[0]) +
-            0.5 * (CORNER_RADIUS - TRADE_RADIUS) * Math.cos(angle),
-        0.5 * (realTrade[1] + realCorner[1]) +
-            0.5 * (CORNER_RADIUS - TRADE_RADIUS) * Math.sin(angle),
+        0.5 * (realTrade[0] + realCorner[0] + (CORNER_RADIUS - TRADE_RADIUS) * Math.cos(angle)),
+        0.5 * (realTrade[1] + realCorner[1] + (CORNER_RADIUS - TRADE_RADIUS) * Math.sin(angle)),
     ];
 
     return center;
