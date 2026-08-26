@@ -1,7 +1,7 @@
 import { WasmEdgePosition, type WasmHexPosition } from "catan/catan_lib";
 import { Rectangle, type GameData } from "./board_util";
 import {
-    EDGE_HEIGHT,
+    EDGE_LENGTH,
     EDGE_START_X,
     EDGE_START_Y,
     EDGE_WIDTH,
@@ -72,7 +72,7 @@ export function edgePositions(data: GameData) {
 
         let rectangle = new Rectangle(
             EDGE_WIDTH,
-            EDGE_HEIGHT,
+            EDGE_LENGTH,
             { x: coordinates[0], y: coordinates[1] },
             rotateAngle(nextPosition),
         );

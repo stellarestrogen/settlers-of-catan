@@ -12,7 +12,7 @@
         BOARD_MARGIN_SIDE,
         HEX_SIDE_LENGTH,
         EDGE_WIDTH,
-        EDGE_HEIGHT,
+        EDGE_LENGTH,
         TRADE_RADIUS,
     } from "./board_constants";
 
@@ -170,7 +170,7 @@
             x={positions.rectangle.calculateTopLeft().x}
             y={positions.rectangle.calculateTopLeft().y}
             width={EDGE_WIDTH}
-            height={EDGE_HEIGHT}
+            height={EDGE_LENGTH}
             transform="rotate({positions.rectangle.angle}, {positions.rectangle.center
                 .x}, {positions.rectangle.center.y})"
             class="edge"

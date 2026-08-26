@@ -1,7 +1,14 @@
 import { WasmCornerPosition, type TradeType, type WasmTradePort } from "catan/catan_lib";
 import { cornerToCoordinates, cornerToHex } from "./corner";
 import { Rectangle, type GameData } from "./board_util";
-import { TRADE_LINE_HEIGHT, TRADE_LINE_WIDTH } from "./board_constants";
+import {
+    CORNER_RADIUS,
+    HEX_SIDE_LENGTH,
+    HEX_WIDTH,
+    TRADE_LINE_LENGTH,
+    TRADE_LINE_WIDTH,
+    TRADE_RADIUS,
+} from "./board_constants";
 
 export class DisplayTrade {
     constructor(
@@ -67,40 +74,51 @@ function calculateTradeLineAngle(icon: WasmCornerPosition, port: WasmCornerPosit
     }
 }
 
+function calculateRectangleCenter(corner: WasmCornerPosition, trade: WasmCornerPosition) {
+    let realCorner = cornerToCoordinates(corner);
+    let realTrade = cornerToCoordinates(trade);
+
+    let angle = Math.acos(
+        (realTrade[0] - realCorner[0]) /
+            Math.sqrt((realTrade[0] - realCorner[0]) ** 2 + (realTrade[1] - realCorner[1]) ** 2),
+    );
+
+    if (trade.downs < corner.downs) angle = Math.PI * 2 - angle;
+
+    let center = [
+        0.5 * (realTrade[0] + realCorner[0]) +
+            0.5 * (CORNER_RADIUS - TRADE_RADIUS) * Math.cos(angle),
+        0.5 * (realTrade[1] + realCorner[1]) +
+            0.5 * (CORNER_RADIUS - TRADE_RADIUS) * Math.sin(angle),
+    ];
+
+    return center;
+}
+
 export function displayTrades(ports: WasmTradePort[], offset: WasmCornerPosition, data: GameData) {
     let trades: DisplayTrade[] = [];
     ports = offsetTrades(ports, offset);
     for (let port of ports) {
         let tradePosition = findTradePosition(port.positions, data);
         let iconPosition = cornerToCoordinates(tradePosition);
-        let center1 = cornerToCoordinates(
-            new WasmCornerPosition(
-                (port.positions[0].rights + tradePosition.rights) / 2,
-                (port.positions[0].downs + tradePosition.downs) / 2,
-            ),
-        );
+        let center1 = calculateRectangleCenter(port.positions[0], tradePosition);
 
         let angle1 = calculateTradeLineAngle(tradePosition, port.positions[0]);
 
         let rect1 = new Rectangle(
             TRADE_LINE_WIDTH,
-            TRADE_LINE_HEIGHT,
+            TRADE_LINE_LENGTH,
             { x: center1[0], y: center1[1] },
             angle1,
         );
 
-        let center2 = cornerToCoordinates(
-            new WasmCornerPosition(
-                (port.positions[1].rights + tradePosition.rights) / 2,
-                (port.positions[1].downs + tradePosition.downs) / 2,
-            ),
-        );
+        let center2 = calculateRectangleCenter(port.positions[1], tradePosition);
 
         let angle2 = calculateTradeLineAngle(tradePosition, port.positions[1]);
 
         let rect2 = new Rectangle(
             TRADE_LINE_WIDTH,
-            TRADE_LINE_HEIGHT,
+            TRADE_LINE_LENGTH,
             {
                 x: center2[0],
                 y: center2[1],
